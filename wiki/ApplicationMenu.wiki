@@ -1,5 +1,9 @@
 #summary Información referida al menú de aplicación de Mac OS X
-#labels Phase-Design
+#labels Phase-Design,Deprecated
+=*Atención: aplicación migrada a Swing. Página mantenida como referencia*=
+
+La aplicación se realizará en Swing, debido a su mayor facilidad de uso en la plataforma Netbeans, y a la posibilidad de realizar programación visual.
+
 = Introducción =
 
 Para integrar una aplicación SWT con el entorno en Mac OS X, es necesario hacer que los menús se comporten como el resto de las aplicaciones nativas. 
