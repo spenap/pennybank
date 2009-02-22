@@ -1,0 +1,17 @@
+#summary Cómo instalar la aplicación y sus dependencias
+#labels Phase-Deploy
+
+= Introducción =
+
+Para instalar Pennybank es necesario, por el momento, compilarlo desde las fuentes. Sin embargo, el proceso es sencillo y se reduce a instalar [http://www.mysql.com/ MySQL], instalar [http://maven.apache.org/ Maven], instalar las dependencias manuales ( [http://code.google.com/p/macwidgets/ macwidgets] y [http://java.sun.com/products/jta jta] ) y ejecutar los scripts de inicialización de la base de datos y de empaquetado.
+
+= Detalles =
+
+La instalación consta de 5 pasos
+  * Instalación y configuración de MySQL
+  * Instalación de Maven
+  * Instalación de las dependencias de Maven:
+    * JTA: La licencia de este componente no permite su redistribución, por lo que debe ser descargado manualmente
+    * Macwidgets: Estas librerías están en continuo desarrollo, y es posible que en un futuro próximo estén ya incluidas en los repositorios de Maven, lo que permitiría evitar este paso.
+  * Inicialización automática de la base de datos, mediante una tarea de Maven
+  * Compilación y creación del paquete
