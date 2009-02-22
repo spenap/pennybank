@@ -6,3 +6,4 @@
   * MySQL
   * Swing
   * macwidgets
+  * Java
