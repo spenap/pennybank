@@ -3,7 +3,7 @@
 
 = Introduction =
 
-To install Pennybank it is necessary to build it up from the sources. However, the installation is almost straight-forward, having to install [http://www.mysql.com/ MySQL, [http://maven.apache.org/ Maven], [http://code.google.com/p/macwidgets/ macwidgets] and [http://java.sun.com/products/jta jta] and call the database init scripts 
+To install Pennybank it is necessary to build it up from the sources. However, the installation is almost straight-forward, having to install [http://www.mysql.com/ MySQL], [http://maven.apache.org/ Maven], [http://code.google.com/p/macwidgets/ macwidgets] and [http://java.sun.com/products/jta jta] and call the database init scripts 
 
 = Details =
 
