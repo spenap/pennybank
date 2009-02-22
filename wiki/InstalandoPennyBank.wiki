@@ -1,17 +1,17 @@
-#summary Cómo instalar la aplicación y sus dependencias
-#labels Phase-Deploy
+#summary Installing the application and its dependencies
+#labels Phase-Deploy,Featured
 
-= Introducción =
+= Introduction =
 
-Para instalar Pennybank es necesario, por el momento, compilarlo desde las fuentes. Sin embargo, el proceso es sencillo y se reduce a instalar [http://www.mysql.com/ MySQL], instalar [http://maven.apache.org/ Maven], instalar las dependencias manuales ( [http://code.google.com/p/macwidgets/ macwidgets] y [http://java.sun.com/products/jta jta] ) y ejecutar los scripts de inicialización de la base de datos y de empaquetado.
+To install Pennybank it is necessary to build it up from the sources. However, the installation is almost straight-forward, having to install [http://www.mysql.com/ MySQL, [http://maven.apache.org/ Maven], [http://code.google.com/p/macwidgets/ macwidgets] and [http://java.sun.com/products/jta jta] and call the database init scripts 
 
-= Detalles =
+= Details =
 
-La instalación consta de 5 pasos
-  * Instalación y configuración de MySQL
-  * Instalación de Maven
-  * Instalación de las dependencias de Maven:
-    * JTA: La licencia de este componente no permite su redistribución, por lo que debe ser descargado manualmente
-    * Macwidgets: Estas librerías están en continuo desarrollo, y es posible que en un futuro próximo estén ya incluidas en los repositorios de Maven, lo que permitiría evitar este paso.
-  * Inicialización automática de la base de datos, mediante una tarea de Maven
-  * Compilación y creación del paquete
+The installation is reduced to 5 steps
+  * Installing and configuring MySQL
+  * Installing Maven
+  * Installing Maven manual dependencies
+    * JTA: This library has a non-free (as in Freedom) licence, which doesn't allow its redistribution. It does, however, allow is personal use.
+    * Macwidgets: This libraries are in a very active state, so it is possible to find them added to the Maven repositories.
+  * Automatic database initialization, using one Maven task
+  * Compiling and building the application
