@@ -1,0 +1,8 @@
+#summary Description of the technology used
+#labels Featured
+
+  * Hibernate
+  * jUnit
+  * MySQL
+  * Swing
+  * macwidgets
