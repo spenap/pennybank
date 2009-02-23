@@ -8,29 +8,41 @@ import com.googlecode.pennybank.model.util.exceptions.InternalErrorException;
 import com.googlecode.pennybank.model.util.exceptions.ModelException;
 import com.googlecode.pennybank.model.util.transactions.NonTransactionalPlainAction;
 
+/**
+ * Class encapsulating the information needed to get
+ * the number of operations for a given account
+ *
+ * @author spenap
+ */
 public class GetOperationsCountAction implements NonTransactionalPlainAction {
 
-	private Long accountId;
-	private AccountOperationDAO accountOperationDAO;
+    private Long accountId;
+    private AccountOperationDAO accountOperationDAO;
 
-	public GetOperationsCountAction(Long accountId) {
+    /**
+     * Creates an action with the specified arguments
+     *
+     * @param accountId The account identifier for the account to search
+     * for
+     */
+    public GetOperationsCountAction(Long accountId) {
 
-		this.accountId = accountId;
+        this.accountId = accountId;
 
-	}
+    }
 
-	public Object execute(EntityManager entityManager) throws ModelException,
-			InternalErrorException {
+    public Object execute(EntityManager entityManager)
+            throws ModelException,
+            InternalErrorException {
 
-		initializeDAOs(entityManager);
-		return accountOperationDAO.getOperationsCount(accountId);
-	}
+        initializeDAOs(entityManager);
+        return accountOperationDAO.getOperationsCount(accountId);
+    }
 
-	private void initializeDAOs(EntityManager entityManager)
-			throws InternalErrorException {
+    private void initializeDAOs(EntityManager entityManager)
+            throws InternalErrorException {
 
-		accountOperationDAO = AccountOperationDAOFactory.getDelegate();
-		accountOperationDAO.setEntityManager(entityManager);
-	}
-
+        accountOperationDAO = AccountOperationDAOFactory.getDelegate();
+        accountOperationDAO.setEntityManager(entityManager);
+    }
 }

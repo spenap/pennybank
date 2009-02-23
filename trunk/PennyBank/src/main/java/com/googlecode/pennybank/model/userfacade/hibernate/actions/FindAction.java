@@ -8,12 +8,22 @@ import com.googlecode.pennybank.model.util.exceptions.InternalErrorException;
 import com.googlecode.pennybank.model.util.exceptions.ModelException;
 import com.googlecode.pennybank.model.util.transactions.NonTransactionalPlainAction;
 
+/**
+ * An action encapsulating the retrieval of an user
+ *
+ * @author spenap
+ */
 public class FindAction implements NonTransactionalPlainAction {
 
 	private Long userId;
 	private UserDAO userDAO;
 
-	public FindAction(Long userId) {
+    /**
+     * Creates a new action with the specified arguments
+     * 
+     * @param userId The user identifier to look for
+     */
+    public FindAction(Long userId) {
 		this.userId = userId;
 		
 	}

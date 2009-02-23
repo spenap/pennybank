@@ -17,55 +17,69 @@ import com.googlecode.pennybank.model.util.exceptions.InternalErrorException;
 import com.googlecode.pennybank.model.util.exceptions.ModelException;
 import com.googlecode.pennybank.model.util.transactions.TransactionalPlainAction;
 
+/**
+ * A class encapsulating the information neede to withdraw money from an account
+ *
+ * @author spenap
+ */
 public class WithdrawFromAccountAction implements TransactionalPlainAction {
 
-	private Long accountId;
-	private double amount;
-	private String comment;
-	private Calendar operationDate;
-	private List<Category> categories;
-	private AccountDAO accountDAO;
-	private AccountOperationDAO accountOperationDAO;
+    private Long accountId;
+    private double amount;
+    private String comment;
+    private Calendar operationDate;
+    private List<Category> categories;
+    private AccountDAO accountDAO;
+    private AccountOperationDAO accountOperationDAO;
 
-	public WithdrawFromAccountAction(Long accountId, double amount,
-			String comment, Calendar operationDate, List<Category> categories) {
+    /**
+     * Creates an action with the specified arguments
+     *
+     * @param accountId The account identifier for the account
+     * @param amount The amount to be withdrawn
+     * @param comment A description for this operation
+     * @param operationDate The operation date
+     * @param categories The categories this operation belong to
+     */
+    public WithdrawFromAccountAction(Long accountId, double amount,
+            String comment, Calendar operationDate, List<Category> categories) {
 
-		this.accountId = accountId;
-		this.amount = amount;
-		this.comment = comment;
-		this.operationDate = operationDate;
-		this.categories = categories;
+        this.accountId = accountId;
+        this.amount = amount;
+        this.comment = comment;
+        this.operationDate = operationDate;
+        this.categories = categories;
 
-	}
+    }
 
-	public Object execute(EntityManager entityManager) throws ModelException,
-			InternalErrorException {
+    public Object execute(EntityManager entityManager)
+            throws ModelException,
+            InternalErrorException {
 
-		initializeDAOs(entityManager);
+        initializeDAOs(entityManager);
 
-		// Retrieve the account
-		Account theAccount = accountDAO.find(accountId);
+        // Retrieve the account
+        Account theAccount = accountDAO.find(accountId);
 
-		// Update balance
-		double balance = theAccount.getBalance();
-		theAccount.setBalance(balance - amount);
-		accountDAO.update(theAccount);
+        // Update balance
+        double balance = theAccount.getBalance();
+        theAccount.setBalance(balance - amount);
+        accountDAO.update(theAccount);
 
-		// Create account operation
-		AccountOperation withdrawOperation = new AccountOperation(theAccount,
-				Type.WITHDRAW, amount, operationDate, comment);
-		accountOperationDAO.create(withdrawOperation);
+        // Create account operation
+        AccountOperation withdrawOperation = new AccountOperation(theAccount,
+                Type.WITHDRAW, amount, operationDate, comment);
+        accountOperationDAO.create(withdrawOperation);
 
-		return null;
-	}
+        return null;
+    }
 
-	private void initializeDAOs(EntityManager entityManager)
-			throws InternalErrorException {
+    private void initializeDAOs(EntityManager entityManager)
+            throws InternalErrorException {
 
-		accountDAO = AccountDAOFactory.getDelegate();
-		accountOperationDAO = AccountOperationDAOFactory.getDelegate();
-		accountDAO.setEntityManager(entityManager);
-		accountOperationDAO.setEntityManager(entityManager);
-	}
-
+        accountDAO = AccountDAOFactory.getDelegate();
+        accountOperationDAO = AccountOperationDAOFactory.getDelegate();
+        accountDAO.setEntityManager(entityManager);
+        accountOperationDAO.setEntityManager(entityManager);
+    }
 }

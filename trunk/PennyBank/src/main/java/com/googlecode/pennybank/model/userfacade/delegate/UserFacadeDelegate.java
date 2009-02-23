@@ -6,6 +6,11 @@ import com.googlecode.pennybank.model.user.entity.User;
 import com.googlecode.pennybank.model.util.exceptions.InstanceNotFoundException;
 import com.googlecode.pennybank.model.util.exceptions.InternalErrorException;
 
+/**
+ * The UserFacade interface
+ *
+ * @author spenap
+ */
 public interface UserFacadeDelegate {
 
 	/**

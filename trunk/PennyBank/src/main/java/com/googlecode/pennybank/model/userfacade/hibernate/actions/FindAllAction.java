@@ -8,6 +8,11 @@ import com.googlecode.pennybank.model.util.exceptions.InternalErrorException;
 import com.googlecode.pennybank.model.util.exceptions.ModelException;
 import com.googlecode.pennybank.model.util.transactions.NonTransactionalPlainAction;
 
+/**
+ * An action encapsulating the retrieval of all the users
+ *
+ * @author spenap
+ */
 public class FindAllAction implements NonTransactionalPlainAction {
 
 	private UserDAO userDAO;

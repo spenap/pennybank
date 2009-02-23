@@ -9,12 +9,22 @@ import com.googlecode.pennybank.model.util.exceptions.InternalErrorException;
 import com.googlecode.pennybank.model.util.exceptions.ModelException;
 import com.googlecode.pennybank.model.util.transactions.TransactionalPlainAction;
 
+/**
+ * An action encapsulating the creation of an user
+ * 
+ * @author spenap
+ */
 public class CreateUserAction implements TransactionalPlainAction {
 
 	private User user;
 	private UserDAO userDAO;
 
-	public CreateUserAction(User user) {
+    /**
+     * Creates a new action with the specified parameters
+     * 
+     * @param user The user to be created
+     */
+    public CreateUserAction(User user) {
 
 		this.user = user;
 

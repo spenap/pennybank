@@ -3,6 +3,11 @@ package com.googlecode.pennybank.model.userfacade.delegate;
 import com.googlecode.pennybank.model.util.exceptions.InternalErrorException;
 import com.googlecode.pennybank.util.configuration.ConfigurationManager;
 
+/**
+ * A Factory to retrieve an UserFacade implementation
+ *
+ * @author spenap
+ */
 public class UserFacadeDelegateFactory {
 
 	private final static String FACADE_CLASS_NAME = "UserFacadeDelegateFactory/delegateClassName";
@@ -25,7 +30,13 @@ public class UserFacadeDelegateFactory {
 		return theClass;
 	}
 
-	public static UserFacadeDelegate getDelegate()
+    /**
+     * A delegate implementing the UserFacade interface
+     *
+     * @return an UserFacade implementation
+     * @throws InternalErrorException If an unexpected error happens
+     */
+    public static UserFacadeDelegate getDelegate()
 			throws InternalErrorException {
 		try {
 			return (UserFacadeDelegate) delegateClass.newInstance();

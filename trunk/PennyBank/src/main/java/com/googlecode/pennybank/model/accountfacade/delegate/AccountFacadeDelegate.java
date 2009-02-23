@@ -12,6 +12,11 @@ import com.googlecode.pennybank.model.util.exceptions.InternalErrorException;
 import com.googlecode.pennybank.model.util.exceptions.NegativeAmountException;
 import com.googlecode.pennybank.model.util.vo.Block;
 
+/**
+ * Interface defining the Account Facade
+ *
+ * @author spenap
+ */
 public interface AccountFacadeDelegate {
 
 	/**

@@ -10,91 +10,98 @@ import javax.naming.InitialContext;
 
 import com.googlecode.pennybank.model.util.exceptions.MissingConfigurationParameterException;
 
+/**
+ * An utility class to get configuration parameters
+ * 
+ * @author spenap
+ */
 @SuppressWarnings("unchecked")
 public class ConfigurationManager {
 
-	private static final String JNDI_PREFIX = "java:comp/env/";
+    private static final String JNDI_PREFIX = "java:comp/env/";
+    private static final String CONFIGURATION_FILE =
+            "ConfigurationParameters.properties";
+    private static boolean usesJNDI;
+    private static Map parameters;
 
-	private static final String CONFIGURATION_FILE = "ConfigurationParameters.properties";
 
-	private static boolean usesJNDI;
+    static {
 
-	private static Map parameters;
+        try {
 
-	static {
+            /* Read property file (if exists). */
+            Class configurationManagerClass = ConfigurationManager.class;
+            ClassLoader classLoader = configurationManagerClass.getClassLoader();
+            InputStream inputStream =
+                    classLoader.getResourceAsStream(CONFIGURATION_FILE);
+            Properties properties = new Properties();
+            properties.load(inputStream);
+            inputStream.close();
 
-		try {
+            /* We have been able to read the file. */
+            usesJNDI = false;
+            System.out.println(">>>> Loading the configuration parameters from '" + CONFIGURATION_FILE + "' file");
 
-			/* Read property file (if exists). */
-			Class configurationManagerClass = ConfigurationManager.class;
-			ClassLoader classLoader = configurationManagerClass
-					.getClassLoader();
-			InputStream inputStream = classLoader
-					.getResourceAsStream(CONFIGURATION_FILE);
-			Properties properties = new Properties();
-			properties.load(inputStream);
-			inputStream.close();
+            /*
+             * We use a "HashMap" instead of a "HashTable" because HashMap's
+             * methods are not synchronized (so they are faster), and the
+             * parameters are only read.
+             */
+            parameters = new HashMap(properties);
 
-			/* We have been able to read the file. */
-			usesJNDI = false;
-			System.out
-					.println(">>>> Loading the configuration parameters from '"
-							+ CONFIGURATION_FILE + "' file");
+        } catch (Exception e) {
 
-			/*
-			 * We use a "HashMap" instead of a "HashTable" because HashMap's
-			 * methods are not synchronized (so they are faster), and the
-			 * parameters are only read.
-			 */
-			parameters = new HashMap(properties);
+            /* We assume configuration with JNDI. */
+            usesJNDI = true;
+            System.out.println(">>>> Reading configuration using JNDI");
 
-		} catch (Exception e) {
+            /*
+             * We use a synchronized map because it will be filled by using a
+             * lazy strategy.
+             */
+            parameters = Collections.synchronizedMap(new HashMap());
 
-			/* We assume configuration with JNDI. */
-			usesJNDI = true;
-			System.out.println(">>>> Reading configuration using JNDI");
+        }
 
-			/*
-			 * We use a synchronized map because it will be filled by using a
-			 * lazy strategy.
-			 */
-			parameters = Collections.synchronizedMap(new HashMap());
+    }
 
-		}
+    private ConfigurationManager() {
+    }
 
-	}
+    /**
+     * Gets a parameter value given its name
+     *
+     * @param name The parameter to be retrieved
+     * @return The value
+     * @throws MissingConfigurationParameterException If the specified parameter was not found
+     */
+    public static String getParameter(String name)
+            throws MissingConfigurationParameterException {
 
-	private ConfigurationManager() {
-	}
+        String value = (String) parameters.get(name);
 
-	public static String getParameter(String name)
-			throws MissingConfigurationParameterException {
+        if (value == null) {
 
-		String value = (String) parameters.get(name);
+            if (usesJNDI) {
 
-		if (value == null) {
+                try {
+                    InitialContext initialContext = new InitialContext();
 
-			if (usesJNDI) {
+                    value = (String) initialContext.lookup(JNDI_PREFIX + name);
+                    parameters.put(name, value);
+                } catch (Exception e) {
+                    throw new MissingConfigurationParameterException(name);
+                }
 
-				try {
-					InitialContext initialContext = new InitialContext();
+            } else {
 
-					value = (String) initialContext.lookup(JNDI_PREFIX + name);
-					parameters.put(name, value);
-				} catch (Exception e) {
-					throw new MissingConfigurationParameterException(name);
-				}
+                throw new MissingConfigurationParameterException(name);
 
-			} else {
+            }
 
-				throw new MissingConfigurationParameterException(name);
+        }
 
-			}
+        return value;
 
-		}
-
-		return value;
-
-	}
-
+    }
 }

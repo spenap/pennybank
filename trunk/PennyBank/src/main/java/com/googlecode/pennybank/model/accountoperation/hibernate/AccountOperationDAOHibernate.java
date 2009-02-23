@@ -8,6 +8,11 @@ import com.googlecode.pennybank.model.accountoperation.entity.AccountOperation;
 import com.googlecode.pennybank.model.accountoperation.entity.AccountOperation.Type;
 import com.googlecode.pennybank.model.util.dao.GenericDAOHibernate;
 
+/**
+ * Class implementing the AccountOperationDAO interface, using Hibernate
+ *
+ * @author spenap
+ */
 public class AccountOperationDAOHibernate extends
 		GenericDAOHibernate<AccountOperation, Long> implements
 		AccountOperationDAO {
