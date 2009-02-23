@@ -1,0 +1,27 @@
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence" version="1.0">
+	<!--
+
+		This url should be in xsi:schemaLocation
+
+		http://java.sun.com/xml/ns/persistence/persistence
+	-->
+	<persistence-unit name="pennybank">
+		<properties>
+			<property name="hibernate.dialect">org.hibernate.dialect.MySQL5InnoDBDialect</property>
+			<property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
+			<property name="hibernate.connection.username">pennybank</property>
+			<property name="hibernate.connection.password">pennybank</property>
+			<property name="hibernate.connection.url">jdbc:mysql://localhost/pennybank</property>
+
+			<property name="connection.autocommit">false</property>
+		</properties>
+
+		<class>com.googlecode.pennybank.model.user.entity.User</class>
+		<class>com.googlecode.pennybank.model.account.entity.Account</class>
+		<class>com.googlecode.pennybank.model.category.entity.Category</class>
+		<class>com.googlecode.pennybank.model.accountoperation.entity.AccountOperation</class>
+
+	</persistence-unit>
+</persistence>

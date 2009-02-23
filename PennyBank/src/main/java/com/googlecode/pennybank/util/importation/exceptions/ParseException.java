@@ -1,17 +1,31 @@
 package com.googlecode.pennybank.util.importation.exceptions;
 
+/**
+ * Creates a new parse-related exception
+ *
+ * @author spenap
+ */
 @SuppressWarnings("serial")
 public class ParseException extends ImportationException {
 
-	public ParseException(String filename) {
+    /**
+     * Creates a new parse exception related to a given filename
+     *
+     * @param filename The filename being parsed
+     */
+    public ParseException(String filename) {
 
-		super(filename);
-		// TODO Auto-generated constructor stub
-	}
+        super(filename);
+    // TODO Auto-generated constructor stub
+    }
 
-	public ParseException(Exception e) {
+    /**
+     * Creates a new parse exception from another exception
+     *
+     * @param e The exception causing the parse exception
+     */
+    public ParseException(Exception e) {
 
-		super(e);
-	}
-
+        super(e);
+    }
 }

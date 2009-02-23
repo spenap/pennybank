@@ -2,6 +2,11 @@ package com.googlecode.pennybank.model.util.vo;
 
 import java.util.List;
 
+/**
+ * A block of Type-T entities
+ * @author spenap
+ * @param <T> The entity type
+ */
 public class Block<T> {
 
 	private boolean existMore;
@@ -9,7 +14,7 @@ public class Block<T> {
 	private List<T> contents;
 
 	/**
-	 * @return the existMore
+	 * @return a boolean value indicating if therer are more entities
 	 */
 	public boolean isExistMore() {
 		return existMore;

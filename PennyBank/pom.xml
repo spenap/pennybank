@@ -1,118 +1,99 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.googlecode.pennybank</groupId>
-	<artifactId>PennyBank</artifactId>
-	<packaging>jar</packaging>
-	<version>1.0-SNAPSHOT</version>
-	<name>PennyBank</name>
-	<url>http://maven.apache.org</url>
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.googlecode.pennybank</groupId>
+    <artifactId>PennyBank</artifactId>
+    <packaging>jar</packaging>
+    <version>1.0-SNAPSHOT</version>
+    <name>PennyBank</name>
+    <url>http://maven.apache.org</url>
 
-	<profiles>
-		<profile>
-			<id>mysql</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<properties>
+    <profiles>
+        <profile>
+            <id>mysql</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
 
 				<!-- JDBC driver properties -->
-				<jdbcDriver.groupId>mysql</jdbcDriver.groupId>
-				<jdbcDriver.artifactId>
-					mysql-connector-java
-                </jdbcDriver.artifactId>
-				<jdbcDriver.version>5.1.6</jdbcDriver.version>
-				<jdbcDriver.className>
-					com.mysql.jdbc.Driver
-                </jdbcDriver.className>
+                <jdbcDriver.groupId>mysql</jdbcDriver.groupId>
+                <jdbcDriver.artifactId>mysql-connector-java</jdbcDriver.artifactId>
+                <jdbcDriver.version>5.1.6</jdbcDriver.version>
+                <jdbcDriver.className>com.mysql.jdbc.Driver</jdbcDriver.className>
 
 				<!--  Data source properties -->
-				<dataSource.url>jdbc:mysql://localhost/pennybank
-				</dataSource.url>
-				<dataSource.user>pennybank</dataSource.user>
-				<dataSource.password>pennybank</dataSource.password>
-				<dataSource.createTablesScript>
-					MySQLCreateTables.sql
-				</dataSource.createTablesScript>
+                <dataSource.url>jdbc:mysql://localhost/pennybank</dataSource.url>
+                <dataSource.user>pennybank</dataSource.user>
+                <dataSource.password>pennybank</dataSource.password>
+                <dataSource.createTablesScript>MySQLCreateTables.sql</dataSource.createTablesScript>
 
 				<!-- Hibernate properties -->
-				<hibernate.dialect>
-					org.hibernate.dialect.MySQL5InnoDBDialect
-				</hibernate.dialect>
-			</properties>
-		</profile>
-		<profile>
-			<id>sqlite</id>
-			<properties>
+                <hibernate.dialect>org.hibernate.dialect.MySQL5InnoDBDialect</hibernate.dialect>
+            </properties>
+        </profile>
+        <profile>
+            <id>sqlite</id>
+            <properties>
 				<!-- JDBC driver properties -->
-				<jdbcDriver.groupId>org.xerial</jdbcDriver.groupId>
-				<jdbcDriver.artifactId>sqlite-jdbc
-				</jdbcDriver.artifactId>
-				<jdbcDriver.version>3.6.6</jdbcDriver.version>
-				<jdbcDriver.className>
-					org.sqlite.JDBC
-                </jdbcDriver.className>
+                <jdbcDriver.groupId>org.xerial</jdbcDriver.groupId>
+                <jdbcDriver.artifactId>sqlite-jdbc</jdbcDriver.artifactId>
+                <jdbcDriver.version>3.6.6</jdbcDriver.version>
+                <jdbcDriver.className>org.sqlite.JDBC</jdbcDriver.className>
 
 				<!--  Data source properties -->
-				<dataSource.url>jdbc:sqlite:/${basedir}/src/resources/pennybank.db
-				</dataSource.url>
-				<dataSource.user>pennybank</dataSource.user>
-				<dataSource.password>pennybank</dataSource.password>
-				<dataSource.createTablesScript>
-					SQLiteCreateTables.sql
-				</dataSource.createTablesScript>
+                <dataSource.url>jdbc:sqlite:/${basedir}/src/resources/pennybank.db</dataSource.url>
+                <dataSource.user>pennybank</dataSource.user>
+                <dataSource.password>pennybank</dataSource.password>
+                <dataSource.createTablesScript>SQLiteCreateTables.sql</dataSource.createTablesScript>
 
 				<!-- Hibernate properties -->
-				<hibernate.dialect>
-					org.hibernate.dialect.SQLiteDialect
-				</hibernate.dialect>
-			</properties>
-		</profile>
-	</profiles>
+                <hibernate.dialect>org.hibernate.dialect.SQLiteDialect</hibernate.dialect>
+            </properties>
+        </profile>
+    </profiles>
 
-	<build>
-		<resources>
-			<resource>
-				<directory>src/main/resources/</directory>
-			</resource>
-		</resources>
-		<testResources>
-			<testResource>
-				<directory>src/test/resources/</directory>
-			</testResource>
-		</testResources>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.5</source>
-					<target>1.5</target>
-				</configuration>
-			</plugin>
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources/</directory>
+            </resource>
+        </resources>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources/</directory>
+            </testResource>
+        </testResources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
 
-			<plugin><!-- Plugin para construir paquetes para Mac OS X -->
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>osxappbundle-maven-plugin
-				</artifactId>
-				<version>1.0-alpha-2</version>
-				<configuration>
-					<mainClass>com.googlecode.pennybank.App
-					</mainClass>
-					<iconFile>src/main/resources/icons/piggybank.icns
-					</iconFile>
-					<dictionaryFile>${basedir}/src/main/resources/dist/Info.plist
-					</dictionaryFile>
-				</configuration>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>bundle</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+            <plugin><!-- Plugin para construir paquetes para Mac OS X -->
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>osxappbundle-maven-plugin</artifactId>
+                <version>1.0-alpha-2</version>
+                <configuration>
+                    <jvmVersion>1.5+</jvmVersion>
+                    <mainClass>com.googlecode.pennybank.App</mainClass>
+                    <iconFile>src/main/resources/icons/piggybank.icns</iconFile>
+                    <!--<dictionaryFile>${basedir}/src/main/resources/dist/Info.plist</dictionaryFile>-->
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>bundle</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 			<!-- ========================================================== -->
 			<!-- Setting SQL Plugin -->
 			<!--
@@ -122,79 +103,98 @@
 				autocommit="true" since some drivers (e.g the PostgreSQL JDBC 2
 				driver) do not commit changes if some error ocurs.
 			-->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>sql-maven-plugin</artifactId>
-				<dependencies>
-					<dependency>
-						<groupId>${jdbcDriver.groupId}</groupId>
-						<artifactId>${jdbcDriver.artifactId}
-						</artifactId>
-						<version>${jdbcDriver.version}</version>
-					</dependency>
-				</dependencies>
-				<configuration>
-					<driver>${jdbcDriver.className}</driver>
-					<url>${dataSource.url}</url>
-					<username>${dataSource.user}</username>
-					<password>${dataSource.password}</password>
-					<autocommit>true</autocommit>
-					<onError>continue</onError>
-					<fileset>
-						<basedir>${basedir}</basedir>
-						<includes>
-							<include>
-								src/sql/${dataSource.createTablesScript}
-                            </include>
-						</includes>
-					</fileset>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>sql-maven-plugin</artifactId>
+                <dependencies>
+                    <dependency>
+                        <groupId>${jdbcDriver.groupId}</groupId>
+                        <artifactId>${jdbcDriver.artifactId}</artifactId>
+                        <version>${jdbcDriver.version}</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <driver>${jdbcDriver.className}</driver>
+                    <url>${dataSource.url}</url>
+                    <username>${dataSource.user}</username>
+                    <password>${dataSource.password}</password>
+                    <autocommit>true</autocommit>
+                    <onError>continue</onError>
+                    <fileset>
+                        <basedir>${basedir}</basedir>
+                        <includes>
+                            <include>src/sql/${dataSource.createTablesScript}</include>
+                        </includes>
+                    </fileset>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.2</version>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
-	<dependencies>
+    <dependencies>
 
+        <dependency>
+            <groupId>${jdbcDriver.groupId}</groupId>
+            <artifactId>${jdbcDriver.artifactId}</artifactId>
+            <version>${jdbcDriver.version}</version>
+        </dependency>
 
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.1</version>
+            <scope>test</scope>
+        </dependency>
 
-		<dependency>
-			<groupId>${jdbcDriver.groupId}</groupId>
-			<artifactId>${jdbcDriver.artifactId}
-			</artifactId>
-			<version>${jdbcDriver.version}</version>
-		</dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate</artifactId>
+            <version>3.2.5.ga</version>
+            <type>jar</type>
+        </dependency>
 
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.1</version>
-			<scope>test</scope>
-		</dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-annotations</artifactId>
+            <version>3.3.0.ga</version>
+        </dependency>
 
-		<dependency> <!-- Habría que añadir las demás subdependencias de swt (en su pom) -->
-			<groupId>org.eclipse.swt</groupId>
-			<artifactId>swt</artifactId>
-			<version>3.4</version>
-			<type>pom</type>
-		</dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <version>3.3.1.ga</version>
+        </dependency>
 
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate</artifactId>
-			<version>3.2.5.ga</version>
-		</dependency>
+        <dependency>
+            <groupId>net.java.dev.swing-layout</groupId>
+            <artifactId>swing-layout</artifactId>
+            <version>1.0.2</version>
+        </dependency>
 
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-annotations</artifactId>
-			<version>3.3.0.ga</version>
-		</dependency>
+        <dependency>
+            <groupId>com.jgoodies</groupId>
+            <artifactId>forms</artifactId>
+            <version>1.2.1</version>
+            <scope>compile</scope>
+        </dependency>
 
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-entitymanager
-			</artifactId>
-			<version>3.3.1.ga</version>
-		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>com.jgoodies</groupId>
+            <artifactId>mac_widgets</artifactId>
+            <version>0.9.4</version>
+            <scope>compile</scope>
+        </dependency>
+
+        
+
+        
+	
+    </dependencies>
 </project>

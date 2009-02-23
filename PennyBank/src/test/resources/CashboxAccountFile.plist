@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Account Name</key>
+	<string>The real name of the account</string>
+	<key>Active</key>
+	<false/>
+	<key>Additional Account Information</key>
+	<string></string>
+	<key>Final Total of Account</key>
+	<real>308.68000000000063</real>
+	<key>Index of Account in View</key>
+	<integer>3</integer>
+	<key>Transactions</key>
+	<array>
+		<dict>
+			<key>Check Column</key>
+			<string></string>
+			<key>Date Column</key>
+			<date>2008-01-12T18:49:13Z</date>
+			<key>Deposit Column</key>
+			<real>1052.27</real>
+			<key>Description Column</key>
+			<string>A Comment</string>
+			<key>Reconciled Column</key>
+			<false/>
+			<key>Withdrawal Column</key>
+			<real>0.0</real>
+		</dict>
+		<dict>
+			<key>Date Column</key>
+			<date>2008-01-15T18:48:25Z</date>
+			<key>Deposit Column</key>
+			<real>0.0</real>
+			<key>Description Column</key>
+			<string>Another comment</string>
+			<key>Label</key>
+			<string>A label</string>
+			<key>Reconciled Column</key>
+			<false/>
+			<key>Withdrawal Column</key>
+			<real>368.60000000000002</real>
+		</dict>
+		<dict>
+			<key>Check Column</key>
+			<string></string>
+			<key>Date Column</key>
+			<date>2008-01-21T18:53:16Z</date>
+			<key>Deposit Column</key>
+			<real>0.0</real>
+			<key>Description Column</key>
+			<string>Disposición Efectivo</string>
+			<key>Index of Coresponding Transaction</key>
+			<integer>0</integer>
+			<key>Name of Coresponding Account</key>
+			<string>Destination Account</string>
+			<key>Reconciled Column</key>
+			<false/>
+			<key>Withdrawal Column</key>
+			<real>70</real>
+		</dict>
+	</array>
+</dict>
+</plist>

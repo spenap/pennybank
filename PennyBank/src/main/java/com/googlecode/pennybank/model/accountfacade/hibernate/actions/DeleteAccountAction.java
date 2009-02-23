@@ -8,30 +8,40 @@ import com.googlecode.pennybank.model.util.exceptions.InternalErrorException;
 import com.googlecode.pennybank.model.util.exceptions.ModelException;
 import com.googlecode.pennybank.model.util.transactions.TransactionalPlainAction;
 
+/**
+ * Class encapsulating the information needed to delete an account
+ *
+ * @author spenap
+ */
 public class DeleteAccountAction implements TransactionalPlainAction {
 
-	private Long accountId;
-	private AccountDAO accountDAO;
+    private Long accountId;
+    private AccountDAO accountDAO;
 
-	public DeleteAccountAction(Long accountId) {
+    /**
+     * Creates a new action with the specified arguments
+     *
+     * @param accountId The identifier for the account to be deleted
+     */
+    public DeleteAccountAction(Long accountId) {
 
-		this.accountId = accountId;
+        this.accountId = accountId;
 
-	}
+    }
 
-	public Object execute(EntityManager entityManager) throws ModelException,
-			InternalErrorException {
+    public Object execute(EntityManager entityManager)
+            throws ModelException,
+            InternalErrorException {
 
-		initializeDAOs(entityManager);
-		accountDAO.remove(accountId);
-		return null;
-	}
+        initializeDAOs(entityManager);
+        accountDAO.remove(accountId);
+        return null;
+    }
 
-	private void initializeDAOs(EntityManager entityManager)
-			throws InternalErrorException {
+    private void initializeDAOs(EntityManager entityManager)
+            throws InternalErrorException {
 
-		accountDAO = AccountDAOFactory.getDelegate();
-		accountDAO.setEntityManager(entityManager);
-	}
-
+        accountDAO = AccountDAOFactory.getDelegate();
+        accountDAO.setEntityManager(entityManager);
+    }
 }

@@ -4,9 +4,17 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
+/**
+ * An HibernateFacade
+ * 
+ * @author spenap
+ */
 public class HibernateFacade {
 
-	protected static EntityManager entityManager;
+    /**
+     *  The entity manager
+     */
+    protected static EntityManager entityManager;
 
 	static {
 		EntityManagerFactory entityManagerFactory = Persistence
@@ -14,7 +22,10 @@ public class HibernateFacade {
 		entityManager = entityManagerFactory.createEntityManager();
 	}
 
-	public static void closeEntityManager() {
+    /**
+     * Closes the entity manager
+     */
+    public static void closeEntityManager() {
 		entityManager.close();
 	}
 
