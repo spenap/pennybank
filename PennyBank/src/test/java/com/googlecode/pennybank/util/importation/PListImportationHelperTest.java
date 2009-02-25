@@ -12,21 +12,21 @@ import java.util.List;
 
 public class PListImportationHelperTest {
 
-    @Test
-    public void testImport()
-            throws ParseException, NotYetParsedException {
+	@Test
+	public void testImport() throws ParseException, NotYetParsedException {
 
-        PListImportationHelper importationHelper = new PListImportationHelper();
-        importationHelper.parseAccountFile("src/test/resources/CashboxAccountFile.plist");
+		PListImportationHelper importationHelper = new PListImportationHelper();
+		importationHelper
+				.parseAccountFile("src/test/resources/CashboxAccountFile.plist");
 
-        Account theAccount = importationHelper.getAccount();
-        List<AccountOperationInfo> accountOperations = importationHelper.
-                getAccountOperations();
+		Account theAccount = importationHelper.getAccount();
+		List<AccountOperationInfo> accountOperations = importationHelper
+				.getAccountOperations();
 
-        System.out.println(theAccount);
-        for (AccountOperationInfo accountOperationInfo : accountOperations) {
-            System.out.println(accountOperationInfo);
-        }
-        assertTrue(true);
-    }
+		System.out.println(theAccount);
+		for (AccountOperationInfo accountOperationInfo : accountOperations) {
+			System.out.println(accountOperationInfo);
+		}
+		assertTrue(false);
+	}
 }

@@ -15,16 +15,20 @@ public final class PlainActionProcessor {
 
 	}
 
-    /**
-     * Processes an action, obtaining its results
-     *
-     * @param entityManager The entity manager
-     * @param action The non transactional plain action to execute
-     * @return The execution results
-     * @throws ModelException A model-related exception
-     * @throws InternalErrorException If an unexpected error happens
-     */
-    public final static Object process(EntityManager entityManager,
+	/**
+	 * Processes an action, obtaining its results
+	 * 
+	 * @param entityManager
+	 *            The entity manager
+	 * @param action
+	 *            The non transactional plain action to execute
+	 * @return The execution results
+	 * @throws ModelException
+	 *             A model-related exception
+	 * @throws InternalErrorException
+	 *             If an unexpected error happens
+	 */
+	public final static Object process(EntityManager entityManager,
 			NonTransactionalPlainAction action) throws ModelException,
 			InternalErrorException {
 
@@ -41,16 +45,20 @@ public final class PlainActionProcessor {
 
 	}
 
-    /**
-     * Processes an action, obtaining its results
-     *
-     * @param entityManager The entity manager
-     * @param action The transactional plain action to be executed
-     * @return The execution results
-     * @throws ModelException A model-related exception
-     * @throws InternalErrorException If an unexpected error happens
-     */
-    public final static Object process(EntityManager entityManager,
+	/**
+	 * Processes an action, obtaining its results
+	 * 
+	 * @param entityManager
+	 *            The entity manager
+	 * @param action
+	 *            The transactional plain action to be executed
+	 * @return The execution results
+	 * @throws ModelException
+	 *             A model-related exception
+	 * @throws InternalErrorException
+	 *             If an unexpected error happens
+	 */
+	public final static Object process(EntityManager entityManager,
 			TransactionalPlainAction action) throws ModelException,
 			InternalErrorException {
 
@@ -58,7 +66,6 @@ public final class PlainActionProcessor {
 		boolean rollback = false;
 
 		try {
-
 			/* Creates the transaction */
 			entityTransaction = entityManager.getTransaction();
 			entityTransaction.begin();

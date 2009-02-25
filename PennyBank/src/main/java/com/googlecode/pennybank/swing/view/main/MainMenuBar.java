@@ -19,6 +19,7 @@ import javax.swing.JMenuItem;
  * 
  * @author spenap
  */
+@SuppressWarnings("serial")
 public class MainMenuBar extends JMenuBar {
 
     /**

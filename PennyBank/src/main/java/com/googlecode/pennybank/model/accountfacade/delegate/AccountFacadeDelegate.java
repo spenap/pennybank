@@ -1,7 +1,6 @@
 package com.googlecode.pennybank.model.accountfacade.delegate;
 
 import java.util.Calendar;
-import java.util.List;
 
 import com.googlecode.pennybank.model.account.entity.Account;
 import com.googlecode.pennybank.model.accountfacade.vo.AccountOperationInfo;
@@ -14,7 +13,7 @@ import com.googlecode.pennybank.model.util.vo.Block;
 
 /**
  * Interface defining the Account Facade
- *
+ * 
  * @author spenap
  */
 public interface AccountFacadeDelegate {
@@ -61,6 +60,19 @@ public interface AccountFacadeDelegate {
 			InternalErrorException;
 
 	/**
+	 * Updates an account
+	 * 
+	 * @param account
+	 *            The account to search for
+	 * @throws InstanceNotFoundException
+	 *             if the account was not found
+	 * @throws InternalErrorException
+	 *             Exception encapsulating a non logical error
+	 */
+	public Account updateAccount(Account account)
+			throws InstanceNotFoundException, InternalErrorException;
+
+	/**
 	 * Adds a given amount to the account with the account identifier given
 	 * 
 	 * @param accountId
@@ -71,8 +83,8 @@ public interface AccountFacadeDelegate {
 	 *            A comment explaining the account operation
 	 * @param operationDate
 	 *            The operation date
-	 * @param categories
-	 *            Categories which classify the account operation
+	 * @param category
+	 *            Category which classifies the account operation
 	 * @throws InstanceNotFoundException
 	 *             if the account was not found
 	 * @throws InternalErrorException
@@ -81,7 +93,7 @@ public interface AccountFacadeDelegate {
 	 *             if the amount is negative
 	 */
 	public void addToAccount(Long accountId, double amount, String comment,
-			Calendar operationDate, List<Category> categories)
+			Calendar operationDate, Category category)
 			throws InstanceNotFoundException, InternalErrorException,
 			NegativeAmountException;
 
@@ -97,8 +109,8 @@ public interface AccountFacadeDelegate {
 	 *            A comment explaining the account operation
 	 * @param operationDate
 	 *            The operation date
-	 * @param categories
-	 *            Categories which classify the account operation
+	 * @param category
+	 *            Category which classifies the account operation
 	 * @throws InstanceNotFoundException
 	 *             if the account was not found
 	 * @throws InternalErrorException
@@ -107,7 +119,7 @@ public interface AccountFacadeDelegate {
 	 *             if the amount is negative
 	 */
 	public void withdrawFromAccount(Long accountId, double amount,
-			String comment, Calendar operationDate, List<Category> categories)
+			String comment, Calendar operationDate, Category category)
 			throws InstanceNotFoundException, InternalErrorException,
 			NegativeAmountException;
 
@@ -124,8 +136,8 @@ public interface AccountFacadeDelegate {
 	 *            A comment explaining the account operation
 	 * @param operationDate
 	 *            The operation date
-	 * @param categories
-	 *            Categories which classify the account operation
+	 * @param category
+	 *            Category which classifies the account operation
 	 * @throws InstanceNotFoundException
 	 *             if any of the accounts was not found
 	 * @throws InternalErrorException
@@ -135,7 +147,7 @@ public interface AccountFacadeDelegate {
 	 */
 	public void transfer(Long sourceAccountId, Long destinationAccountId,
 			double amount, String comment, Calendar operationDate,
-			List<Category> categories) throws InstanceNotFoundException,
+			Category category) throws InstanceNotFoundException,
 			InternalErrorException, NegativeAmountException;
 
 	/**
@@ -148,9 +160,13 @@ public interface AccountFacadeDelegate {
 	 * @param count
 	 *            The numbers of accounts to retrieve
 	 * @return The block of accounts retrieved
+	 * @throws InstanceNotFoundException
+	 *             if the user account was not found
+	 * @throws InternalErrorException
+	 *             Exception encapsulating a non logical error
 	 */
 	public Block<Account> findAccountByUserId(Long userId, int startIndex,
-			int count);
+			int count) throws InternalErrorException, InstanceNotFoundException;
 
 	/**
 	 * Finds all the account operations in an account between two dates given
@@ -185,9 +201,12 @@ public interface AccountFacadeDelegate {
 	 * @return The block of account operations retrieved
 	 * @throws InstanceNotFoundException
 	 *             if the account was not found
+	 * @throws InternalErrorException
+	 *             if an unexpected error happened
 	 */
 	public Block<AccountOperationInfo> findAccountOperations(Long accountId,
-			int startIndex, int count) throws InstanceNotFoundException;
+			int startIndex, int count) throws InstanceNotFoundException,
+			InternalErrorException;
 
 	/**
 	 * Finds all the account operations for a given type in an account
@@ -233,8 +252,14 @@ public interface AccountFacadeDelegate {
 	 * @param category
 	 *            The new category to be created
 	 * @return The category created
+	 * @throws InternalErrorException
+	 *             if an unexpected error happened
+	 * @throws InstanceNotFoundException
+	 *             if the parent category didn't exist
+	 * 
 	 */
-	public Category createCategory(Category category);
+	public Category createCategory(Category category)
+			throws InstanceNotFoundException, InternalErrorException;
 
 	/**
 	 * Deletes a category with the specified category identifier
@@ -243,9 +268,11 @@ public interface AccountFacadeDelegate {
 	 *            The category identifier to look for
 	 * @throws InstanceNotFoundException
 	 *             if the category was not found
+	 * @throws InternalErrorException
+	 *             if an unexpected error happens
 	 */
 	public void deleteCategory(Long categoryId)
-			throws InstanceNotFoundException;
+			throws InstanceNotFoundException, InternalErrorException;
 
 	/**
 	 * Obtains the number of operations done in a given account
@@ -260,4 +287,13 @@ public interface AccountFacadeDelegate {
 	 */
 	public Long getOperationsCount(Long accountId)
 			throws InstanceNotFoundException, InternalErrorException;
+
+	/**
+	 * Finds a category with the given category identifier
+	 * 
+	 * @param categoryId
+	 *            the category identifier to search for
+	 */
+	public Category findCategory(Long categoryId)
+			throws InternalErrorException, InstanceNotFoundException;
 }

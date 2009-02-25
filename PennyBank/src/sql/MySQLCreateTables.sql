@@ -9,9 +9,8 @@ CREATE TABLE PingTable (foo CHAR(1));
 -- must be dropped first (otherwise, the corresponding checks on those tables
 -- could not be done).
 
-DROP TABLE OpCategory;
-DROP TABLE Category;
 DROP TABLE AccountOp;
+DROP TABLE Category;
 DROP TABLE Account;
 DROP TABLE User;
 
@@ -39,18 +38,34 @@ CREATE TABLE Account (
 CREATE INDEX AccountIndexByAccId ON Account(accId);
 CREATE INDEX AccountIndexByUsrId ON Account(accId,usrId);
 
+-- Category table
+CREATE TABLE Category (
+	categoryId BIGINT NOT NULL AUTO_INCREMENT,
+	name VARCHAR(100) NOT NULL,
+	parentCategoryId BIGINT,
+	version BIGINT,
+	CONSTRAINT CategoryPK PRIMARY KEY (categoryId),
+	CONSTRAINT CategoryFK FOREIGN KEY(parentCategoryId) REFERENCES Category (categoryId)
+		ON UPDATE CASCADE ON DELETE SET NULL 
+) TYPE InnoDB;
+
+
+
 -- Account Operations table
 CREATE TABLE AccountOp (
 	accOpId BIGINT NOT NULL AUTO_INCREMENT,
 	accId BIGINT NOT NULL,
 	type TINYINT NOT NULL,
-	amount DOUBLE PRECISION NOT NULL,
+	amount DECIMAL NOT NULL,
 	comment VARCHAR(100),
 	date TIMESTAMP NOT NULL,
+	categoryId BIGINT,
 	version BIGINT,
 	CONSTRAINT AccountOpPK PRIMARY KEY (accOpId),
 	CONSTRAINT AccountIdFK FOREIGN KEY (accId) REFERENCES Account(accId) 
-		ON DELETE CASCADE ON UPDATE CASCADE,
+		ON UPDATE CASCADE ON DELETE CASCADE,
+	CONSTRAINT AccountCategoryFK FOREIGN KEY (categoryId) REFERENCES Category(categoryId)
+		ON UPDATE CASCADE ON DELETE SET NULL,
 	CONSTRAINT validType CHECK (type >=0 AND type <= 1),
 	CONSTRAINT validAmount CHECK (amount>0) 
 ) TYPE InnoDB;
@@ -59,25 +74,3 @@ CREATE INDEX AccountOpIndexByAccOpId ON AccountOp(accOpId);
 CREATE INDEX AccountOpIndexByAccId ON AccountOp(accOpId,accId);
 CREATE INDEX AccountOpIndexByOpTypeId ON AccountOp(accOpId,accId,type);
 CREATE INDEX AccountOpIndexByDate ON AccountOp(accOpId,accId,date);
-
--- Category table
-CREATE TABLE Category (
-	categoryId BIGINT NOT NULL AUTO_INCREMENT,
-	name VARCHAR(100) NOT NULL,
-	version BIGINT,
-	CONSTRAINT CategoryPK PRIMARY KEY (categoryId)
-) TYPE InnoDB;
-
--- Operations categorized table
-CREATE TABLE OpCategory (
-	categoryId BIGINT NOT NULL,
-	accOpId BIGINT NOT NULL,
-	CONSTRAINT OpCategoryPK PRIMARY KEY (categoryId,accOpId),
-	CONSTRAINT OpCategoryCatIdFK FOREIGN KEY(categoryId) REFERENCES Category (categoryId)
-		ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT OpCategoryAccOpIdFK FOREIGN KEY(accOpId) REFERENCES AccountOp (accOpId)
-	    ON DELETE CASCADE ON UPDATE CASCADE
-) TYPE InnoDB;
-
-CREATE INDEX OpCategoryByCategoryId ON OpCategory(categoryId,accOpId);
-CREATE INDEX OpCategoryByAccOpId ON OpCategory(accOpId,categoryId);

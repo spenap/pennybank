@@ -22,6 +22,6 @@ public class AccountDAOHibernate extends GenericDAOHibernate<Account, Long>
                 "FROM Account a " +
                 "WHERE a.user.userId = :userId " +
                 "ORDER BY a.name").
-                setParameter("userId", id).list();
+                setParameter("userId", id).setMaxResults(count).setFirstResult(startIndex).list();
     }
 }

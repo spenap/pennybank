@@ -6,8 +6,8 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.googlecode.pennybank.model.user.entity.User;
@@ -18,11 +18,11 @@ import com.googlecode.pennybank.model.util.exceptions.InternalErrorException;
 
 public class UserFacadeTest {
 
-	private UserFacadeDelegate userFacade;
+	private static UserFacadeDelegate userFacade;
 	private final long NON_EXISTENT_USER_ID = -1;
 
-	@Before
-	public void setUp() {
+	@BeforeClass
+	public static void setUpBeforeClass() {
 
 		try {
 			userFacade = UserFacadeDelegateFactory.getDelegate();
@@ -32,8 +32,8 @@ public class UserFacadeTest {
 		}
 	}
 
-	@After
-	public void tearDown() {
+	@AfterClass
+	public static void tearDownAfterClass() {
 
 		try {
 			userFacade = UserFacadeDelegateFactory.getDelegate();
