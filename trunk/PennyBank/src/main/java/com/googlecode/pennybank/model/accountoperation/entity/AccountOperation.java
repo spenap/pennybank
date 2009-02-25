@@ -3,8 +3,6 @@ package com.googlecode.pennybank.model.accountoperation.entity;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -16,7 +14,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
@@ -29,258 +26,283 @@ import com.googlecode.pennybank.model.category.entity.Category;
 
 /**
  * Entity encapsulation an account operation
+ * 
  * @author spenap
  */
+@SuppressWarnings("serial")
 @Entity
 @Table(name = "AccountOp")
 public class AccountOperation implements Serializable {
 
-    /**
-     * The account operation type
-     */
-    public enum Type {
+	/**
+	 * The account operation type
+	 */
+	public enum Type {
 
-        /**
-         * If the operation is a deposit
-         */
-        DEPOSIT,
-        /**
-         * If the operation is a withdrawal
-         */
-        WITHDRAW
-    }
-    private Long operationId;
-    private Account account;
-    private Type type;
-    private double amount;
-    private Calendar date;
-    private String comment;
-    private long version;
-    private Set<Category> categories = new HashSet<Category>();
+		/**
+		 * If the operation is a deposit
+		 */
+		DEPOSIT,
+		/**
+		 * If the operation is a withdrawal
+		 */
+		WITHDRAW
+	}
 
-    /**
-     * Constructor without arguments, needed for Hibernate
-     */
-    public AccountOperation() {
-    }
+	private Long operationId;
+	private Account account;
+	private Type type;
+	private double amount;
+	private Calendar date;
+	private String comment;
+	private long version;
+	private Category category;
 
-    /**
-     * Creates a new account operation
-     *
-     * @param account The account for the account operation
-     * @param type The account operation type
-     * @param amount The account operation amount
-     * @param date The account operation date
-     * @param comment The account operation description
-     */
-    public AccountOperation(Account account, Type type, double amount,
-            Calendar date, String comment) {
+	/**
+	 * Constructor without arguments, needed for Hibernate
+	 */
+	public AccountOperation() {
+	}
 
-        this.account = account;
-        this.type = type;
-        this.amount = amount;
-        this.date = date;
-        this.comment = comment;
-    }
+	/**
+	 * Creates a new account operation
+	 * 
+	 * @param account
+	 *            The account for the account operation
+	 * @param type
+	 *            The account operation type
+	 * @param amount
+	 *            The account operation amount
+	 * @param date
+	 *            The account operation date
+	 * @param comment
+	 *            The account operation description
+	 */
+	public AccountOperation(Account account, Type type, double amount,
+			Calendar date, String comment) {
 
-    /**
-     *
-     * @param obj The object to compare
-     * @return True if the account operations are the same, false otherwise
-     */
-    @Override
-    public boolean equals(Object obj) {
+		this.account = account;
+		this.type = type;
+		this.amount = amount;
+		this.date = date;
+		this.comment = comment;
+		this.category = null;
+	}
 
-        if ((obj == null) || !(obj instanceof AccountOperation)) {
-            return false;
-        }
-        AccountOperation theOther = (AccountOperation) obj;
-        return operationId.equals(theOther.operationId) && amount == theOther.amount && comment.
-                equals(theOther.comment) && date.equals(theOther.date) && version == theOther.version;
-    }
+	/**
+	 * Create a new account operation classified by a category
+	 * 
+	 * @param account
+	 *            The account for the account operation
+	 * @param type
+	 *            The account operation type
+	 * @param amount
+	 *            The account operation amount
+	 * @param date
+	 *            The account operation date
+	 * @param comment
+	 *            The account operation description
+	 * @param category
+	 *            The account operation category
+	 */
+	public AccountOperation(Account account, Type type, double amount,
+			Calendar date, String comment, Category category) {
+		
+		this.account = account;
+		this.type = type;
+		this.amount = amount;
+		this.date = date;
+		this.comment = comment;
+		this.category = category;
+	}
 
-    /**
-     *
-     * @return the hash code
-     */
-    @Override
-    public int hashCode() {
-        int hash = 5;
-        hash =
-                89 * hash + (this.operationId != null ? this.operationId.
-                hashCode() : 0);
-        hash =
-                89 * hash + (int) (Double.doubleToLongBits(this.amount) ^ (Double.
-                doubleToLongBits(this.amount) >>> 32));
-        hash = 89 * hash + (this.date != null ? this.date.hashCode() : 0);
-        hash = 89 * hash + (this.comment != null ? this.comment.hashCode() : 0);
-        hash = 89 * hash + (int) (this.version ^ (this.version >>> 32));
-        return hash;
-    }
+	/**
+	 * 
+	 * @param obj
+	 *            The object to compare
+	 * @return True if the account operations are the same, false otherwise
+	 */
+	@Override
+	public boolean equals(Object obj) {
 
-    /**
-     * @return the account
-     */
-    @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade =
-    CascadeType.ALL)
-    @JoinColumn(name = "accId")
-    public Account getAccount() {
+		if ((obj == null) || !(obj instanceof AccountOperation)) {
+			return false;
+		}
+		AccountOperation theOther = (AccountOperation) obj;
 
-        return account;
-    }
+		if ((category == null && theOther.category != null)
+				|| !category.equals(theOther.category)) {
+			return false;
+		}
 
-    /**
-     * @return the amount
-     */
-    public double getAmount() {
+		return operationId.equals(theOther.operationId)
+				&& account.equals(theOther.account)
+				&& amount == theOther.amount
+				&& comment.equals(theOther.comment)
+				&& date.equals(theOther.date) && version == theOther.version;
+	}
 
-        return amount;
-    }
+	/**
+	 * @return the account
+	 */
+	@ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = { CascadeType.REFRESH, CascadeType.REMOVE })
+	@JoinColumn(name = "accId")
+	public Account getAccount() {
 
-    /**
-     * @return the categories
-     */
-    @ManyToMany(mappedBy = "accountOperations")
-    public Set<Category> getCategories() {
+		return account;
+	}
 
-        return categories;
-    }
+	/**
+	 * @return the amount
+	 */
+	public double getAmount() {
 
-    /**
-     * @return the comment
-     */
-    public String getComment() {
+		return amount;
+	}
 
-        return comment;
-    }
+	/**
+	 * @return the category
+	 */
+	@ManyToOne(optional = true, fetch = FetchType.LAZY, cascade = { CascadeType.REFRESH })
+	@JoinColumn(name = "categoryId")
+	public Category getCategory() {
 
-    /**
-     * @return the date
-     */
-    @Temporal(TemporalType.TIMESTAMP)
-    public Calendar getDate() {
+		return category;
+	}
 
-        return date;
-    }
+	/**
+	 * @return the comment
+	 */
+	public String getComment() {
 
-    /**
-     * @return the operationIdentifier
-     */
-    @Id
-    @Column(name = "accOpId")
-    @SequenceGenerator(name = "AccountOperationIdGenerator", sequenceName =
-    "AccountOpSeq")
-    @GeneratedValue(strategy = GenerationType.AUTO, generator =
-    "AccountOperationIdGenerator")
-    public Long getOperationIdentifier() {
+		return comment;
+	}
 
-        return operationId;
-    }
+	/**
+	 * @return the date
+	 */
+	@Temporal(TemporalType.TIMESTAMP)
+	public Calendar getDate() {
 
-    /**
-     * @return the type
-     */
-    @Enumerated(EnumType.ORDINAL)
-    public Type getType() {
+		return date;
+	}
 
-        return type;
-    }
+	/**
+	 * @return the operationIdentifier
+	 */
+	@Id
+	@Column(name = "accOpId")
+	@SequenceGenerator(name = "AccountOperationIdGenerator", sequenceName = "AccountOpSeq")
+	@GeneratedValue(strategy = GenerationType.AUTO, generator = "AccountOperationIdGenerator")
+	public Long getOperationIdentifier() {
 
-    /**
-     * @return the version
-     */
-    @Version
-    public long getVersion() {
+		return operationId;
+	}
 
-        return version;
-    }
+	/**
+	 * @return the type
+	 */
+	@Enumerated(EnumType.ORDINAL)
+	public Type getType() {
 
-    /**
-     * @param account
-     *            the account to set
-     */
-    public void setAccount(Account account) {
+		return type;
+	}
 
-        this.account = account;
-    }
+	/**
+	 * @return the version
+	 */
+	@Version
+	public long getVersion() {
 
-    /**
-     * @param amount
-     *            the amount to set
-     */
-    public void setAmount(double amount) {
+		return version;
+	}
 
-        this.amount = amount;
-    }
+	/**
+	 * @param account
+	 *            the account to set
+	 */
+	public void setAccount(Account account) {
 
-    /**
-     * @param categories
-     *            the categories to set
-     */
-    public void setCategories(Set<Category> categories) {
+		this.account = account;
+	}
 
-        this.categories = categories;
-    }
+	/**
+	 * @param amount
+	 *            the amount to set
+	 */
+	public void setAmount(double amount) {
 
-    /**
-     * @param comment
-     *            the comment to set
-     */
-    public void setComment(String comment) {
+		this.amount = amount;
+	}
 
-        this.comment = comment;
-    }
+	/**
+	 * @param category
+	 *            the category to set
+	 */
+	public void setCategory(Category category) {
 
-    /**
-     * @param date
-     *            the date to set
-     */
-    public void setDate(Calendar date) {
+		this.category = category;
+	}
 
-        this.date = date;
-    }
+	/**
+	 * @param comment
+	 *            the comment to set
+	 */
+	public void setComment(String comment) {
 
-    /**
-     * @param operationIdentifier
-     *            the operationIdentifier to set
-     */
-    public void setOperationIdentifier(Long operationIdentifier) {
+		this.comment = comment;
+	}
 
-        this.operationId = operationIdentifier;
-    }
+	/**
+	 * @param date
+	 *            the date to set
+	 */
+	public void setDate(Calendar date) {
 
-    /**
-     * @param type
-     *            the type to set
-     */
-    public void setType(Type type) {
+		this.date = date;
+	}
 
-        this.type = type;
-    }
+	/**
+	 * @param operationIdentifier
+	 *            the operationIdentifier to set
+	 */
+	public void setOperationIdentifier(Long operationIdentifier) {
 
-    /**
-     * @param version
-     *            the version to set
-     */
-    public void setVersion(long version) {
+		this.operationId = operationIdentifier;
+	}
 
-        this.version = version;
-    }
+	/**
+	 * @param type
+	 *            the type to set
+	 */
+	public void setType(Type type) {
 
-    /**
-     *
-     * @return The string representation of the account operation
-     */
-    @Override
-    public String toString() {
+		this.type = type;
+	}
 
-        StringBuffer output = new StringBuffer();
+	/**
+	 * @param version
+	 *            the version to set
+	 */
+	public void setVersion(long version) {
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("[yyyy/MM/dd]");
-        output.append(dateFormat.format(date.getTime()));
-        output.append(" " + type.toString().toUpperCase());
-        output.append(":" + amount);
-        output.append("\t\"" + comment + "\"");
-        return output.toString();
-    }
+		this.version = version;
+	}
+
+	/**
+	 * 
+	 * @return The string representation of the account operation
+	 */
+	@Override
+	public String toString() {
+
+		StringBuffer output = new StringBuffer();
+
+		SimpleDateFormat dateFormat = new SimpleDateFormat("[yyyy/MM/dd]");
+		output.append(dateFormat.format(date.getTime()));
+		output.append(" " + type.toString().toUpperCase());
+		output.append(":" + amount);
+		output.append("\t\"" + comment + "\"");
+		return output.toString();
+	}
 }

@@ -15,6 +15,7 @@ import java.awt.Component;
  *
  * @author spenap
  */
+@SuppressWarnings("serial")
 public class MainBottomBar extends Component {
 
     /**

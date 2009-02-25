@@ -18,6 +18,7 @@ import javax.swing.JSplitPane;
  *
  * @author spenap
  */
+@SuppressWarnings("serial")
 public class MainWindow extends JFrame {
 
     private Container mainWindow;

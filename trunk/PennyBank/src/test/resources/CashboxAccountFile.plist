@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>Account Name</key>
-	<string>The real name of the account</string>
+	<string>CashboxAccountFile</string>
 	<key>Active</key>
 	<false/>
 	<key>Additional Account Information</key>

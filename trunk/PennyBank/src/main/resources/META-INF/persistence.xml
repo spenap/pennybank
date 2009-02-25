@@ -15,7 +15,7 @@
 			<property name="hibernate.connection.password">pennybank</property>
 			<property name="hibernate.connection.url">jdbc:mysql://localhost/pennybank</property>
 
-			<property name="connection.autocommit">false</property>
+			<property name="hibernate.connection.autocommit">true</property>
 		</properties>
 
 		<class>com.googlecode.pennybank.model.user.entity.User</class>

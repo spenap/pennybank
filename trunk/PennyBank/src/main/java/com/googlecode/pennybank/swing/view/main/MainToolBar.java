@@ -24,6 +24,7 @@ import javax.swing.JFrame;
  * 
  * @author spenap
  */
+@SuppressWarnings("serial")
 public class MainToolBar extends Component {
 
     /**
