@@ -1,6 +1,8 @@
 package com.googlecode.pennybank.model.category.entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -10,6 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Version;
 
@@ -25,6 +28,7 @@ public class Category implements Serializable {
 	private Long categoryId;
 	private String name;
 	private Category parentCategory;
+	private List<Category> childCategories;
 	private long version;
 
 	/**
@@ -39,7 +43,8 @@ public class Category implements Serializable {
 	 */
 	public Category(String name) {
 		this.name = name;
-		this.setParentCategory(null);
+		parentCategory = null;
+		this.childCategories = new ArrayList<Category>();
 	}
 
 	/**
@@ -51,7 +56,9 @@ public class Category implements Serializable {
 	 */
 	public Category(String name, Category parentCategory) {
 		this.name = name;
-		this.setParentCategory(parentCategory);
+		this.parentCategory = parentCategory;
+		this.parentCategory.childCategories.add(this);
+		this.childCategories = new ArrayList<Category>();
 	}
 
 	/**
@@ -69,6 +76,10 @@ public class Category implements Serializable {
 		if ((parentCategory == null && theOther.parentCategory != null)
 				|| (parentCategory != null && !parentCategory
 						.equals(theOther.parentCategory)))
+			return false;
+		if ((childCategories.isEmpty() && !theOther.childCategories.isEmpty())
+				|| (!childCategories.isEmpty() && !childCategories
+						.equals(theOther.childCategories)))
 			return false;
 		return categoryId.equals(theOther.categoryId)
 				&& name.equals(theOther.name) && version == theOther.version;
@@ -95,10 +106,19 @@ public class Category implements Serializable {
 	 * 
 	 * @return the parent category
 	 */
-	@ManyToOne(optional = true, fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
 	@JoinColumn(name = "parentCategoryId")
+	@ManyToOne(cascade = CascadeType.MERGE)
 	public Category getParentCategory() {
 		return parentCategory;
+	}
+
+	/**
+	 * 
+	 * @return the child categories
+	 */
+	@OneToMany(mappedBy = "parentCategory", fetch = FetchType.LAZY)
+	public List<Category> getChildCategories() {
+		return childCategories;
 	}
 
 	/**
@@ -140,6 +160,15 @@ public class Category implements Serializable {
 	 */
 	public void setParentCategory(Category parentCategory) {
 		this.parentCategory = parentCategory;
+	}
+
+	/**
+	 * 
+	 * @param childCategories
+	 *            the children categories
+	 */
+	public void setChildCategories(List<Category> childCategories) {
+		this.childCategories = childCategories;
 	}
 
 }

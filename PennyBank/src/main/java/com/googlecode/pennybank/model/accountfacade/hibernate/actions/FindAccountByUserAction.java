@@ -71,8 +71,8 @@ public class FindAccountByUserAction implements NonTransactionalPlainAction {
 	private void initializeDAOs(EntityManager entityManager)
 			throws InternalErrorException {
 
-		userDAO = UserDAOFactory.getDelegate();
-		accountDAO = AccountDAOFactory.getDelegate();
+		userDAO = UserDAOFactory.getDAO();
+		accountDAO = AccountDAOFactory.getDAO();
 		userDAO.setEntityManager(entityManager);
 		accountDAO.setEntityManager(entityManager);
 	}

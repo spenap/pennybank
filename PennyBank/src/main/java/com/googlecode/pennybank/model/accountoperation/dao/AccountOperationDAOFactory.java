@@ -36,7 +36,7 @@ public class AccountOperationDAOFactory {
      * @return A delegate which implements AccountOperationDAO
      * @throws InternalErrorException If an unexpected error happens
      */
-    public static AccountOperationDAO getDelegate()
+    public static AccountOperationDAO getDAO()
 			throws InternalErrorException {
 
 		try {

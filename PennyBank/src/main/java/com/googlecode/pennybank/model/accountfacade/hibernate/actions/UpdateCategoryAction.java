@@ -1,7 +1,7 @@
 /**
- * DeleteCategoryAction.java
+ * UpdateCategoryAction.java
  * 
- * 24/02/2009
+ * 28/02/2009
  */
 package com.googlecode.pennybank.model.accountfacade.hibernate.actions;
 
@@ -9,28 +9,29 @@ import javax.persistence.EntityManager;
 
 import com.googlecode.pennybank.model.category.dao.CategoryDAO;
 import com.googlecode.pennybank.model.category.dao.CategoryDAOFactory;
+import com.googlecode.pennybank.model.category.entity.Category;
 import com.googlecode.pennybank.model.util.exceptions.InternalErrorException;
 import com.googlecode.pennybank.model.util.exceptions.ModelException;
 import com.googlecode.pennybank.model.util.transactions.TransactionalPlainAction;
 
 /**
- * Encapsulates the information needed to delete a category
+ * Class encapsulating all the information needed to update a category
  * 
  * @author spenap
+ * 
  */
-public class DeleteCategoryAction implements TransactionalPlainAction {
+public class UpdateCategoryAction implements TransactionalPlainAction {
 
-	private Long categoryId;
+	private Category category;
 	private CategoryDAO categoryDAO;
 
 	/**
-	 * Creates an action with the specified arguments
+	 * Creates a new action with the specified arguments
 	 * 
 	 * @param categoryId
-	 *            The category identifier
 	 */
-	public DeleteCategoryAction(Long categoryId) {
-		this.categoryId = categoryId;
+	public UpdateCategoryAction(Category category) {
+		this.category = category;
 	}
 
 	/*
@@ -42,11 +43,13 @@ public class DeleteCategoryAction implements TransactionalPlainAction {
 	 */
 	public Object execute(EntityManager entityManager) throws ModelException,
 			InternalErrorException {
-
 		initializeDAOs(entityManager);
-		categoryDAO.remove(categoryId);
 
-		return null;
+		// Checks if the category exists
+		categoryDAO.find(category.getCategoryId());
+
+		return categoryDAO.update(category);
+
 	}
 
 	private void initializeDAOs(EntityManager entityManager)

@@ -48,8 +48,8 @@ public class CreateAccountAction implements TransactionalPlainAction {
     private void initializeDAOs(EntityManager entityManager)
             throws InternalErrorException {
 
-        accountDAO = AccountDAOFactory.getDelegate();
-        userDAO = UserDAOFactory.getDelegate();
+        accountDAO = AccountDAOFactory.getDAO();
+        userDAO = UserDAOFactory.getDAO();
         userDAO.setEntityManager(entityManager);
         accountDAO.setEntityManager(entityManager);
     }

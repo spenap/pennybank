@@ -41,10 +41,13 @@ public class UpdateAccountTest {
 	public static void setUpBeforeClass() throws Exception {
 		accountFacade = AccountFacadeDelegateFactory.getDelegate();
 		userFacade = UserFacadeDelegateFactory.getDelegate();
+
 		anUser = new User("A Test User");
-		anotherUser = new User("Another Test User");
 		anUser = userFacade.createUser(anUser);
+
+		anotherUser = new User("Another Test User");
 		anotherUser = userFacade.createUser(anotherUser);
+
 		testAccount = new Account(anUser, INITIAL_BALANCE, "Test Account");
 		testAccount = accountFacade.createAccount(testAccount);
 	}
@@ -56,6 +59,7 @@ public class UpdateAccountTest {
 	public static void tearDownAfterClass() throws Exception {
 		accountFacade.deleteAccount(testAccount.getAccountId());
 		userFacade.deleteUser(anUser.getUserId());
+		userFacade.deleteUser(anotherUser.getUserId());
 	}
 
 	/**

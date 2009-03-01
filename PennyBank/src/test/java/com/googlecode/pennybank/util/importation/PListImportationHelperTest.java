@@ -1,32 +1,33 @@
 package com.googlecode.pennybank.util.importation;
 
-import com.googlecode.pennybank.model.account.entity.Account;
-import com.googlecode.pennybank.model.accountfacade.vo.AccountOperationInfo;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.util.List;
 
 import org.junit.Test;
 
+import com.googlecode.pennybank.model.account.entity.Account;
+import com.googlecode.pennybank.model.accountoperation.entity.AccountOperation;
 import com.googlecode.pennybank.util.importation.exceptions.NotYetParsedException;
 import com.googlecode.pennybank.util.importation.exceptions.ParseException;
-import java.util.List;
 
 public class PListImportationHelperTest {
 
 	@Test
 	public void testImport() throws ParseException, NotYetParsedException {
-
+		fail("Bad parsed");
 		PListImportationHelper importationHelper = new PListImportationHelper();
 		importationHelper
 				.parseAccountFile("src/test/resources/CashboxAccountFile.plist");
 
 		Account theAccount = importationHelper.getAccount();
-		List<AccountOperationInfo> accountOperations = importationHelper
+		List<AccountOperation> accountOperations = importationHelper
 				.getAccountOperations();
 
 		System.out.println(theAccount);
-		for (AccountOperationInfo accountOperationInfo : accountOperations) {
-			System.out.println(accountOperationInfo);
+		for (AccountOperation operation : accountOperations) {
+			System.out.println(operation);
 		}
-		assertTrue(false);
+
 	}
 }

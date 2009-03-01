@@ -28,7 +28,7 @@ public class FindAllAction implements NonTransactionalPlainAction {
 	private void initializeDAOs(EntityManager entityManager)
 			throws InternalErrorException {
 
-		userDAO = UserDAOFactory.getDelegate();
+		userDAO = UserDAOFactory.getDAO();
 		userDAO.setEntityManager(entityManager);
 	}
 

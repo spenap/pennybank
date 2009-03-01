@@ -117,4 +117,36 @@ public class DeleteCategoryTest {
 		assertTrue(exceptionCatched);
 	}
 
+	/**
+	 * Method which tests if a category gets its parent category reference
+	 * updated when the parent is removed
+	 * 
+	 * @throws InternalErrorException
+	 * @throws InstanceNotFoundException
+	 */
+	@Test
+	public void testDeleteRootCategoryWithExistingLeafs()
+			throws InternalErrorException, InstanceNotFoundException {
+		// Create root category
+		Category theCategory = new Category("Test Root Category");
+		theCategory = accountFacade.createCategory(theCategory);
+
+		// Create leaf category
+		Category otherCategory = new Category("Test Leaf Category", theCategory);
+		otherCategory = accountFacade.createCategory(otherCategory);
+
+		// Delete root category
+		accountFacade.deleteCategory(theCategory.getCategoryId());
+
+		// Check "ON DELETE SET NULL"
+		otherCategory = accountFacade.findCategory(otherCategory
+				.getCategoryId());
+
+		Category x = accountFacade.findCategory(otherCategory.getCategoryId());
+
+		assertTrue(x.getParentCategory() == null);
+
+		accountFacade.deleteCategory(otherCategory.getCategoryId());
+	}
+
 }

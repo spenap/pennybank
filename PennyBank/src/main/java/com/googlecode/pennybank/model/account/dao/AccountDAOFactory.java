@@ -36,7 +36,7 @@ public class AccountDAOFactory {
      * @return A delegate implementing the AccountDAO interface
      * @throws InternalErrorException if there is any error
      */
-    public static AccountDAO getDelegate()
+    public static AccountDAO getDAO()
 			throws InternalErrorException {
 
 		try {

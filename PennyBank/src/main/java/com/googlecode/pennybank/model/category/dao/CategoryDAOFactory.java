@@ -37,7 +37,7 @@ public class CategoryDAOFactory {
      * @return a CategoryDAO implementation
      * @throws InternalErrorException If an unexpected error happened
      */
-    public static CategoryDAO getDelegate()
+    public static CategoryDAO getDAO()
             throws InternalErrorException {
 
         try {
