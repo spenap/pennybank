@@ -88,9 +88,9 @@ public class WithdrawFromAccountAction implements TransactionalPlainAction {
 	private void initializeDAOs(EntityManager entityManager)
 			throws InternalErrorException {
 
-		accountDAO = AccountDAOFactory.getDelegate();
-		accountOperationDAO = AccountOperationDAOFactory.getDelegate();
-		categoryDAO = CategoryDAOFactory.getDelegate();
+		accountDAO = AccountDAOFactory.getDAO();
+		accountOperationDAO = AccountOperationDAOFactory.getDAO();
+		categoryDAO = CategoryDAOFactory.getDAO();
 		accountDAO.setEntityManager(entityManager);
 		accountOperationDAO.setEntityManager(entityManager);
 		categoryDAO.setEntityManager(entityManager);

@@ -9,7 +9,7 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
-import com.googlecode.pennybank.model.accountfacade.vo.AccountOperationInfo;
+import com.googlecode.pennybank.model.accountoperation.entity.AccountOperation;
 import com.googlecode.pennybank.model.util.vo.Block;
 import com.googlecode.pennybank.swing.view.util.MessageManager;
 
@@ -62,34 +62,34 @@ public class MainContentPanel extends JPanel {
 	}
 
 	public void setAccountOperations(
-			Block<AccountOperationInfo> accountOperationBlocks) {
+			Block<AccountOperation> block) {
 
 		DefaultTableModel tableModel = (DefaultTableModel) accountOperationsTable
 				.getModel();
 
-		tableModel.setRowCount(accountOperationBlocks.getContents().size());
+		tableModel.setRowCount(block.getContents().size());
 
-		for (int i = 0; i < accountOperationBlocks.getContents().size(); i++) {
-			AccountOperationInfo accountOperationInfo = accountOperationBlocks
+		for (int i = 0; i < block.getContents().size(); i++) {
+			AccountOperation operationsBlock = block
 					.getContents().get(i);
 			// Type
-			accountOperationsTable.setValueAt(accountOperationInfo.getType(),
+			accountOperationsTable.setValueAt(operationsBlock.getType(),
 					i, 0);
 
 			// Amount
-			accountOperationsTable.setValueAt(accountOperationInfo.getAmount(),
+			accountOperationsTable.setValueAt(operationsBlock.getAmount(),
 					i, 1);
 
 			// Date
-			accountOperationsTable.setValueAt(accountOperationInfo.getDate()
+			accountOperationsTable.setValueAt(operationsBlock.getDate()
 					.getTime().toString(), i, 2);
 
 			// Comment
 			accountOperationsTable.setValueAt(
-					accountOperationInfo.getComment(), i, 3);
+					operationsBlock.getComment(), i, 3);
 
 			// Categories
-			accountOperationsTable.setValueAt(accountOperationInfo
+			accountOperationsTable.setValueAt(operationsBlock
 					.getCategory(), i, 4);
 		}
 	}

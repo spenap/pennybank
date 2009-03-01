@@ -36,7 +36,7 @@ public class UserDAOFactory {
      * @return A delegate implementing the UserDAO interface
      * @throws InternalErrorException If an unexpected error happened
      */
-    public static UserDAO getDelegate() throws InternalErrorException {
+    public static UserDAO getDAO() throws InternalErrorException {
 
 		try {
 			return (UserDAO) daoClass.newInstance();

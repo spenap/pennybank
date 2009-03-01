@@ -53,7 +53,7 @@ public class FindCategoryAction implements NonTransactionalPlainAction {
 
 	private void initializeDAOs(EntityManager entityManager)
 			throws InternalErrorException {
-		categoryDAO = CategoryDAOFactory.getDelegate();
+		categoryDAO = CategoryDAOFactory.getDAO();
 		categoryDAO.setEntityManager(entityManager);
 	}
 

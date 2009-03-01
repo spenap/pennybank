@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -107,7 +106,7 @@ public class AccountOperation implements Serializable {
 	 */
 	public AccountOperation(Account account, Type type, double amount,
 			Calendar date, String comment, Category category) {
-		
+
 		this.account = account;
 		this.type = type;
 		this.amount = amount;
@@ -145,7 +144,7 @@ public class AccountOperation implements Serializable {
 	/**
 	 * @return the account
 	 */
-	@ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = { CascadeType.REFRESH, CascadeType.REMOVE })
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "accId")
 	public Account getAccount() {
 
@@ -163,7 +162,7 @@ public class AccountOperation implements Serializable {
 	/**
 	 * @return the category
 	 */
-	@ManyToOne(optional = true, fetch = FetchType.LAZY, cascade = { CascadeType.REFRESH })
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "categoryId")
 	public Category getCategory() {
 

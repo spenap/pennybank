@@ -12,12 +12,15 @@ import com.googlecode.pennybank.model.accountfacade.hibernate.actions.DeleteCate
 import com.googlecode.pennybank.model.accountfacade.hibernate.actions.FindAccountAction;
 import com.googlecode.pennybank.model.accountfacade.hibernate.actions.FindAccountByUserAction;
 import com.googlecode.pennybank.model.accountfacade.hibernate.actions.FindAccountOperationsAction;
+import com.googlecode.pennybank.model.accountfacade.hibernate.actions.FindAccountOperationsByCategoryAction;
+import com.googlecode.pennybank.model.accountfacade.hibernate.actions.FindAccountOperationsByType;
 import com.googlecode.pennybank.model.accountfacade.hibernate.actions.FindCategoryAction;
 import com.googlecode.pennybank.model.accountfacade.hibernate.actions.GetOperationsCountAction;
 import com.googlecode.pennybank.model.accountfacade.hibernate.actions.TransferAction;
 import com.googlecode.pennybank.model.accountfacade.hibernate.actions.UpdateAccountAction;
+import com.googlecode.pennybank.model.accountfacade.hibernate.actions.UpdateCategoryAction;
 import com.googlecode.pennybank.model.accountfacade.hibernate.actions.WithdrawFromAccountAction;
-import com.googlecode.pennybank.model.accountfacade.vo.AccountOperationInfo;
+import com.googlecode.pennybank.model.accountoperation.entity.AccountOperation;
 import com.googlecode.pennybank.model.accountoperation.entity.AccountOperation.Type;
 import com.googlecode.pennybank.model.category.entity.Category;
 import com.googlecode.pennybank.model.util.exceptions.InstanceNotFoundException;
@@ -61,21 +64,6 @@ public class AccountFacade extends HibernateFacade implements
 
 		CreateAccountAction action = new CreateAccountAction(account);
 
-		Account theAccount;
-		try {
-			theAccount = (Account) PlainActionProcessor.process(entityManager,
-					action);
-			return theAccount;
-		} catch (InstanceNotFoundException e) {
-			throw e;
-		} catch (ModelException e) {
-			throw new InternalErrorException(e);
-		}
-	}
-
-	public Account updateAccount(Account account)
-			throws InternalErrorException, InstanceNotFoundException {
-		UpdateAccountAction action = new UpdateAccountAction(account);
 		Account theAccount;
 		try {
 			theAccount = (Account) PlainActionProcessor.process(entityManager,
@@ -161,14 +149,14 @@ public class AccountFacade extends HibernateFacade implements
 	}
 
 	@SuppressWarnings("unchecked")
-	public Block<AccountOperationInfo> findAccountOperations(Long accountId,
+	public Block<AccountOperation> findAccountOperations(Long accountId,
 			int startIndex, int count) throws InstanceNotFoundException,
 			InternalErrorException {
 
 		FindAccountOperationsAction action = new FindAccountOperationsAction(
 				accountId, startIndex, count);
 		try {
-			return (Block<AccountOperationInfo>) PlainActionProcessor.process(
+			return (Block<AccountOperation>) PlainActionProcessor.process(
 					entityManager, action);
 		} catch (InstanceNotFoundException e) {
 			throw e;
@@ -177,28 +165,76 @@ public class AccountFacade extends HibernateFacade implements
 		}
 	}
 
-	public Block<AccountOperationInfo> findAccountOperationsByCategory(
+	@SuppressWarnings("unchecked")
+	public Block<AccountOperation> findAccountOperationsByCategory(
 			Long accountId, Long categoryId, int startIndex, int count)
-			throws InstanceNotFoundException {
+			throws InstanceNotFoundException, InternalErrorException {
+
+		FindAccountOperationsByCategoryAction action = new FindAccountOperationsByCategoryAction(
+				accountId, categoryId, startIndex, count);
+		try {
+			return (Block<AccountOperation>) PlainActionProcessor.process(
+					entityManager, action);
+		} catch (InstanceNotFoundException e) {
+			throw e;
+		} catch (ModelException e) {
+			throw new InternalErrorException(e);
+		}
+	}
+
+	public Block<AccountOperation> findAccountOperationsByDate(Long accountId,
+			Calendar startDate, Calendar endDate, int startIndex, int count)
+			throws InstanceNotFoundException, InternalErrorException {
 
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public Block<AccountOperationInfo> findAccountOperationsByDate(
-			Long accountId, Calendar startDate, Calendar endDate,
-			int startIndex, int count) throws InstanceNotFoundException {
+	@SuppressWarnings("unchecked")
+	public Block<AccountOperation> findAccountOperationsByType(Long accountId,
+			Type type, int startIndex, int count)
+			throws InstanceNotFoundException, InternalErrorException {
 
-		// TODO Auto-generated method stub
-		return null;
+		FindAccountOperationsByType action = new FindAccountOperationsByType(
+				accountId, type, startIndex, count);
+
+		try {
+			return (Block<AccountOperation>) PlainActionProcessor.process(
+					entityManager, action);
+		} catch (InstanceNotFoundException e) {
+			throw e;
+		} catch (ModelException e) {
+			throw new InternalErrorException(e);
+		}
 	}
 
-	public Block<AccountOperationInfo> findAccountOperationsByType(
-			Long accountId, Type type, int startIndex, int count)
-			throws InstanceNotFoundException {
+	public Category findCategory(Long categoryId)
+			throws InternalErrorException, InstanceNotFoundException {
 
-		// TODO Auto-generated method stub
-		return null;
+		FindCategoryAction action = new FindCategoryAction(categoryId);
+
+		try {
+			return (Category) PlainActionProcessor.process(entityManager,
+					action);
+		} catch (InstanceNotFoundException e) {
+			throw e;
+		} catch (ModelException e) {
+			throw new InternalErrorException(e);
+		}
+	}
+
+	public Long getOperationsCount(Long accountId)
+			throws InstanceNotFoundException, InternalErrorException {
+
+		GetOperationsCountAction action = new GetOperationsCountAction(
+				accountId);
+		try {
+			return (Long) PlainActionProcessor.process(entityManager, action);
+		} catch (InstanceNotFoundException e) {
+			throw e;
+		} catch (ModelException e) {
+			throw new InternalErrorException(e);
+		}
 	}
 
 	public void transfer(Long sourceAccountId, Long destinationAccountId,
@@ -222,6 +258,21 @@ public class AccountFacade extends HibernateFacade implements
 
 	}
 
+	public Account updateAccount(Account account)
+			throws InternalErrorException, InstanceNotFoundException {
+		UpdateAccountAction action = new UpdateAccountAction(account);
+		Account theAccount;
+		try {
+			theAccount = (Account) PlainActionProcessor.process(entityManager,
+					action);
+			return theAccount;
+		} catch (InstanceNotFoundException e) {
+			throw e;
+		} catch (ModelException e) {
+			throw new InternalErrorException(e);
+		}
+	}
+
 	public void withdrawFromAccount(Long accountId, double amount,
 			String comment, Calendar operationDate, Category category)
 			throws InstanceNotFoundException, InternalErrorException,
@@ -242,25 +293,9 @@ public class AccountFacade extends HibernateFacade implements
 		}
 	}
 
-	public Long getOperationsCount(Long accountId)
+	public Category updateCategory(Category category)
 			throws InstanceNotFoundException, InternalErrorException {
-
-		GetOperationsCountAction action = new GetOperationsCountAction(
-				accountId);
-		try {
-			return (Long) PlainActionProcessor.process(entityManager, action);
-		} catch (InstanceNotFoundException e) {
-			throw e;
-		} catch (ModelException e) {
-			throw new InternalErrorException(e);
-		}
-	}
-
-	public Category findCategory(Long categoryId)
-			throws InternalErrorException, InstanceNotFoundException {
-
-		FindCategoryAction action = new FindCategoryAction(categoryId);
-
+		UpdateCategoryAction action = new UpdateCategoryAction(category);
 		try {
 			return (Category) PlainActionProcessor.process(entityManager,
 					action);

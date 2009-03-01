@@ -1,44 +1,57 @@
+/**
+ * UpdateUserAction.java
+ * 
+ * 28/02/2009
+ */
 package com.googlecode.pennybank.model.userfacade.hibernate.actions;
 
 import javax.persistence.EntityManager;
 
 import com.googlecode.pennybank.model.user.dao.UserDAO;
 import com.googlecode.pennybank.model.user.dao.UserDAOFactory;
+import com.googlecode.pennybank.model.user.entity.User;
 import com.googlecode.pennybank.model.util.exceptions.InternalErrorException;
 import com.googlecode.pennybank.model.util.exceptions.ModelException;
 import com.googlecode.pennybank.model.util.transactions.TransactionalPlainAction;
 
 /**
- * An action encapsulating the deletion of an user
- *
+ * Class which encapsulates the information needed to update an user
+ * 
  * @author spenap
  */
-public class DeleteAction implements TransactionalPlainAction {
+public class UpdateUserAction implements TransactionalPlainAction {
 
-	private Long userId;
+	private User user;
 	private UserDAO userDAO;
 
-    /**
-     * Creates a new action with the specified parameters
-     *
-     * @param userId The user to be deleted
-     */
-    public DeleteAction(Long userId) {
-		this.userId = userId;
-		
+	/**
+	 * Creates an action with the specified arguments
+	 * 
+	 * @param user
+	 */
+	public UpdateUserAction(User user) {
+		this.user = user;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.googlecode.pennybank.model.util.transactions.PlainAction#execute(
+	 * javax.persistence.EntityManager)
+	 */
 	public Object execute(EntityManager entityManager) throws ModelException,
 			InternalErrorException {
-		
 		initializeDAOs(entityManager);
-		userDAO.remove(userId);
-		return null;
+
+		// Check if the user exists
+		userDAO.find(user.getUserId());
+
+		return userDAO.update(user);
 	}
 
 	private void initializeDAOs(EntityManager entityManager)
-			throws InternalErrorException {
-
+			throws ModelException, InternalErrorException {
 		userDAO = UserDAOFactory.getDAO();
 		userDAO.setEntityManager(entityManager);
 	}

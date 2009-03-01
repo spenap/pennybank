@@ -20,7 +20,7 @@ import org.junit.Test;
 import com.googlecode.pennybank.model.account.entity.Account;
 import com.googlecode.pennybank.model.accountfacade.delegate.AccountFacadeDelegate;
 import com.googlecode.pennybank.model.accountfacade.delegate.AccountFacadeDelegateFactory;
-import com.googlecode.pennybank.model.accountfacade.vo.AccountOperationInfo;
+import com.googlecode.pennybank.model.accountoperation.entity.AccountOperation;
 import com.googlecode.pennybank.model.user.entity.User;
 import com.googlecode.pennybank.model.userfacade.delegate.UserFacadeDelegate;
 import com.googlecode.pennybank.model.userfacade.delegate.UserFacadeDelegateFactory;
@@ -112,10 +112,10 @@ public class FindAccountOperationsTest {
 			accountFacade.addToAccount(testAccount.getAccountId(), amount,
 					comment, operationDate, null);
 		}
-		Block<AccountOperationInfo> accountOperationsInfo = accountFacade
+		Block<AccountOperation> accountOperations = accountFacade
 				.findAccountOperations(testAccount.getAccountId(), 0,
 						operationsNumber - 1);
-		assertTrue(accountOperationsInfo.isExistMore());
+		assertTrue(accountOperations.isExistMore());
 	}
 
 	/**
@@ -140,10 +140,10 @@ public class FindAccountOperationsTest {
 		}
 		Long readOpCount = accountFacade.getOperationsCount(testAccount
 				.getAccountId());
-		Block<AccountOperationInfo> accountOperationsInfo = accountFacade
+		Block<AccountOperation> accountOperations = accountFacade
 				.findAccountOperations(testAccount.getAccountId(), 0,
 						readOpCount.intValue());
-		assertFalse(accountOperationsInfo.isExistMore());
+		assertFalse(accountOperations.isExistMore());
 	}
 
 	/**
@@ -168,10 +168,10 @@ public class FindAccountOperationsTest {
 		}
 		Long readOpCount = accountFacade.getOperationsCount(testAccount
 				.getAccountId());
-		Block<AccountOperationInfo> accountOperationsInfo = accountFacade
+		Block<AccountOperation> accountOperations = accountFacade
 				.findAccountOperations(testAccount.getAccountId(), 0,
 						readOpCount.intValue());
-		assertEquals(readOpCount.intValue(), accountOperationsInfo
+		assertEquals(readOpCount.intValue(), accountOperations
 				.getContents().size());
 	}
 

@@ -41,7 +41,7 @@ public class CreateUserAction implements TransactionalPlainAction {
 	private void initializeDAOs(EntityManager entityManager)
 			throws InternalErrorException {
 
-		userDAO = UserDAOFactory.getDelegate();
+		userDAO = UserDAOFactory.getDAO();
 		userDAO.setEntityManager(entityManager);
 	}
 

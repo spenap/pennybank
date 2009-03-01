@@ -46,8 +46,8 @@ public class GetOperationsCountAction implements NonTransactionalPlainAction {
 	private void initializeDAOs(EntityManager entityManager)
 			throws InternalErrorException {
 
-		accountOperationDAO = AccountOperationDAOFactory.getDelegate();
-		accountDAO = AccountDAOFactory.getDelegate();
+		accountOperationDAO = AccountOperationDAOFactory.getDAO();
+		accountDAO = AccountDAOFactory.getDAO();
 		accountOperationDAO.setEntityManager(entityManager);
 		accountDAO.setEntityManager(entityManager);
 	}

@@ -1,7 +1,7 @@
 /**
- * FindAccountOperationsAction.java
+ * FindAccountOperationsByCategoryAction.java
  * 
- * 25/02/2009
+ * 28/02/2009
  */
 package com.googlecode.pennybank.model.accountfacade.hibernate.actions;
 
@@ -14,37 +14,44 @@ import com.googlecode.pennybank.model.account.dao.AccountDAOFactory;
 import com.googlecode.pennybank.model.accountoperation.dao.AccountOperationDAO;
 import com.googlecode.pennybank.model.accountoperation.dao.AccountOperationDAOFactory;
 import com.googlecode.pennybank.model.accountoperation.entity.AccountOperation;
+import com.googlecode.pennybank.model.category.dao.CategoryDAO;
+import com.googlecode.pennybank.model.category.dao.CategoryDAOFactory;
 import com.googlecode.pennybank.model.util.exceptions.InternalErrorException;
 import com.googlecode.pennybank.model.util.exceptions.ModelException;
 import com.googlecode.pennybank.model.util.transactions.NonTransactionalPlainAction;
 import com.googlecode.pennybank.model.util.vo.Block;
 
 /**
- * @author spenap
+ * Class which encapsulates the information needed to search account operations
+ * by category
  * 
+ * @author spenap
  */
-public class FindAccountOperationsAction implements NonTransactionalPlainAction {
+public class FindAccountOperationsByCategoryAction implements
+		NonTransactionalPlainAction {
 
-	private long accountId;
+	private Long accountId;
 	private int startIndex;
 	private int count;
-	private AccountOperationDAO accountOperationDAO;
+	private Long categoryId;
 	private AccountDAO accountDAO;
+	private AccountOperationDAO accountOperationDAO;
+	private CategoryDAO categoryDAO;
 
 	/**
-	 * Creates an new action with the specified arguments
+	 * Creates an action with the specified arguments
 	 * 
 	 * @param accountId
-	 *            The account identifier whose actions we are trying to retrieve
+	 * @param categoryId
 	 * @param startIndex
-	 *            The index to start retrieving account operations
 	 * @param count
-	 *            The number of account operations to retrieve
 	 */
-	public FindAccountOperationsAction(long accountId, int startIndex, int count) {
+	public FindAccountOperationsByCategoryAction(Long accountId,
+			Long categoryId, int startIndex, int count) {
 		this.accountId = accountId;
 		this.startIndex = startIndex;
 		this.count = count;
+		this.categoryId = categoryId;
 	}
 
 	/*
@@ -56,32 +63,35 @@ public class FindAccountOperationsAction implements NonTransactionalPlainAction 
 	 */
 	public Object execute(EntityManager entityManager) throws ModelException,
 			InternalErrorException {
-
 		initializeDAOs(entityManager);
 
 		// Check if the account exists
 		accountDAO.find(accountId);
 
+		// Check if the category exists
+		categoryDAO.find(categoryId);
+
+		// Retrieve the account operations
 		List<AccountOperation> accountOperations = accountOperationDAO
-				.findByAccount(accountId, startIndex, count + 1);
+				.findByCategory(accountId, categoryId, startIndex, count + 1);
 
 		boolean existMore = accountOperations.size() == count + 1;
 		if (existMore) {
 			accountOperations.remove(accountOperations.size() - 1);
 		}
 
-		Block<AccountOperation> operationBlock = new Block<AccountOperation>(
-				existMore, accountOperations);
-
-		return operationBlock;
+		return new Block<AccountOperation>(existMore, accountOperations);
 	}
 
 	private void initializeDAOs(EntityManager entityManager)
 			throws InternalErrorException {
-		accountOperationDAO = AccountOperationDAOFactory.getDAO();
 		accountDAO = AccountDAOFactory.getDAO();
-		accountOperationDAO.setEntityManager(entityManager);
+		accountOperationDAO = AccountOperationDAOFactory.getDAO();
+		categoryDAO = CategoryDAOFactory.getDAO();
+
 		accountDAO.setEntityManager(entityManager);
+		accountOperationDAO.setEntityManager(entityManager);
+		categoryDAO.setEntityManager(entityManager);
 	}
 
 }

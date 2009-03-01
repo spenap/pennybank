@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.googlecode.pennybank.model.accountfacade.vo.AccountOperationInfo;
+import com.googlecode.pennybank.model.accountoperation.entity.AccountOperation;
 import com.googlecode.pennybank.model.util.vo.Block;
 import com.googlecode.pennybank.swing.view.main.MainWindow;
 import com.googlecode.pennybank.util.importation.PListImportationHelper;
@@ -70,10 +70,10 @@ public class ImportFileListener implements ActionListener {
 		PListImportationHelper importationHelper = new PListImportationHelper();
 		try {
 			importationHelper.parseAccountFile(pathToFile.toString());
-			List<AccountOperationInfo> accountOperations = importationHelper
+			List<AccountOperation> accountOperations = importationHelper
 					.getAccountOperations();
 			MainWindow.getInstance().getContentPanel().setAccountOperations(
-					new Block<AccountOperationInfo>(false, accountOperations));
+					new Block<AccountOperation>(false, accountOperations));
 		} catch (ParseException ex) {
 			Logger.getLogger(ImportFileListener.class.getName()).log(
 					Level.SEVERE, null, ex);

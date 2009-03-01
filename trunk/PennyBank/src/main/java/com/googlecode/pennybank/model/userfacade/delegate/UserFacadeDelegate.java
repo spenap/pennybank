@@ -8,7 +8,7 @@ import com.googlecode.pennybank.model.util.exceptions.InternalErrorException;
 
 /**
  * The UserFacade interface
- *
+ * 
  * @author spenap
  */
 public interface UserFacadeDelegate {
@@ -58,5 +58,19 @@ public interface UserFacadeDelegate {
 	 *             Exception encapsulating a non logical error
 	 */
 	public User find(Long userId) throws InstanceNotFoundException,
+			InternalErrorException;
+
+	/**
+	 * Updates an user
+	 * 
+	 * @param theUser
+	 *            the user to update
+	 * @return the user up to date
+	 * @throws InstanceNotFoundException
+	 *             if the user was not found
+	 * @throws InternalErrorException
+	 *             if an unexpected error happened
+	 */
+	public User updateUser(User theUser) throws InstanceNotFoundException,
 			InternalErrorException;
 }

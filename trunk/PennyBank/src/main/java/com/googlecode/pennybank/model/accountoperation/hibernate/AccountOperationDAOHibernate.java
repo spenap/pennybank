@@ -10,7 +10,7 @@ import com.googlecode.pennybank.model.util.dao.GenericDAOHibernate;
 
 /**
  * Class implementing the AccountOperationDAO interface, using Hibernate
- *
+ * 
  * @author spenap
  */
 public class AccountOperationDAOHibernate extends
@@ -35,8 +35,8 @@ public class AccountOperationDAOHibernate extends
 		return getSession()
 				.createQuery(
 						"SELECT a "
-								+ "FROM AccountOperation a INNER JOIN a.categories c "
-								+ "WHERE a.account.accountId = :accountId AND c.categoryId = :categoryId "
+								+ "FROM AccountOperation a "
+								+ "WHERE a.account.accountId = :accountId AND a.category.categoryId = :categoryId "
 								+ "ORDER BY a.date").setParameter("accountId",
 						accountId).setParameter("categoryId", categoryId)
 				.setFirstResult(startIndex).setMaxResults(count).list();

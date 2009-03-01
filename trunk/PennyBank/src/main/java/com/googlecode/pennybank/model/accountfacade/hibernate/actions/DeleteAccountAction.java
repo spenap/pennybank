@@ -41,7 +41,7 @@ public class DeleteAccountAction implements TransactionalPlainAction {
     private void initializeDAOs(EntityManager entityManager)
             throws InternalErrorException {
 
-        accountDAO = AccountDAOFactory.getDelegate();
+        accountDAO = AccountDAOFactory.getDAO();
         accountDAO.setEntityManager(entityManager);
     }
 }

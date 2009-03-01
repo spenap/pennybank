@@ -48,6 +48,7 @@ public class Account implements Serializable {
 		this.user = user;
 		this.balance = balance;
 		this.name = name;
+		this.user.getAccounts().add(this);
 	}
 
 	/**
