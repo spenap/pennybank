@@ -19,8 +19,8 @@ public class AccountDAOHibernate extends GenericDAOHibernate<Account, Long>
 	public List<Account> findByUser(Long id, int startIndex, int count) {
 
 		return getSession().createQuery(
-				"SELECT a " + "FROM Account a "
-						+ "WHERE a.user.userId = :userId " + "ORDER BY a.name")
+				"SELECT a FROM Account a "
+						+ "WHERE a.user.userId = :userId ORDER BY a.name")
 				.setParameter("userId", id).setMaxResults(count)
 				.setFirstResult(startIndex).list();
 	}
@@ -30,6 +30,7 @@ public class AccountDAOHibernate extends GenericDAOHibernate<Account, Long>
 
 		Account theAccount = find(id);
 
+		// Remove the account from the user's account list
 		theAccount.getUser().getAccounts().remove(theAccount);
 
 		super.remove(id);

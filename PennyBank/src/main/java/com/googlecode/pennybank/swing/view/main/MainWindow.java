@@ -1,101 +1,118 @@
 package com.googlecode.pennybank.swing.view.main;
 
-import com.explodingpixels.macwidgets.MacUtils;
-import com.explodingpixels.macwidgets.MacWidgetFactory;
-import com.explodingpixels.widgets.WindowUtils;
-import com.googlecode.pennybank.swing.view.util.MessageManager;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
+
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
+import com.explodingpixels.macwidgets.MacUtils;
+import com.explodingpixels.macwidgets.MacWidgetFactory;
+import com.explodingpixels.widgets.WindowUtils;
+import com.googlecode.pennybank.App;
+import com.googlecode.pennybank.model.account.entity.Account;
+import com.googlecode.pennybank.swing.view.util.MessageManager;
+
 /**
- * The application main Window
- *
+ * The application main window
+ * 
  * @author spenap
  */
 @SuppressWarnings("serial")
 public class MainWindow extends JFrame {
 
-    private Container mainWindow;
-    private Component toolBar;
-    private JSplitPane mainContent;
-    private Component bottomBar;
-    private MainNavigationPanel navigationPanel;
-    private JComponent contentPanel;
-    private JMenuBar menuBar;
+	private Container mainWindow;
+	private Component toolBar;
+	private JSplitPane mainContent;
+	private Component bottomBar;
+	private MainNavigationPanel navigationPanel;
+	private JComponent contentPanel;
+	private JMenuBar menuBar;
 
-    /**
-     * Creates the main Window of the aplication
-     * 
-     * @return The main Window
-     */
-    public static MainWindow getInstance() {
-        if (instance == null) {
-            instance = new MainWindow();
-        }
-        return instance;
-    }
+	private static MainWindow instance = null;
 
-    public MainContentPanel getContentPanel() {
-        return (MainContentPanel) contentPanel;
-    }
+	/**
+	 * Creates the main window of the application
+	 * 
+	 * @return The main window
+	 */
+	public static MainWindow getInstance() {
+		if (instance == null) {
+			instance = new MainWindow();
+		}
+		return instance;
+	}
 
-    public MainNavigationPanel getNavigationPanel() {
-        return navigationPanel;
-    }
+	private MainWindow() {
 
-    private static MainWindow instance = null;
+		initComponents();
+		setUp();
+	}
 
-    private MainWindow() {
+	/**
+	 * Retrieves the main content of the application
+	 * 
+	 * @return The application main content
+	 */
+	public MainContentPanel getContentPanel() {
+		return (MainContentPanel) contentPanel;
+	}
 
-        initComponents();
-        setUp();
-    }
+	/**
+	 * Retrieves the navigation panel of the application
+	 * 
+	 * @return The application navigation panel
+	 */
+	public MainNavigationPanel getNavigationPanel() {
+		return navigationPanel;
+	}
 
-    private void initComponents() {
+	private void initComponents() {
 
-        // MainWindow Look & Feel
-        setTitle(MessageManager.getMessage("MainWindow.Title"));
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        MacUtils.makeWindowLeopardStyle(getRootPane());
-        WindowUtils.createAndInstallRepaintWindowFocusListener(this);
+		// MainWindow Look & Feel
+		setTitle(MessageManager.getMessage("MainWindow.Title"));
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		MacUtils.makeWindowLeopardStyle(getRootPane());
+		WindowUtils.createAndInstallRepaintWindowFocusListener(this);
 
-        // Menu Bar
-        menuBar = new MainMenuBar();
-        setJMenuBar(menuBar);
+		// Menu Bar
+		menuBar = new MainMenuBar();
+		setJMenuBar(menuBar);
 
-        // Navigation Panel
-        navigationPanel = new MainNavigationPanel();
+		// Navigation Panel
+		navigationPanel = new MainNavigationPanel();
+		for (Account account : App.getCurrentUser().getAccounts()) {
+			navigationPanel.addAccount(account);
+		}
 
-        // Content Panel
-        contentPanel = new MainContentPanel();
+		// Content Panel
+		contentPanel = new MainContentPanel();
 
-        // ToolBar
-        toolBar = MainToolBar.getMainToolBar(this);
+		// ToolBar
+		toolBar = MainToolBar.getMainToolBar(this);
 
-        // BottomBar
-        bottomBar = MainBottomBar.getBottomBar();
+		// BottomBar
+		bottomBar = MainBottomBar.getBottomBar();
 
-        // Main Content
-        mainContent = MacWidgetFactory.createSplitPaneForSourceList(
-                navigationPanel.getSourceList(), contentPanel);
+		// Main Content
+		mainContent = MacWidgetFactory.createSplitPaneForSourceList(
+				navigationPanel.getSourceList(), contentPanel);
 
-        // Window
-        mainWindow = new JPanel(new BorderLayout());
-        mainWindow.add(toolBar, BorderLayout.NORTH);
-        mainWindow.add(mainContent, BorderLayout.CENTER);
-        mainWindow.add(bottomBar, BorderLayout.SOUTH);
+		// Window
+		mainWindow = new JPanel(new BorderLayout());
+		mainWindow.add(toolBar, BorderLayout.NORTH);
+		mainWindow.add(mainContent, BorderLayout.CENTER);
+		mainWindow.add(bottomBar, BorderLayout.SOUTH);
 
-        setContentPane(mainWindow);
-    }
+		setContentPane(mainWindow);
+	}
 
-    private void setUp() {
-        pack();
-        setLocation(100, 50);
-    }
+	private void setUp() {
+		pack();
+		setLocation(100, 50);
+	}
 }

@@ -49,8 +49,8 @@ public class AccountOperationDAOHibernate extends
 				.createQuery(
 						"SELECT a "
 								+ "FROM AccountOperation a "
-								+ "WHERE a.date < :endDate "
-								+ "AND a.date > :startDate AND a.account.accountId = :accountId "
+								+ "WHERE a.date <= :endDate "
+								+ "AND a.date >= :startDate AND a.account.accountId = :accountId "
 								+ "ORDER BY a.date").setParameter("endDate",
 						endDate).setParameter("startDate", startDate)
 				.setParameter("accountId", accountId)

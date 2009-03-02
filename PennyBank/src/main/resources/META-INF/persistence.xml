@@ -14,7 +14,6 @@
 			<property name="hibernate.connection.username">pennybank</property>
 			<property name="hibernate.connection.password">pennybank</property>
 			<property name="hibernate.connection.url">jdbc:mysql://localhost/pennybank</property>
-
 			<property name="hibernate.connection.autocommit">true</property>
 		</properties>
 
