@@ -45,7 +45,7 @@ public class ImportFileListener implements ActionListener {
 
 		if (fileChooser.getDirectory() == null)
 			return;
-		StringBuffer pathToFile = new StringBuffer(fileChooser.getDirectory());
+		StringBuilder pathToFile = new StringBuilder(fileChooser.getDirectory());
 		pathToFile.append(fileChooser.getFile());
 
 		switch (type) {
@@ -53,7 +53,7 @@ public class ImportFileListener implements ActionListener {
 			if (!pathToFile.toString().toLowerCase().endsWith("plist"))
 				return;
 			try {
-				importPlist(pathToFile);
+				importPlist(pathToFile.toString());
 			} catch (ImportationException ex) {
 
 				ex.printStackTrace();
@@ -65,7 +65,7 @@ public class ImportFileListener implements ActionListener {
 
 	}
 
-	private void importPlist(StringBuffer pathToFile)
+	private void importPlist(String pathToFile)
 			throws ImportationException {
 		PListImportationHelper importationHelper = new PListImportationHelper();
 		try {

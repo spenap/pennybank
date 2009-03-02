@@ -83,7 +83,8 @@ public class AccountOperation implements Serializable {
 		this.account = account;
 		this.type = type;
 		this.amount = amount;
-		this.date = date;
+		this.date = Calendar.getInstance();
+		this.date.setTime(date.getTime());
 		this.comment = comment;
 		this.category = null;
 	}
@@ -110,7 +111,8 @@ public class AccountOperation implements Serializable {
 		this.account = account;
 		this.type = type;
 		this.amount = amount;
-		this.date = date;
+		this.date = Calendar.getInstance();
+		this.date.setTime(date.getTime());
 		this.comment = comment;
 		this.category = category;
 	}
@@ -231,6 +233,19 @@ public class AccountOperation implements Serializable {
 	 */
 	public void setAmount(double amount) {
 
+		if (this.amount != 0) {
+			double difference = this.amount - amount;
+			switch (type) {
+			case DEPOSIT:
+				account.setBalance(account.getBalance() - difference);
+				break;
+			case WITHDRAW:
+				account.setBalance(account.getBalance() + difference);
+				break;
+			default:
+				break;
+			}
+		}
 		this.amount = amount;
 	}
 
@@ -258,7 +273,8 @@ public class AccountOperation implements Serializable {
 	 */
 	public void setDate(Calendar date) {
 
-		this.date = date;
+		this.date = Calendar.getInstance();
+		this.date.setTime(date.getTime());
 	}
 
 	/**
@@ -295,7 +311,7 @@ public class AccountOperation implements Serializable {
 	@Override
 	public String toString() {
 
-		StringBuffer output = new StringBuffer();
+		StringBuilder output = new StringBuilder();
 
 		SimpleDateFormat dateFormat = new SimpleDateFormat("[yyyy/MM/dd]");
 		output.append(dateFormat.format(date.getTime()));

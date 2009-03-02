@@ -8,16 +8,18 @@ import com.googlecode.pennybank.model.accountfacade.hibernate.actions.AddToAccou
 import com.googlecode.pennybank.model.accountfacade.hibernate.actions.CreateAccountAction;
 import com.googlecode.pennybank.model.accountfacade.hibernate.actions.CreateCategoryAction;
 import com.googlecode.pennybank.model.accountfacade.hibernate.actions.DeleteAccountAction;
+import com.googlecode.pennybank.model.accountfacade.hibernate.actions.DeleteAccountOperationAction;
 import com.googlecode.pennybank.model.accountfacade.hibernate.actions.DeleteCategoryAction;
 import com.googlecode.pennybank.model.accountfacade.hibernate.actions.FindAccountAction;
-import com.googlecode.pennybank.model.accountfacade.hibernate.actions.FindAccountByUserAction;
 import com.googlecode.pennybank.model.accountfacade.hibernate.actions.FindAccountOperationsAction;
 import com.googlecode.pennybank.model.accountfacade.hibernate.actions.FindAccountOperationsByCategoryAction;
+import com.googlecode.pennybank.model.accountfacade.hibernate.actions.FindAccountOperationsByDate;
 import com.googlecode.pennybank.model.accountfacade.hibernate.actions.FindAccountOperationsByType;
 import com.googlecode.pennybank.model.accountfacade.hibernate.actions.FindCategoryAction;
 import com.googlecode.pennybank.model.accountfacade.hibernate.actions.GetOperationsCountAction;
 import com.googlecode.pennybank.model.accountfacade.hibernate.actions.TransferAction;
 import com.googlecode.pennybank.model.accountfacade.hibernate.actions.UpdateAccountAction;
+import com.googlecode.pennybank.model.accountfacade.hibernate.actions.UpdateAccountOperationAction;
 import com.googlecode.pennybank.model.accountfacade.hibernate.actions.UpdateCategoryAction;
 import com.googlecode.pennybank.model.accountfacade.hibernate.actions.WithdrawFromAccountAction;
 import com.googlecode.pennybank.model.accountoperation.entity.AccountOperation;
@@ -32,7 +34,7 @@ import com.googlecode.pennybank.model.util.transactions.PlainActionProcessor;
 import com.googlecode.pennybank.model.util.vo.Block;
 
 /**
- * Delegate implementing the AccountFacadeDelegate interface, using hibernate
+ * Delegate implementing the AccountFacadeDelegate interface, using Hibernate
  * 
  * @author spenap
  */
@@ -103,6 +105,19 @@ public class AccountFacade extends HibernateFacade implements
 		}
 	}
 
+	public void deleteAccountOperation(Long accountOperationId)
+			throws InstanceNotFoundException, InternalErrorException {
+		DeleteAccountOperationAction action = new DeleteAccountOperationAction(
+				accountOperationId);
+		try {
+			PlainActionProcessor.process(entityManager, action);
+		} catch (InstanceNotFoundException e) {
+			throw e;
+		} catch (ModelException e) {
+			throw new InternalErrorException(e);
+		}
+	}
+
 	public void deleteCategory(Long categoryId)
 			throws InstanceNotFoundException, InternalErrorException {
 
@@ -130,22 +145,6 @@ public class AccountFacade extends HibernateFacade implements
 			throw new InternalErrorException(e);
 		}
 
-	}
-
-	@SuppressWarnings("unchecked")
-	public Block<Account> findAccountByUserId(Long userId, int startIndex,
-			int count) throws InternalErrorException, InstanceNotFoundException {
-
-		FindAccountByUserAction action = new FindAccountByUserAction(userId,
-				startIndex, count);
-		try {
-			return (Block<Account>) PlainActionProcessor.process(entityManager,
-					action);
-		} catch (InstanceNotFoundException e) {
-			throw e;
-		} catch (ModelException e) {
-			throw new InternalErrorException(e);
-		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -182,12 +181,22 @@ public class AccountFacade extends HibernateFacade implements
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public Block<AccountOperation> findAccountOperationsByDate(Long accountId,
 			Calendar startDate, Calendar endDate, int startIndex, int count)
 			throws InstanceNotFoundException, InternalErrorException {
 
-		// TODO Auto-generated method stub
-		return null;
+		FindAccountOperationsByDate action = new FindAccountOperationsByDate(
+				accountId, startDate, endDate, startIndex, count);
+
+		try {
+			return (Block<AccountOperation>) PlainActionProcessor.process(
+					entityManager, action);
+		} catch (InstanceNotFoundException e) {
+			throw e;
+		} catch (ModelException e) {
+			throw new InternalErrorException(e);
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -273,19 +282,14 @@ public class AccountFacade extends HibernateFacade implements
 		}
 	}
 
-	public void withdrawFromAccount(Long accountId, double amount,
-			String comment, Calendar operationDate, Category category)
-			throws InstanceNotFoundException, InternalErrorException,
-			NegativeAmountException {
-
-		if (amount < 0) {
-			throw new NegativeAmountException(amount);
-		}
-
-		WithdrawFromAccountAction action = new WithdrawFromAccountAction(
-				accountId, amount, comment, operationDate, category);
+	public AccountOperation updateAccountOperation(
+			AccountOperation accountOperation)
+			throws InstanceNotFoundException, InternalErrorException {
+		UpdateAccountOperationAction action = new UpdateAccountOperationAction(
+				accountOperation);
 		try {
-			PlainActionProcessor.process(entityManager, action);
+			return (AccountOperation) PlainActionProcessor.process(
+					entityManager, action);
 		} catch (InstanceNotFoundException e) {
 			throw e;
 		} catch (ModelException e) {
@@ -299,6 +303,26 @@ public class AccountFacade extends HibernateFacade implements
 		try {
 			return (Category) PlainActionProcessor.process(entityManager,
 					action);
+		} catch (InstanceNotFoundException e) {
+			throw e;
+		} catch (ModelException e) {
+			throw new InternalErrorException(e);
+		}
+	}
+
+	public void withdrawFromAccount(Long accountId, double amount,
+			String comment, Calendar operationDate, Category category)
+			throws InstanceNotFoundException, InternalErrorException,
+			NegativeAmountException {
+
+		if (amount < 0) {
+			throw new NegativeAmountException(amount);
+		}
+
+		WithdrawFromAccountAction action = new WithdrawFromAccountAction(
+				accountId, amount, comment, operationDate, category);
+		try {
+			PlainActionProcessor.process(entityManager, action);
 		} catch (InstanceNotFoundException e) {
 			throw e;
 		} catch (ModelException e) {

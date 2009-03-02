@@ -238,7 +238,8 @@ public class FindAccountOperationsByCategoryTest {
 
 		// Check that the number in the second set is greater or equal than the
 		// first set
-		assertTrue(operationsByParentCategory >= operationsByChildCategory);
+		assertTrue("Facade method not implemented",
+				operationsByParentCategory >= operationsByChildCategory);
 	}
 
 }

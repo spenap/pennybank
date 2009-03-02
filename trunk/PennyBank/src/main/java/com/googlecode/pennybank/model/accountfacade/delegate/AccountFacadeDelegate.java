@@ -86,6 +86,21 @@ public interface AccountFacadeDelegate {
 			InternalErrorException;
 
 	/**
+	 * Deletes an account operation with the given identifier. By deleting an
+	 * account operation, its effects are undone: the account balance is
+	 * restored to the previous one.
+	 * 
+	 * @param accountOperationId
+	 *            The account operation identifier
+	 * @throws InstanceNotFoundException
+	 *             if the account operation was not found
+	 * @throws InternalErrorException
+	 *             if a non-expected error happened
+	 */
+	public void deleteAccountOperation(Long accountOperationId)
+			throws InstanceNotFoundException, InternalErrorException;
+
+	/**
 	 * Deletes a category with the specified category identifier
 	 * 
 	 * @param categoryId
@@ -260,6 +275,35 @@ public interface AccountFacadeDelegate {
 			throws InstanceNotFoundException, InternalErrorException;
 
 	/**
+	 * Updates an account operation, updating the account balance if necessary.
+	 * 
+	 * @param accountOperation
+	 *            The accountOperation to update
+	 * @return The updated account operation
+	 * @throws InstanceNotFoundException
+	 *             if the account operation was not found
+	 * @throws InternalErrorException
+	 *             if a non-expected error happened
+	 */
+	public AccountOperation updateAccountOperation(
+			AccountOperation accountOperation)
+			throws InstanceNotFoundException, InternalErrorException;
+
+	/**
+	 * Updates the given category
+	 * 
+	 * @param category
+	 *            the category to be updated
+	 * @return The updated category
+	 * @throws InstanceNotFoundException
+	 *             if the category was not found
+	 * @throws InternalErrorException
+	 *             if an unexpected error happened
+	 */
+	public Category updateCategory(Category category)
+			throws InstanceNotFoundException, InternalErrorException;
+
+	/**
 	 * Withdraws a given amount from the account with the account identifier
 	 * given
 	 * 
@@ -284,18 +328,4 @@ public interface AccountFacadeDelegate {
 			String comment, Calendar operationDate, Category category)
 			throws InstanceNotFoundException, InternalErrorException,
 			NegativeAmountException;
-
-	/**
-	 * Updates the given category
-	 * 
-	 * @param category
-	 *            the category to be updated
-	 * @return The updated category
-	 * @throws InstanceNotFoundException
-	 *             if the category was not found
-	 * @throws InternalErrorException
-	 *             if an unexpected error happened
-	 */
-	public Category updateCategory(Category category)
-			throws InstanceNotFoundException, InternalErrorException;
 }

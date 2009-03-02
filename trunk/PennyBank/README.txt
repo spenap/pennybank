@@ -28,3 +28,44 @@ mvn install:install-file -Dfile=PATH_TO_MACWIDGETS/mac_widgets-0.9.4/forms-1.2.1
 mvn install:install-file -Dfile=PATH_TO_MACWIDGETS/mac_widgets-0.9.4/mac_widgets.jar \
 -DgroupId=com.jgoodies -DartifactId=mac_widgets -Dversion=0.9.4 -Dpackaging=jar -DgeneratePom=true
 
+MySQL
+------
+       
+   - Create a directory where MySQL will store its databases. For example:
+     /home/user/.MySQLData.
+   - Create $HOME/.my.cnf file with a similar content to the following:
+   
+     [mysqld]
+     datadir=/home/user/.MySQLData
+    
+     Change the value of "datadir" to the directory created previously.
+   
+   - cd /usr/local/mysql 
+   - scripts/mysql_install_db
+   
+     This will create "mysql" and "test" databases in the directory specified
+     by the previous "datadir" option.
+         
+Create a database
+-----------------                       
+
+- Start the MySQL server.
+
+- Create a database with name "pennybank".
+
+  mysqladmin -u root create pennybank
+
+- Create a user with name "pennybank" and password "pennybank", and allow her/him to
+  access from local host.
+
+  mysql -u root
+
+  GRANT ALL PRIVILEGES ON pennybank.* to pennybank@localhost IDENTIFIED BY 'pennybank';
+  
+- Try to access to "pennybank" database as "pennybank" user with password "pennybank".
+   
+  mysql -u pennybank --password=pennybank pennybank
+   
+- Shutdown the MySQL server.
+
+  mysqladmin -u root shutdown

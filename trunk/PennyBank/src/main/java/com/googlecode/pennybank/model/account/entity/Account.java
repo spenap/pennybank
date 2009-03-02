@@ -170,7 +170,7 @@ public class Account implements Serializable {
 	@Override
 	public String toString() {
 
-		StringBuffer output = new StringBuffer();
+		StringBuilder output = new StringBuilder();
 
 		output.append("NOMBRE:" + name + "\n");
 		output.append("BALANCE:" + balance);
