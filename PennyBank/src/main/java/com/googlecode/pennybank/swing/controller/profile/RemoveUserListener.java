@@ -1,13 +1,14 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * RemoveUserListener.java
+ * 
+ * 06/03/2009
  */
-package com.googlecode.pennybank.swing.controller.account;
+package com.googlecode.pennybank.swing.controller.profile;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import com.googlecode.pennybank.model.account.entity.Account;
+import com.googlecode.pennybank.model.user.entity.User;
 import com.googlecode.pennybank.swing.view.main.MainWindow;
 import com.googlecode.pennybank.swing.view.util.MessageBox;
 import com.googlecode.pennybank.swing.view.util.MessageManager;
@@ -15,35 +16,38 @@ import com.googlecode.pennybank.swing.view.util.MessageBox.MessageType;
 import com.googlecode.pennybank.swing.view.util.MessageBox.ResultType;
 
 /**
- * 
  * @author spenap
+ * 
  */
-public class RemoveAccountListener implements ActionListener {
+public class RemoveUserListener implements ActionListener {
 
-	private Account theAccount = null;
+	private User toDelete;
 
-	public RemoveAccountListener() {
-	}
-
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+	 */
 	public void actionPerformed(ActionEvent e) {
-		theAccount = MainWindow.getInstance().getNavigationPanel()
-				.getSelectedAccount();
-		if (theAccount == null) {
+		toDelete = MainWindow.getInstance().getNavigationPanel()
+				.getSelectedUser();
+		if (toDelete == null) {
 			MessageBox messageBox = new MessageBox(
 					MainWindow.getInstance(),
 					MessageManager
-							.getMessage("AccountWindow.AccountNotSelected.Title"),
+							.getMessage("UserWindow.UserNotSelected.Title"),
 					MessageManager
-							.getMessage("AccountWindow.AccountNotSelected.Description"),
+							.getMessage("UserWindow.UserNotSelected.Description"),
 					MessageType.INFORMATION);
 			messageBox.setVisible(true);
 		} else {
 			MessageBox messageBox = new MessageBox(
 					MainWindow.getInstance(),
 					MessageManager
-							.getMessage("AccountWindow.DeleteAccount.Title"),
+							.getMessage("UserWindow.DeleteUser.Title"),
 					MessageManager
-							.getMessage("AccountWindow.DeleteAccount.Description"),
+							.getMessage("UserWindow.DeleteUser.Description"),
 					MessageType.YESNO);
 			messageBox.setVisible(true);
 			if (messageBox.getWindowResult() == ResultType.OK) {
@@ -51,4 +55,5 @@ public class RemoveAccountListener implements ActionListener {
 			}
 		}
 	}
+
 }

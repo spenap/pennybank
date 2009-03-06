@@ -11,11 +11,9 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
 import com.explodingpixels.macwidgets.MacUtils;
-import com.explodingpixels.macwidgets.MacWidgetFactory;
 import com.explodingpixels.widgets.WindowUtils;
-import com.googlecode.pennybank.App;
-import com.googlecode.pennybank.model.account.entity.Account;
 import com.googlecode.pennybank.swing.view.util.MessageManager;
+import com.googlecode.pennybank.swing.view.util.PlatformUtils;
 
 /**
  * The application main window
@@ -75,9 +73,11 @@ public class MainWindow extends JFrame {
 
 		// MainWindow Look & Feel
 		setTitle(MessageManager.getMessage("MainWindow.Title"));
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		MacUtils.makeWindowLeopardStyle(getRootPane());
-		WindowUtils.createAndInstallRepaintWindowFocusListener(this);
+		if (PlatformUtils.isMacOS()) {
+			setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+			MacUtils.makeWindowLeopardStyle(getRootPane());
+			WindowUtils.createAndInstallRepaintWindowFocusListener(this);
+		}
 
 		// Menu Bar
 		menuBar = new MainMenuBar();
@@ -85,9 +85,6 @@ public class MainWindow extends JFrame {
 
 		// Navigation Panel
 		navigationPanel = new MainNavigationPanel();
-		for (Account account : App.getCurrentUser().getAccounts()) {
-			navigationPanel.addAccount(account);
-		}
 
 		// Content Panel
 		contentPanel = new MainContentPanel();
@@ -99,8 +96,7 @@ public class MainWindow extends JFrame {
 		bottomBar = MainBottomBar.getBottomBar();
 
 		// Main Content
-		mainContent = MacWidgetFactory.createSplitPaneForSourceList(
-				navigationPanel.getSourceList(), contentPanel);
+		mainContent = MainContent.getJSPlitPane(navigationPanel, contentPanel);
 
 		// Window
 		mainWindow = new JPanel(new BorderLayout());

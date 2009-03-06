@@ -1,155 +1,223 @@
-/*
- * AddAccountWindow.java
- *
- * Created on 21-feb-2009, 1:10:27
+/**
+ * AccountWindow.java
+ * 
+ * 03/03/2009
  */
 package com.googlecode.pennybank.swing.view.account;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
+import java.awt.Frame;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.WindowConstants;
+import javax.swing.SwingConstants;
 
-import com.googlecode.pennybank.App;
-import com.googlecode.pennybank.model.account.entity.Account;
-import com.googlecode.pennybank.model.accountfacade.delegate.AccountFacadeDelegate;
-import com.googlecode.pennybank.model.accountfacade.delegate.AccountFacadeDelegateFactory;
-import com.googlecode.pennybank.model.util.exceptions.InstanceNotFoundException;
-import com.googlecode.pennybank.model.util.exceptions.InternalErrorException;
-import com.googlecode.pennybank.swing.view.main.MainWindow;
+import com.googlecode.pennybank.model.user.entity.User;
 import com.googlecode.pennybank.swing.view.util.IconManager;
 import com.googlecode.pennybank.swing.view.util.MessageManager;
 
 /**
- * JDialog which allows the user to create a new account
- * 
  * @author spenap
+ * 
  */
-@SuppressWarnings("serial")
 public class AddAccountWindow extends JDialog {
 
-	private JLabel accountIcon;
-	private JLabel accountNameLabel;
-	private JTextField accountNameTextField;
-	private JLabel balanceLabel;
-	private JTextField balanceTextField;
-	private JPanel buttonsPanel;
-	private JButton cancelButton;
-	private JPanel fieldsPanel;
-	private JButton okButton;
+	private static final long serialVersionUID = 1L;
+	private JPanel mainContentPane = null;
+	private JPanel fieldsPane = null;
+	private JPanel buttonsPane = null;
+	private JButton okButton = null;
+	private JButton cancelButton = null;
+	private JPanel componentsPane = null;
+	private JLabel iconLabel = null;
+	private JLabel accountNameLabel = null;
+	private JLabel accountBalanceLabel = null;
+	private JTextField accountNameTextField = null;
+	private JTextField accountBalanceTextField = null;
+	private User theUser;
 
 	/**
-	 * Creates a new AddAccountWindow with the specified parameters
-	 * 
-	 * @param parent
-	 *            The parent JFrame
-	 * @param modal
-	 *            Boolean value indicating whether this is modal or not
+	 * @param owner
 	 */
-	public AddAccountWindow(JFrame parent, boolean modal) {
-		super(parent, modal);
-		initComponents();
+	public AddAccountWindow(Frame owner, User user) {
+		super(owner);
+		this.theUser = user;
+		initialize(owner);
 	}
 
-	private void initComponents() {
-
-		accountIcon = new JLabel();
-		buttonsPanel = new JPanel();
-		okButton = new JButton();
-		cancelButton = new JButton();
-		fieldsPanel = new JPanel();
-		accountNameLabel = new JLabel();
-		accountNameTextField = new JTextField();
-		balanceLabel = new JLabel();
-		balanceTextField = new JTextField();
-
-		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		setTitle(MessageManager.getMessage("AddAccountWindow.Title"));
-		setResizable(false);
-
-		accountIcon.setIcon(IconManager.getIcon("toolbar_add_account"));
-		accountIcon.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-		getContentPane().add(accountIcon, BorderLayout.WEST);
-
-		buttonsPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
-
-		okButton.setText(MessageManager.getMessage("okButton"));
-		okButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				okButtonActionPerformed(evt);
-			}
-		});
-		buttonsPanel.add(okButton);
-
-		cancelButton.setText(MessageManager.getMessage("cancelButton"));
-		cancelButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				cancelButtonActionPerformed(evt);
-			}
-		});
-		buttonsPanel.add(cancelButton);
-
-		getContentPane().add(buttonsPanel, BorderLayout.PAGE_END);
-
-		fieldsPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-		fieldsPanel.setLayout(new GridLayout(2, 2, 2, 0));
-
-		accountNameLabel.setText(MessageManager
-				.getMessage("AccountWindow.AccountName"));
-		fieldsPanel.add(accountNameLabel);
-
-		accountNameTextField.setMinimumSize(new Dimension(30, 28));
-		accountNameTextField.setPreferredSize(new Dimension(100, 28));
-		fieldsPanel.add(accountNameTextField);
-
-		balanceLabel
-				.setText(MessageManager.getMessage("AccountWindow.Balance"));
-		fieldsPanel.add(balanceLabel);
-
-		balanceTextField.setMinimumSize(new Dimension(30, 28));
-		balanceTextField.setPreferredSize(new Dimension(100, 28));
-		fieldsPanel.add(balanceTextField);
-
-		getContentPane().add(fieldsPanel, BorderLayout.CENTER);
-
-		pack();
+	/**
+	 * This method initializes this
+	 * 
+	 * @return void
+	 */
+	private void initialize(Frame owner) {
+		this.setResizable(false);
+		this.setSize(350, 170);
+		this.setLocationRelativeTo(owner);
+		this.setTitle(MessageManager
+				.getMessage("AccountWindow.AddAccount.Title"));
+		this.setContentPane(getMainContentPane());
 	}
 
-	private void cancelButtonActionPerformed(ActionEvent evt) {
-		this.dispose();
-	}
-
-	private void okButtonActionPerformed(ActionEvent evt) {
-		Account theAccount = new Account(App.getCurrentUser(), Double
-				.parseDouble(balanceTextField.getText()), accountNameTextField
-				.getText());
-		try {
-
-			AccountFacadeDelegate accountFacade = AccountFacadeDelegateFactory
-					.getDelegate();
-			theAccount = accountFacade.createAccount(theAccount);
-		} catch (InstanceNotFoundException ex) {
-			Logger.getLogger(AddAccountWindow.class.getName()).log(
-					Level.SEVERE, null, ex);
-		} catch (InternalErrorException ex) {
-			Logger.getLogger(AddAccountWindow.class.getName()).log(
-					Level.SEVERE, null, ex);
+	/**
+	 * This method initializes mainContentPane
+	 * 
+	 * @return javax.swing.JPanel
+	 */
+	private JPanel getMainContentPane() {
+		if (mainContentPane == null) {
+			mainContentPane = new JPanel();
+			mainContentPane.setLayout(new BorderLayout());
+			mainContentPane.add(getFieldsPane(), BorderLayout.CENTER);
 		}
-		MainWindow.getInstance().getNavigationPanel().addAccount(theAccount);
+		return mainContentPane;
+	}
+
+	/**
+	 * This method initializes fieldsPane
+	 * 
+	 * @return javax.swing.JPanel
+	 */
+	private JPanel getFieldsPane() {
+		if (fieldsPane == null) {
+			fieldsPane = new JPanel();
+			fieldsPane.setLayout(new BorderLayout());
+			fieldsPane.add(getButtonsPane(), BorderLayout.SOUTH);
+			fieldsPane.add(getComponentsPane(), BorderLayout.CENTER);
+			fieldsPane.add(getIconLabel(), BorderLayout.WEST);
+		}
+		return fieldsPane;
+	}
+
+	/**
+	 * This method initializes buttonsPane
+	 * 
+	 * @return javax.swing.JPanel
+	 */
+	private JPanel getButtonsPane() {
+		if (buttonsPane == null) {
+			FlowLayout flowLayout = new FlowLayout();
+			flowLayout.setAlignment(java.awt.FlowLayout.RIGHT);
+			buttonsPane = new JPanel();
+			buttonsPane.setLayout(flowLayout);
+			buttonsPane.add(getCancelButton(), null);
+			buttonsPane.add(getOkButton(), null);
+		}
+		return buttonsPane;
+	}
+
+	/**
+	 * This method initializes okButton
+	 * 
+	 * @return javax.swing.JButton
+	 */
+	private JButton getOkButton() {
+		if (okButton == null) {
+			okButton = new JButton();
+			okButton.setText(MessageManager.getMessage("okButton"));
+			okButton.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					okButtonActionPerformed(e);
+				}
+			});
+		}
+		return okButton;
+	}
+
+	protected void okButtonActionPerformed(ActionEvent e) {
+		System.out.println(theUser);
+	}
+
+	/**
+	 * This method initializes cancelButton
+	 * 
+	 * @return javax.swing.JButton
+	 */
+	private JButton getCancelButton() {
+		if (cancelButton == null) {
+			cancelButton = new JButton();
+			cancelButton.setText(MessageManager.getMessage("cancelButton"));
+			cancelButton.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					cancelButtonActionPerformed(e);
+				}
+			});
+		}
+		return cancelButton;
+	}
+
+	protected void cancelButtonActionPerformed(ActionEvent e) {
 		this.dispose();
 	}
 
-}
+	/**
+	 * This method initializes componentsPane
+	 * 
+	 * @return javax.swing.JPanel
+	 */
+	private JPanel getComponentsPane() {
+		if (componentsPane == null) {
+			accountBalanceLabel = new JLabel();
+			accountBalanceLabel.setHorizontalAlignment(SwingConstants.CENTER);
+			accountBalanceLabel.setText(MessageManager
+					.getMessage("AccountWindow.Balance"));
+			accountBalanceLabel.setBounds(new Rectangle(0, 60, 102, 28));
+
+			accountNameLabel = new JLabel();
+			accountNameLabel.setHorizontalAlignment(SwingConstants.CENTER);
+			accountNameLabel.setText(MessageManager
+					.getMessage("AccountWindow.AccountName"));
+			accountNameLabel.setBounds(new Rectangle(0, 20, 102, 28));
+
+			componentsPane = new JPanel();
+			componentsPane.setBorder(BorderFactory.createEmptyBorder(20, 0, 20,
+					20));
+			componentsPane.setLayout(null);
+			componentsPane.add(accountNameLabel, null);
+			componentsPane.add(getAccountNameTextField(), null);
+			componentsPane.add(accountBalanceLabel, null);
+			componentsPane.add(getAccountBalanceTextField(), null);
+		}
+		return componentsPane;
+	}
+
+	private JLabel getIconLabel() {
+		iconLabel = new JLabel();
+		iconLabel.setIcon(IconManager.getIcon("toolbar_add_account"));
+		iconLabel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
+		return iconLabel;
+	}
+
+	/**
+	 * This method initializes accountNameTextField
+	 * 
+	 * @return javax.swing.JTextField
+	 */
+	private JTextField getAccountNameTextField() {
+		if (accountNameTextField == null) {
+			accountNameTextField = new JTextField();
+			accountNameTextField.setBounds(new Rectangle(104, 20, 172, 28));
+		}
+		return accountNameTextField;
+	}
+
+	/**
+	 * This method initializes accountBalanceTextField
+	 * 
+	 * @return javax.swing.JTextField
+	 */
+	private JTextField getAccountBalanceTextField() {
+		if (accountBalanceTextField == null) {
+			accountBalanceTextField = new JTextField();
+			accountBalanceTextField.setBounds(new Rectangle(104, 60, 172, 28));
+		}
+		return accountBalanceTextField;
+	}
+} // @jve:decl-index=0:visual-constraint="128,6"
