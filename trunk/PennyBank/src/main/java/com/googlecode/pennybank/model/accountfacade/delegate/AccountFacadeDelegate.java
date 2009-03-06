@@ -1,6 +1,7 @@
 package com.googlecode.pennybank.model.accountfacade.delegate;
 
 import java.util.Calendar;
+import java.util.List;
 
 import com.googlecode.pennybank.model.account.entity.Account;
 import com.googlecode.pennybank.model.accountoperation.entity.AccountOperation;
@@ -328,4 +329,13 @@ public interface AccountFacadeDelegate {
 			String comment, Calendar operationDate, Category category)
 			throws InstanceNotFoundException, InternalErrorException,
 			NegativeAmountException;
+
+	/**
+	 * Retrieves all the categories
+	 * 
+	 * @return the categories
+	 * @throws InternalErrorException
+	 *             if an unexpected error happened
+	 */
+	public List<Category> findAllCategories() throws InternalErrorException;
 }

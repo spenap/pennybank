@@ -4,17 +4,18 @@
  */
 package com.googlecode.pennybank.swing.view.main;
 
-import com.googlecode.pennybank.model.accountoperation.entity.AccountOperation.Type;
-import com.googlecode.pennybank.swing.controller.account.AddAccountListener;
-import com.googlecode.pennybank.swing.controller.account.RemoveAccountListener;
-import com.googlecode.pennybank.swing.controller.accountoperation.AddAccountOperationListener;
-import com.googlecode.pennybank.swing.controller.importation.ImportFileListener;
-import com.googlecode.pennybank.swing.controller.importation.ImportFileListener.FileType;
-import com.googlecode.pennybank.swing.controller.profile.AddProfileListener;
-import com.googlecode.pennybank.swing.view.util.MessageManager;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+
+import com.googlecode.pennybank.swing.controller.account.AddAccountListener;
+import com.googlecode.pennybank.swing.controller.account.RemoveAccountListener;
+import com.googlecode.pennybank.swing.controller.accountoperation.AddAccountOperationListener;
+import com.googlecode.pennybank.swing.controller.accountoperation.AddAccountOperationListener.OperationType;
+import com.googlecode.pennybank.swing.controller.importation.ImportFileListener;
+import com.googlecode.pennybank.swing.controller.importation.ImportFileListener.FileType;
+import com.googlecode.pennybank.swing.controller.profile.AddUserListener;
+import com.googlecode.pennybank.swing.view.util.MessageManager;
 
 /**
  * The main MenuBar for the application
@@ -53,7 +54,7 @@ public class MainMenuBar extends JMenuBar {
 				.getMessage("MainMenu.UserMenu"));
 		JMenuItem addProfileItem = new JMenuItem(MessageManager
 				.getMessage("MainMenu.UserMenu.AddUser"));
-		addProfileItem.addActionListener(new AddProfileListener());
+		addProfileItem.addActionListener(new AddUserListener());
 		profileMenu.add(addProfileItem);
 
 		JMenuItem editProfileItem = new JMenuItem(MessageManager
@@ -89,18 +90,20 @@ public class MainMenuBar extends JMenuBar {
 				.getMessage("MainMenu.AccountsMenu.AddToAccount"));
 		accountsMenu.add(addToAccountItem);
 		addToAccountItem.addActionListener(new AddAccountOperationListener(
-				Type.DEPOSIT));
+				OperationType.DEPOSIT));
 
 		JMenuItem withdrawFromAccountItem = new JMenuItem(MessageManager
 				.getMessage("MainMenu.AccountsMenu.WithdrawFromAccount"));
 		accountsMenu.add(withdrawFromAccountItem);
 		withdrawFromAccountItem
 				.addActionListener(new AddAccountOperationListener(
-						Type.WITHDRAW));
+						OperationType.WITHDRAW));
 
 		JMenuItem transferItem = new JMenuItem(MessageManager
 				.getMessage("MainMenu.AccountsMenu.Transfer"));
 		accountsMenu.add(transferItem);
+		transferItem.addActionListener(new AddAccountOperationListener(
+				OperationType.TRANSFER));
 
 		add(accountsMenu);
 

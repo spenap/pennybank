@@ -4,22 +4,28 @@
  */
 package com.googlecode.pennybank.swing.view.main;
 
+import java.awt.Component;
+import java.awt.Dimension;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JTextField;
+import javax.swing.JToolBar;
+
 import com.explodingpixels.macwidgets.MacButtonFactory;
 import com.explodingpixels.macwidgets.MacWidgetFactory;
 import com.explodingpixels.macwidgets.TriAreaComponent;
-import com.googlecode.pennybank.model.accountoperation.entity.AccountOperation.Type;
 import com.googlecode.pennybank.swing.controller.account.AddAccountListener;
 import com.googlecode.pennybank.swing.controller.account.RemoveAccountListener;
 import com.googlecode.pennybank.swing.controller.accountoperation.AddAccountOperationListener;
+import com.googlecode.pennybank.swing.controller.accountoperation.AddAccountOperationListener.OperationType;
+import com.googlecode.pennybank.swing.controller.profile.AddUserListener;
+import com.googlecode.pennybank.swing.controller.profile.RemoveUserListener;
 import com.googlecode.pennybank.swing.view.util.IconManager;
 import com.googlecode.pennybank.swing.view.util.MessageManager;
-import java.awt.Component;
-import java.awt.Image;
-import java.awt.Toolkit;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JFrame;
+import com.googlecode.pennybank.swing.view.util.PlatformUtils;
 
 /**
  * The main ToolBar for the application
@@ -38,55 +44,117 @@ public class MainToolBar extends Component {
 	 */
 	public static Component getMainToolBar(JFrame mainFrame) {
 
-		TriAreaComponent toolBar = MacWidgetFactory.createUnifiedToolBar();
+		List<JButton> leftButtons = new ArrayList<JButton>();
+		List<JButton> rightButtons = new ArrayList<JButton>();
 
-		toolBar.installWindowDraggerOnWindow(mainFrame);
+		// User buttons
+		JButton addUserButton = new JButton(MessageManager
+				.getMessage("MainToolbar.Users.AddUser"), IconManager
+				.getIcon("toolbar_add_user"));
+		addUserButton.addActionListener(new AddUserListener());
+		leftButtons.add(addUserButton);
+
+		JButton delUserButton = new JButton(MessageManager
+				.getMessage("MainToolbar.Users.RemoveUser"), IconManager
+				.getIcon("toolbar_del_user"));
+		delUserButton.addActionListener(new RemoveUserListener());
+		leftButtons.add(delUserButton);
 
 		// Account buttons
 		JButton addAccountButton = new JButton(MessageManager
 				.getMessage("MainToolbar.Accounts.AddAccount"), IconManager
 				.getIcon("toolbar_add_account"));
 		addAccountButton.addActionListener(new AddAccountListener());
+		leftButtons.add(addAccountButton);
+
 		JButton removeAccountButton = new JButton(MessageManager
 				.getMessage("MainToolbar.Accounts.RemoveAccount"), IconManager
 				.getIcon("toolbar_del_account"));
 		removeAccountButton.addActionListener(new RemoveAccountListener());
+		leftButtons.add(removeAccountButton);
 
 		// Account operation buttons
 		JButton addToAccountButton = new JButton(MessageManager
 				.getMessage("MainToolbar.Accounts.AddToAccount"), IconManager
 				.getIcon("toolbar_deposit"));
 		addToAccountButton.addActionListener(new AddAccountOperationListener(
-				Type.DEPOSIT));
+				OperationType.DEPOSIT));
+		leftButtons.add(addToAccountButton);
+
 		JButton withdrawFromAccountButton = new JButton(MessageManager
 				.getMessage("MainToolbar.Accounts.WithdrawFromAccount"),
 				IconManager.getIcon("toolbar_withdraw"));
 		withdrawFromAccountButton
 				.addActionListener(new AddAccountOperationListener(
-						Type.WITHDRAW));
+						OperationType.WITHDRAW));
+		leftButtons.add(withdrawFromAccountButton);
 
-		// Preferences button
-		JButton preferencesButton = new JButton(MessageManager
-				.getMessage("MainToolbar.Preferences"));
-		Icon preferencesIcon = new ImageIcon(Toolkit.getDefaultToolkit()
-				.getImage("NSImage://NSPreferencesGeneral").getScaledInstance(
-						32, 32, Image.SCALE_SMOOTH));
-		preferencesButton.setIcon(preferencesIcon);
+		JButton transferBetweenAccountsButton = new JButton(MessageManager
+				.getMessage("MainToolbar.Accounts.TransferBetweenAccounts"),
+				IconManager.getIcon("toolbar_transfer"));
+		transferBetweenAccountsButton
+				.addActionListener(new AddAccountOperationListener(
+						OperationType.TRANSFER));
+		leftButtons.add(transferBetweenAccountsButton);
+
+		if (PlatformUtils.isMacOS()) {
+			return populateOSXToolBar(mainFrame, leftButtons, rightButtons)
+					.getComponent();
+		} else {
+			return populateJToolBar(mainFrame, leftButtons, rightButtons);
+		}
+	}
+
+	private static JToolBar populateJToolBar(JFrame mainFrame,
+			List<JButton> leftButtons, List<JButton> rightButtons) {
+
+		JToolBar jToolBar = new JToolBar();
+		mainFrame.add(jToolBar);
 
 		// Left side buttons
-		toolBar.addComponentToLeft(MacButtonFactory
-				.makeUnifiedToolBarButton(addAccountButton));
-		toolBar.addComponentToLeft(MacButtonFactory
-				.makeUnifiedToolBarButton(removeAccountButton));
-		toolBar.addComponentToLeft(MacButtonFactory
-				.makeUnifiedToolBarButton(addToAccountButton));
-		toolBar.addComponentToLeft(MacButtonFactory
-				.makeUnifiedToolBarButton(withdrawFromAccountButton));
+		for (JButton button : leftButtons) {
+			jToolBar.add(button);
+		}
 
 		// Right side buttons
-		toolBar.addComponentToRight(MacButtonFactory
-				.makeUnifiedToolBarButton(preferencesButton));
+		for (JButton button : rightButtons) {
+			jToolBar.add(button);
+		}
 
-		return toolBar.getComponent();
+		// jToolBar.add(removeAccountButton);
+		// jToolBar.add(addToAccountButton);
+		// jToolBar.add(withdrawFromAccountButton);
+
+		return jToolBar;
+	}
+
+	private static TriAreaComponent populateOSXToolBar(JFrame mainFrame,
+			List<JButton> leftButtons, List<JButton> rightButtons) {
+
+		TriAreaComponent osxToolBar = MacWidgetFactory.createUnifiedToolBar();
+		osxToolBar.installWindowDraggerOnWindow(mainFrame);
+
+		// Left side buttons
+		for (JButton button : leftButtons) {
+			osxToolBar.addComponentToLeft(MacButtonFactory
+					.makeUnifiedToolBarButton(button));
+			// osxToolBar.addComponentToLeft(MacButtonFactory
+			// .makeUnifiedToolBarButton(removeAccountButton));
+			// osxToolBar.addComponentToLeft(MacButtonFactory
+			// .makeUnifiedToolBarButton(addToAccountButton));
+			// osxToolBar.addComponentToLeft(MacButtonFactory
+			// .makeUnifiedToolBarButton(withdrawFromAccountButton));
+		}
+
+		for (JButton button : rightButtons) {
+			osxToolBar.addComponentToRight(button);
+		}
+
+		// Right side buttons
+		JTextField searchField = new JTextField();
+		searchField.setPreferredSize(new Dimension(150, 20));
+		searchField.putClientProperty("JTextField.variant", "search");
+		osxToolBar.addComponentToRight(searchField);
+		return osxToolBar;
 	}
 }

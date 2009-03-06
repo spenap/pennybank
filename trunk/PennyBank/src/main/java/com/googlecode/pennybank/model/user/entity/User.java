@@ -131,4 +131,9 @@ public class User {
 	public void setVersion(long version) {
 		this.version = version;
 	}
+
+	@Override
+	public String toString() {
+		return this.name;
+	}
 }

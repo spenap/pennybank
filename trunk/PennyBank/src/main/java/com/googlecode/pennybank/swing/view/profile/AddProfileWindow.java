@@ -1,132 +1,198 @@
-/*
- * AddProfileWindow.java
- *
- * Created on 21-feb-2009, 13:01:53
+/**
+ * AddUserWindow.java
+ * 
+ * 04/03/2009
  */
 package com.googlecode.pennybank.swing.view.profile;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
+import java.awt.Frame;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.WindowConstants;
+import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
 
-import com.googlecode.pennybank.model.user.entity.User;
-import com.googlecode.pennybank.model.userfacade.delegate.UserFacadeDelegate;
-import com.googlecode.pennybank.model.userfacade.delegate.UserFacadeDelegateFactory;
-import com.googlecode.pennybank.model.util.exceptions.InternalErrorException;
+import com.googlecode.pennybank.swing.view.main.MainWindow;
 import com.googlecode.pennybank.swing.view.util.IconManager;
+import com.googlecode.pennybank.swing.view.util.MessageBox;
 import com.googlecode.pennybank.swing.view.util.MessageManager;
+import com.googlecode.pennybank.swing.view.util.MessageBox.MessageType;
 
 /**
- * JDialog allowing the user to create a new profile
- * 
  * @author spenap
+ * 
  */
-@SuppressWarnings("serial")
 public class AddProfileWindow extends JDialog {
 
-	private JPanel buttonsPanel;
-	private JButton cancelButton;
-	private JPanel fieldsPanel;
-	private JButton okButton;
-	private JLabel profileIcon;
-	private JLabel profileNameLabel;
-	private JTextField profileNameTextField;
+	private static final long serialVersionUID = 1L;
+	private JPanel mainContentPane = null;
+	private JPanel fieldsPane = null;
+	private JLabel iconLabel = null;
+	private JPanel componentsPane = null;
+	private JLabel userNameLabel = null;
+	private JTextField userNameTextField = null;
+	private JPanel buttonsPane = null;
+	private JButton cancelButton = null;
+	private JButton okButton = null;
 
 	/**
-	 * Creates a new AddProfileWindow with the specified parameters
-	 * 
-	 * @param parent
-	 *            The parent JFrame
-	 * @param modal
-	 *            Boolean value telling whether this JDialog is modal or not
+	 * @param owner
 	 */
-	public AddProfileWindow(JFrame parent, boolean modal) {
-		super(parent, modal);
-		initComponents();
+	public AddProfileWindow(Frame owner) {
+		super(owner);
+		initialize(owner);
 	}
 
-	private void initComponents() {
-
-		buttonsPanel = new JPanel();
-		okButton = new JButton();
-		cancelButton = new JButton();
-		profileIcon = new JLabel();
-		fieldsPanel = new JPanel();
-		profileNameLabel = new JLabel();
-		profileNameTextField = new JTextField();
-
-		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		setTitle(MessageManager.getMessage("AddProfileWindow.Title"));
-		setResizable(false);
-
-		buttonsPanel.setLayout(new FlowLayout(
-				FlowLayout.RIGHT));
-
-		okButton.setText(MessageManager.getMessage("okButton"));
-		okButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				okButtonActionPerformed(evt);
-			}
-		});
-		buttonsPanel.add(okButton);
-
-		cancelButton.setText(MessageManager.getMessage("cancelButton"));
-		cancelButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				cancelButtonActionPerformed(evt);
-			}
-		});
-		buttonsPanel.add(cancelButton);
-
-		getContentPane().add(buttonsPanel, BorderLayout.PAGE_END);
-
-		profileIcon.setIcon(IconManager.getIcon("toolbar_add_user"));
-		profileIcon.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-		getContentPane().add(profileIcon, BorderLayout.LINE_START);
-
-		fieldsPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-		fieldsPanel.setLayout(new GridLayout(1, 2, 0, 1));
-
-		profileNameLabel.setText(MessageManager
-				.getMessage("ProfileWindow.ProfileName"));
-		fieldsPanel.add(profileNameLabel);
-		fieldsPanel.add(profileNameTextField);
-
-		getContentPane().add(fieldsPanel, BorderLayout.CENTER);
-
-		pack();
+	/**
+	 * This method initializes this
+	 * 
+	 * @return void
+	 */
+	private void initialize(Frame owner) {
+		this.setSize(400, 145);
+		this.setTitle(MessageManager.getMessage("AddProfileWindow.Title"));
+		this.setResizable(false);
+		this.setLocationRelativeTo(owner);
+		this.setContentPane(getMainContentPane());
 	}
 
-	private void okButtonActionPerformed(ActionEvent evt) {
-
-		User user = new User(profileNameTextField.getText());
-		try {
-			UserFacadeDelegate userFacade = UserFacadeDelegateFactory
-					.getDelegate();
-			userFacade.createUser(user);
-			this.dispose();
-
-		} catch (InternalErrorException ex) {
-			Logger.getLogger(AddProfileWindow.class.getName()).log(
-					Level.SEVERE, null, ex);
+	/**
+	 * This method initializes mainContentPane
+	 * 
+	 * @return javax.swing.JPanel
+	 */
+	private JPanel getMainContentPane() {
+		if (mainContentPane == null) {
+			mainContentPane = new JPanel();
+			mainContentPane.setLayout(new BorderLayout());
+			mainContentPane.add(getFieldsPane(), java.awt.BorderLayout.CENTER);
+			mainContentPane.add(getButtonsPane(), java.awt.BorderLayout.SOUTH);
 		}
-
+		return mainContentPane;
 	}
-	
-	private void cancelButtonActionPerformed(ActionEvent evt) {
+
+	/**
+	 * This method initializes fieldsPane
+	 * 
+	 * @return javax.swing.JPanel
+	 */
+	private JPanel getFieldsPane() {
+		if (fieldsPane == null) {
+			iconLabel = new JLabel();
+			iconLabel.setBorder(new EmptyBorder(0, 10, 0, 10));
+			iconLabel.setIcon(IconManager.getIcon("toolbar_add_user"));
+			fieldsPane = new JPanel();
+			fieldsPane.setLayout(new BorderLayout());
+			fieldsPane.add(iconLabel, java.awt.BorderLayout.WEST);
+			fieldsPane.add(getComponentsPane(), java.awt.BorderLayout.CENTER);
+		}
+		return fieldsPane;
+	}
+
+	/**
+	 * This method initializes componentsPane
+	 * 
+	 * @return javax.swing.JPanel
+	 */
+	private JPanel getComponentsPane() {
+		if (componentsPane == null) {
+			userNameLabel = new JLabel();
+			userNameLabel.setBounds(new Rectangle(15, 30, 120, 30));
+			userNameLabel.setText(MessageManager
+					.getMessage("ProfileWindow.ProfileName"));
+			userNameLabel.setHorizontalAlignment(SwingConstants.CENTER);
+			componentsPane = new JPanel();
+			componentsPane.setLayout(null);
+			componentsPane.add(userNameLabel, null);
+			componentsPane.add(getUserNameTextField(), null);
+		}
+		return componentsPane;
+	}
+
+	/**
+	 * This method initializes userNameTextField
+	 * 
+	 * @return javax.swing.JTextField
+	 */
+	private JTextField getUserNameTextField() {
+		if (userNameTextField == null) {
+			userNameTextField = new JTextField();
+			userNameTextField.setBounds(new Rectangle(150, 30, 180, 30));
+		}
+		return userNameTextField;
+	}
+
+	/**
+	 * This method initializes buttonsPane
+	 * 
+	 * @return javax.swing.JPanel
+	 */
+	private JPanel getButtonsPane() {
+		if (buttonsPane == null) {
+			FlowLayout flowLayout = new FlowLayout();
+			flowLayout.setAlignment(FlowLayout.RIGHT);
+			buttonsPane = new JPanel();
+			buttonsPane.setLayout(flowLayout);
+			buttonsPane.add(getCancelButton(), null);
+			buttonsPane.add(getOkButton(), null);
+		}
+		return buttonsPane;
+	}
+
+	/**
+	 * This method initializes cancelButton
+	 * 
+	 * @return javax.swing.JButton
+	 */
+	private JButton getCancelButton() {
+		if (cancelButton == null) {
+			cancelButton = new JButton();
+			cancelButton.setText(MessageManager.getMessage("cancelButton"));
+			cancelButton.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					cancelButtonActionPerformed(e);
+				}
+			});
+		}
+		return cancelButton;
+	}
+
+	protected void cancelButtonActionPerformed(ActionEvent e) {
 		this.dispose();
 	}
-}
+
+	/**
+	 * This method initializes okButton
+	 * 
+	 * @return javax.swing.JButton
+	 */
+	private JButton getOkButton() {
+		if (okButton == null) {
+			okButton = new JButton();
+			okButton.setText(MessageManager.getMessage("okButton"));
+			okButton.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					okButtonActionPerformed(e);
+				}
+			});
+		}
+		return okButton;
+	}
+
+	protected void okButtonActionPerformed(ActionEvent e) {
+		MessageBox messageBox = new MessageBox(
+				MainWindow.getInstance(),
+				"Solicitada creación de usuario",
+				"Se ha solicitado la creación de un usuario a la base de datos",
+				MessageType.YESNO);
+		messageBox.setVisible(true);
+	}
+
+} // @jve:decl-index=0:visual-constraint="10,10"

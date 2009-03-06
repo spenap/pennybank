@@ -28,7 +28,7 @@ public class PlatformUtils {
 
 	public static boolean isLinux() {
 		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 }

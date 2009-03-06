@@ -10,8 +10,12 @@ import java.awt.event.ActionListener;
 
 import com.googlecode.pennybank.model.account.entity.Account;
 import com.googlecode.pennybank.model.accountoperation.entity.AccountOperation.Type;
-import com.googlecode.pennybank.swing.view.accountoperation.AddAccountOperationWindow;
+import com.googlecode.pennybank.swing.view.accountoperation.DepositWithdrawWindow;
+import com.googlecode.pennybank.swing.view.accountoperation.TransferWindow;
 import com.googlecode.pennybank.swing.view.main.MainWindow;
+import com.googlecode.pennybank.swing.view.util.MessageBox;
+import com.googlecode.pennybank.swing.view.util.MessageManager;
+import com.googlecode.pennybank.swing.view.util.MessageBox.MessageType;
 
 /**
  * Listener who allows to operate an account
@@ -20,14 +24,19 @@ import com.googlecode.pennybank.swing.view.main.MainWindow;
  */
 public class AddAccountOperationListener implements ActionListener {
 
-	private Type type;
+	public enum OperationType {
+		DEPOSIT, WITHDRAW, TRANSFER
+	};
+
+	private OperationType type;
+	private Account operatedAccount;
 
 	/**
 	 * Creates a listener with the specified arguments
 	 * 
 	 * @param type
 	 */
-	public AddAccountOperationListener(Type type) {
+	public AddAccountOperationListener(OperationType type) {
 		this.type = type;
 	}
 
@@ -38,11 +47,43 @@ public class AddAccountOperationListener implements ActionListener {
 	 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
 	public void actionPerformed(ActionEvent e) {
-		Account operatedAccount = MainWindow.getInstance().getNavigationPanel()
+
+		operatedAccount = MainWindow.getInstance().getNavigationPanel()
 				.getSelectedAccount();
-		AddAccountOperationWindow dialog = new AddAccountOperationWindow(
-				MainWindow.getInstance(), true, type, operatedAccount);
-		dialog.setVisible(true);
+
+		if (operatedAccount == null) {
+			MessageBox messageBox = new MessageBox(
+					MainWindow.getInstance(),
+					MessageManager
+							.getMessage("AccountOperationWindow.AccountNotSelected.Title"),
+					MessageManager
+							.getMessage("AccountOperationWindow.AccountNotSelected.Description"),
+					MessageType.INFORMATION);
+			messageBox.setVisible(true);
+		} else {
+			if (type != OperationType.TRANSFER) {
+				DepositWithdrawWindow dialog = null;
+				switch (type) {
+				case DEPOSIT:
+					dialog = new DepositWithdrawWindow(
+							MainWindow.getInstance(), Type.DEPOSIT,
+							operatedAccount);
+
+					break;
+				case WITHDRAW:
+					dialog = new DepositWithdrawWindow(
+							MainWindow.getInstance(), Type.WITHDRAW,
+							operatedAccount);
+					break;
+				default:
+					break;
+				}
+				dialog.setVisible(true);
+			} else {
+				new TransferWindow(MainWindow.getInstance(), operatedAccount)
+						.setVisible(true);
+			}
+		}
 	}
 
 }

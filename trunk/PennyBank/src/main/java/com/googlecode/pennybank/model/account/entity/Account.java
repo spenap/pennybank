@@ -170,11 +170,6 @@ public class Account implements Serializable {
 	@Override
 	public String toString() {
 
-		StringBuilder output = new StringBuilder();
-
-		output.append("NOMBRE:" + name + "\n");
-		output.append("BALANCE:" + balance);
-
-		return output.toString();
+		return name;
 	}
 }

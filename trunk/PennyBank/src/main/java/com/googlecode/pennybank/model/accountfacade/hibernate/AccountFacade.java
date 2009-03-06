@@ -1,6 +1,7 @@
 package com.googlecode.pennybank.model.accountfacade.hibernate;
 
 import java.util.Calendar;
+import java.util.List;
 
 import com.googlecode.pennybank.model.account.entity.Account;
 import com.googlecode.pennybank.model.accountfacade.delegate.AccountFacadeDelegate;
@@ -15,6 +16,7 @@ import com.googlecode.pennybank.model.accountfacade.hibernate.actions.FindAccoun
 import com.googlecode.pennybank.model.accountfacade.hibernate.actions.FindAccountOperationsByCategoryAction;
 import com.googlecode.pennybank.model.accountfacade.hibernate.actions.FindAccountOperationsByDate;
 import com.googlecode.pennybank.model.accountfacade.hibernate.actions.FindAccountOperationsByType;
+import com.googlecode.pennybank.model.accountfacade.hibernate.actions.FindAllCategoriesAction;
 import com.googlecode.pennybank.model.accountfacade.hibernate.actions.FindCategoryAction;
 import com.googlecode.pennybank.model.accountfacade.hibernate.actions.GetOperationsCountAction;
 import com.googlecode.pennybank.model.accountfacade.hibernate.actions.TransferAction;
@@ -325,6 +327,17 @@ public class AccountFacade extends HibernateFacade implements
 			PlainActionProcessor.process(entityManager, action);
 		} catch (InstanceNotFoundException e) {
 			throw e;
+		} catch (ModelException e) {
+			throw new InternalErrorException(e);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Category> findAllCategories() throws InternalErrorException {
+		FindAllCategoriesAction action = new FindAllCategoriesAction();
+		try {
+			return (List<Category>) PlainActionProcessor.process(entityManager,
+					action);
 		} catch (ModelException e) {
 			throw new InternalErrorException(e);
 		}
