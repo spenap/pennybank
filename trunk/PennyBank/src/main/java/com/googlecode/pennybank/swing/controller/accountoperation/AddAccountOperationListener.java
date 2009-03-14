@@ -13,9 +13,7 @@ import com.googlecode.pennybank.model.accountoperation.entity.AccountOperation.T
 import com.googlecode.pennybank.swing.view.accountoperation.DepositWithdrawWindow;
 import com.googlecode.pennybank.swing.view.accountoperation.TransferWindow;
 import com.googlecode.pennybank.swing.view.main.MainWindow;
-import com.googlecode.pennybank.swing.view.util.MessageBox;
-import com.googlecode.pennybank.swing.view.util.MessageManager;
-import com.googlecode.pennybank.swing.view.util.MessageBox.MessageType;
+import com.googlecode.pennybank.swing.view.util.GuiUtils;
 
 /**
  * Listener who allows to operate an account
@@ -52,14 +50,7 @@ public class AddAccountOperationListener implements ActionListener {
 				.getSelectedAccount();
 
 		if (operatedAccount == null) {
-			MessageBox messageBox = new MessageBox(
-					MainWindow.getInstance(),
-					MessageManager
-							.getMessage("AccountOperationWindow.AccountNotSelected.Title"),
-					MessageManager
-							.getMessage("AccountOperationWindow.AccountNotSelected.Description"),
-					MessageType.INFORMATION);
-			messageBox.setVisible(true);
+			GuiUtils.info("AccountOperationWindow.AccountNotSelected");
 		} else {
 			if (type != OperationType.TRANSFER) {
 				DepositWithdrawWindow dialog = null;

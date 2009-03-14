@@ -10,7 +10,9 @@ import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
-import java.awt.event.ItemEvent;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.util.Calendar;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -26,8 +28,16 @@ import javax.swing.border.EmptyBorder;
 
 import com.googlecode.pennybank.App;
 import com.googlecode.pennybank.model.account.entity.Account;
+import com.googlecode.pennybank.model.accountfacade.delegate.AccountFacadeDelegate;
+import com.googlecode.pennybank.model.accountfacade.delegate.AccountFacadeDelegateFactory;
 import com.googlecode.pennybank.model.accountoperation.entity.AccountOperation.Type;
 import com.googlecode.pennybank.model.category.entity.Category;
+import com.googlecode.pennybank.model.util.exceptions.InstanceNotFoundException;
+import com.googlecode.pennybank.model.util.exceptions.InternalErrorException;
+import com.googlecode.pennybank.model.util.exceptions.NegativeAmountException;
+import com.googlecode.pennybank.swing.controller.category.AddCategoryListener;
+import com.googlecode.pennybank.swing.view.main.MainWindow;
+import com.googlecode.pennybank.swing.view.util.GuiUtils;
 import com.googlecode.pennybank.swing.view.util.IconManager;
 import com.googlecode.pennybank.swing.view.util.MessageManager;
 
@@ -55,6 +65,8 @@ public class DepositWithdrawWindow extends JDialog {
 	private JComboBox categoryComboBox = null;
 	private JTextArea descriptionTextArea = null;
 	private Account account;
+	private JLabel descriptionLabel = null;
+	private DateFormat dateFormat;
 
 	/**
 	 * @param owner
@@ -64,30 +76,158 @@ public class DepositWithdrawWindow extends JDialog {
 		super(owner);
 		this.type = type;
 		this.account = operatedAccount;
+		dateFormat = DateFormat.getDateInstance();
 		initialize(owner);
 	}
 
 	/**
-	 * This method initializes this
+	 * This method initializes amountTextField
 	 * 
-	 * @return void
+	 * @return javax.swing.JTextField
 	 */
-	private void initialize(Frame owner) {
-		this.setSize(420, 250);
-		switch (type) {
-		case WITHDRAW:
-			title = MessageManager
-					.getMessage("WithdrawFromAccountWindow.Title");
-			break;
-		case DEPOSIT:
-			title = MessageManager.getMessage("AddToAccountWindow.Title");
-		default:
-			break;
+	private JTextField getAmountTextField() {
+		if (amountTextField == null) {
+			amountTextField = new JTextField();
+			amountTextField.setBounds(new Rectangle(164, 1, 180, 30));
 		}
-		this.setLocationRelativeTo(owner);
-		this.setResizable(false);
-		this.setTitle(title);
-		this.setContentPane(getMainContentPane());
+		return amountTextField;
+	}
+
+	/**
+	 * This method initializes buttonsPane
+	 * 
+	 * @return javax.swing.JPanel
+	 */
+	private JPanel getButtonsPane() {
+		if (buttonsPane == null) {
+			FlowLayout flowLayout = new FlowLayout();
+			flowLayout.setAlignment(java.awt.FlowLayout.RIGHT);
+			flowLayout.setAlignment(java.awt.FlowLayout.RIGHT);
+			flowLayout.setAlignment(java.awt.FlowLayout.RIGHT);
+			buttonsPane = new JPanel();
+			buttonsPane.setLayout(flowLayout);
+			buttonsPane.add(getCancelButton(), null);
+			buttonsPane.add(getOkButton(), null);
+		}
+		return buttonsPane;
+	}
+
+	/**
+	 * This method initializes cancelButton
+	 * 
+	 * @return javax.swing.JButton
+	 */
+	private JButton getCancelButton() {
+		if (cancelButton == null) {
+			cancelButton = new JButton();
+			cancelButton.setText(MessageManager.getMessage("cancelButton"));
+			cancelButton.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					cancelButtonActionPerformed(e);
+				}
+			});
+		}
+		return cancelButton;
+	}
+
+	/**
+	 * This method initializes categoryComboBox
+	 * 
+	 * @return javax.swing.JComboBox
+	 */
+	private JComboBox getCategoryComboBox() {
+		if (categoryComboBox == null) {
+			categoryComboBox = new JComboBox();
+			categoryComboBox.addItem(MessageManager
+					.getMessage("Category.Uncategorized"));
+			for (Category category : App.getCategories()) {
+				categoryComboBox.addItem(category.getName());
+			}
+			categoryComboBox.addItem(MessageManager.getMessage("Category.New"));
+			categoryComboBox.setBounds(new Rectangle(17, 71, 327, 47));
+			categoryComboBox.addItemListener(new AddCategoryListener(
+					categoryComboBox));
+		}
+		return categoryComboBox;
+	}
+
+	/**
+	 * This method initializes componentsPane
+	 * 
+	 * @return javax.swing.JPanel
+	 */
+	private JPanel getComponentsPane() {
+		if (componentsPane == null) {
+			descriptionLabel = new JLabel();
+			descriptionLabel.setBounds(new Rectangle(20, 109, 130, 30));
+			descriptionLabel.setText(MessageManager
+					.getMessage("AccountOperationWindow.Description"));
+			dateLabel = new JLabel();
+			dateLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+			dateLabel.setText(MessageManager
+					.getMessage("AccountOperationWindow.Date"));
+			dateLabel.setBounds(new Rectangle(20, 41, 130, 30));
+			amountLabel = new JLabel();
+			amountLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+			amountLabel.setText(MessageManager
+					.getMessage("AccountOperationWindow.Amount"));
+			amountLabel.setBounds(new Rectangle(20, 1, 130, 30));
+			componentsPane = new JPanel();
+			componentsPane.setLayout(null);
+			componentsPane.add(amountLabel, null);
+			componentsPane.add(getDescriptionTextArea(), null);
+			componentsPane.add(dateLabel, null);
+			componentsPane.add(getAmountTextField(), null);
+			componentsPane.add(getCategoryComboBox(), null);
+			componentsPane.add(getDateTextField(), null);
+			componentsPane.add(descriptionLabel, null);
+		}
+		return componentsPane;
+	}
+
+	/**
+	 * This method initializes dateTextField
+	 * 
+	 * @return javax.swing.JTextField
+	 */
+	private JTextField getDateTextField() {
+		if (dateTextField == null) {
+			dateTextField = new JTextField();
+			dateTextField.setText(dateFormat.format(Calendar.getInstance()
+					.getTime()));
+			dateTextField.setBounds(new Rectangle(164, 41, 180, 30));
+		}
+		return dateTextField;
+	}
+
+	/**
+	 * This method initializes descriptionTextArea
+	 * 
+	 * @return javax.swing.JTextArea
+	 */
+	private JTextArea getDescriptionTextArea() {
+		if (descriptionTextArea == null) {
+			descriptionTextArea = new JTextArea();
+			descriptionTextArea.setBorder(new BevelBorder(BevelBorder.LOWERED));
+			descriptionTextArea.setLineWrap(true);
+			descriptionTextArea.setBounds(new Rectangle(20, 142, 327, 55));
+		}
+		return descriptionTextArea;
+	}
+
+	/**
+	 * This method initializes fieldsPane
+	 * 
+	 * @return javax.swing.JPanel
+	 */
+	private JPanel getFieldsPane() {
+		if (fieldsPane == null) {
+			fieldsPane = new JPanel();
+			fieldsPane.setLayout(new BorderLayout());
+			fieldsPane.add(getIconLabel(), BorderLayout.WEST);
+			fieldsPane.add(getComponentsPane(), BorderLayout.CENTER);
+		}
+		return fieldsPane;
 	}
 
 	private JLabel getIconLabel() {
@@ -123,39 +263,6 @@ public class DepositWithdrawWindow extends JDialog {
 	}
 
 	/**
-	 * This method initializes fieldsPane
-	 * 
-	 * @return javax.swing.JPanel
-	 */
-	private JPanel getFieldsPane() {
-		if (fieldsPane == null) {
-			fieldsPane = new JPanel();
-			fieldsPane.setLayout(new BorderLayout());
-			fieldsPane.add(getIconLabel(), BorderLayout.WEST);
-			fieldsPane.add(getComponentsPane(), BorderLayout.CENTER);
-		}
-		return fieldsPane;
-	}
-
-	/**
-	 * This method initializes buttonsPane
-	 * 
-	 * @return javax.swing.JPanel
-	 */
-	private JPanel getButtonsPane() {
-		if (buttonsPane == null) {
-			FlowLayout flowLayout = new FlowLayout();
-			flowLayout.setAlignment(java.awt.FlowLayout.RIGHT);
-			flowLayout.setAlignment(java.awt.FlowLayout.RIGHT);
-			buttonsPane = new JPanel();
-			buttonsPane.setLayout(flowLayout);
-			buttonsPane.add(getCancelButton(), null);
-			buttonsPane.add(getOkButton(), null);
-		}
-		return buttonsPane;
-	}
-
-	/**
 	 * This method initializes okButton
 	 * 
 	 * @return javax.swing.JButton
@@ -173,138 +280,92 @@ public class DepositWithdrawWindow extends JDialog {
 		return okButton;
 	}
 
-	protected void okButtonActionPerformed(ActionEvent e) {
-		System.out.println(account);
+	private Category getSelectedCategory() {
+		Category selectedCategory = null;
+		String selectedCategoryName = getCategoryComboBox().getSelectedItem()
+				.toString();
+		for (Category category : App.getCategories()) {
+			if (category.getName().equals(selectedCategoryName)) {
+				selectedCategory = category;
+				break;
+			}
+		}
+
+		return selectedCategory;
 	}
 
 	/**
-	 * This method initializes cancelButton
+	 * This method initializes this
 	 * 
-	 * @return javax.swing.JButton
+	 * @return void
 	 */
-	private JButton getCancelButton() {
-		if (cancelButton == null) {
-			cancelButton = new JButton();
-			cancelButton.setText(MessageManager.getMessage("cancelButton"));
-			cancelButton.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
-					cancelButtonActionPerformed(e);
-				}
-			});
+	private void initialize(Frame owner) {
+		this.setSize(420, 264);
+		switch (type) {
+		case WITHDRAW:
+			title = MessageManager
+					.getMessage("WithdrawFromAccountWindow.Title");
+			break;
+		case DEPOSIT:
+			title = MessageManager.getMessage("AddToAccountWindow.Title");
+		default:
+			break;
 		}
-		return cancelButton;
+		this.setLocationRelativeTo(owner);
+		this.setResizable(false);
+		this.setTitle(title);
+		this.setContentPane(getMainContentPane());
 	}
 
 	protected void cancelButtonActionPerformed(ActionEvent e) {
 		this.dispose();
 	}
 
-	/**
-	 * This method initializes componentsPane
-	 * 
-	 * @return javax.swing.JPanel
-	 */
-	private JPanel getComponentsPane() {
-		if (componentsPane == null) {
-			dateLabel = new JLabel();
-			dateLabel.setHorizontalAlignment(SwingConstants.CENTER);
-			dateLabel.setText(MessageManager
-					.getMessage("AccountOperationWindow.Date"));
-			dateLabel.setBounds(new Rectangle(22, 50, 120, 30));
-			amountLabel = new JLabel();
-			amountLabel.setHorizontalAlignment(SwingConstants.CENTER);
-			amountLabel.setText(MessageManager
-					.getMessage("AccountOperationWindow.Amount"));
-			amountLabel.setBounds(new Rectangle(22, 10, 120, 30));
-			componentsPane = new JPanel();
-			componentsPane.setLayout(null);
-			componentsPane.add(amountLabel, null);
-			componentsPane.add(getDescriptionTextArea(), null);
-			componentsPane.add(dateLabel, null);
-			componentsPane.add(getAmountTextField(), null);
-			componentsPane.add(getCategoryComboBox(), null);
-			componentsPane.add(getDateTextField(), null);
-		}
-		return componentsPane;
-	}
+	protected void okButtonActionPerformed(ActionEvent e) {
+		try {
+			// Parse amount
+			double amount = Double.parseDouble(getAmountTextField().getText());
+			String comment = getDescriptionTextArea().getText();
 
-	/**
-	 * This method initializes amountTextField
-	 * 
-	 * @return javax.swing.JTextField
-	 */
-	private JTextField getAmountTextField() {
-		if (amountTextField == null) {
-			amountTextField = new JTextField();
-			amountTextField.setBounds(new Rectangle(164, 50, 180, 30));
-		}
-		return amountTextField;
-	}
+			// Parse date
+			Calendar operationDate = Calendar.getInstance();
+			operationDate.setTime(dateFormat
+					.parse(getDateTextField().getText()));
 
-	/**
-	 * This method initializes dateTextField
-	 * 
-	 * @return javax.swing.JTextField
-	 */
-	private JTextField getDateTextField() {
-		if (dateTextField == null) {
-			dateTextField = new JTextField();
-			dateTextField.setBounds(new Rectangle(164, 10, 180, 30));
-		}
-		return dateTextField;
-	}
+			// Get category
+			Category category = getSelectedCategory();
 
-	/**
-	 * This method initializes categoryComboBox
-	 * 
-	 * @return javax.swing.JComboBox
-	 */
-	private JComboBox getCategoryComboBox() {
-		if (categoryComboBox == null) {
-			categoryComboBox = new JComboBox();
-			categoryComboBox
-					.addItem(MessageManager
-							.getMessage("AccountOperationWindow.Category.Uncategorized"));
-			for (Category category : App.getCategories()) {
-				categoryComboBox.addItem(category.getName());
+			// Create the account
+			AccountFacadeDelegate accountFacade = AccountFacadeDelegateFactory
+					.getDelegate();
+			switch (type) {
+			case DEPOSIT:
+				accountFacade.addToAccount(account.getAccountId(), amount,
+						comment, operationDate, category);
+				break;
+			case WITHDRAW:
+				accountFacade.withdrawFromAccount(account.getAccountId(),
+						amount, comment, operationDate, category);
+				break;
+			default:
+				break;
 			}
-			categoryComboBox.addItem(MessageManager
-					.getMessage("AccountOperationWindow.Category.New"));
-			categoryComboBox.setBounds(new Rectangle(30, 86, 310, 47));
-			categoryComboBox.addItemListener(new java.awt.event.ItemListener() {
-				public void itemStateChanged(java.awt.event.ItemEvent e) {
-					categoryComboBoxItemChanged(e);
-				}
-			});
+			MainWindow.getInstance().getContentPanel().showAccountOperations(
+					account);
+			this.dispose();
+			GuiUtils.info("AccountOperationWindow.Operate.Success");
+		} catch (InstanceNotFoundException ex) {
+			GuiUtils.error("AccountOperationWindow.Operate.Failure.NotFound");
+		} catch (ParseException ex) {
+			GuiUtils.warn("AccountOperationWindow.Operate.Failure.BadDate");
+		} catch (NumberFormatException ex) {
+			GuiUtils.warn("AccountOperationWindow.Operate.Failure.BadNumber");
+		} catch (InternalErrorException ex) {
+			GuiUtils.warn("AccountOperationWindow.Operate.Failure.Generic");
+		} catch (NegativeAmountException ex) {
+			GuiUtils.warn("AccountOperationWindow.Operate.Failure.Negative");
 		}
-		return categoryComboBox;
-	}
 
-	protected void categoryComboBoxItemChanged(ItemEvent e) {
-		if ((e.getStateChange() == ItemEvent.SELECTED)
-				&& (e.getItem().toString().equals(MessageManager
-						.getMessage("AccountOperationWindow.Category.New")))) {
-			System.out.println("Create new category");
-			categoryComboBox.insertItemAt("New created category",
-					categoryComboBox.getItemCount() - 1);
-			categoryComboBox
-					.setSelectedIndex(categoryComboBox.getItemCount() - 2);
-		}
-	}
-
-	/**
-	 * This method initializes descriptionTextArea
-	 * 
-	 * @return javax.swing.JTextArea
-	 */
-	private JTextArea getDescriptionTextArea() {
-		if (descriptionTextArea == null) {
-			descriptionTextArea = new JTextArea();
-			descriptionTextArea.setBorder(new BevelBorder(BevelBorder.LOWERED));
-			descriptionTextArea.setLineWrap(true);
-			descriptionTextArea.setBounds(new Rectangle(30, 130, 310, 55));
-		}
-		return descriptionTextArea;
 	}
 
 } // @jve:decl-index=0:visual-constraint="10,10"

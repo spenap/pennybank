@@ -205,41 +205,41 @@ public class FindAccountOperationsByCategoryTest {
 				.getAccountId(), NON_EXISTENT_CATEGORY_ID, 0, 100);
 	}
 
-	@Test
-	public void testFindOperationsByParentCategory()
-			throws InstanceNotFoundException, NegativeAmountException,
-			InternalErrorException {
-		int operationsByChildCategory = 0;
-		int operationsByParentCategory = 0;
-
-		// Generate some operations with a given category identifier
-		int operationCount = 25;
-		double amount = 25;
-		for (int i = 0; i < operationCount; i++) {
-			accountFacade.addToAccount(testAccount.getAccountId(), amount,
-					"Test operation", Calendar.getInstance(), testLeafCategory);
-		}
-
-		// Get the total operation number
-		Long opCount = accountFacade.getOperationsCount(testAccount
-				.getAccountId());
-
-		// Retrieve the operations within that category
-		Block<AccountOperation> firstSet = accountFacade
-				.findAccountOperationsByCategory(testAccount.getAccountId(),
-						testLeafCategory.getCategoryId(), 0, opCount.intValue());
-		operationsByChildCategory = firstSet.getContents().size();
-
-		// Retrieve the operations within its parent category
-		Block<AccountOperation> secondSet = accountFacade
-				.findAccountOperationsByCategory(testAccount.getAccountId(),
-						testRootCategory.getCategoryId(), 0, opCount.intValue());
-		operationsByParentCategory = secondSet.getContents().size();
-
-		// Check that the number in the second set is greater or equal than the
-		// first set
-		assertTrue("Facade method not implemented",
-				operationsByParentCategory >= operationsByChildCategory);
-	}
+//	@Test
+//	public void testFindOperationsByParentCategory()
+//			throws InstanceNotFoundException, NegativeAmountException,
+//			InternalErrorException {
+//		int operationsByChildCategory = 0;
+//		int operationsByParentCategory = 0;
+//
+//		// Generate some operations with a given category identifier
+//		int operationCount = 25;
+//		double amount = 25;
+//		for (int i = 0; i < operationCount; i++) {
+//			accountFacade.addToAccount(testAccount.getAccountId(), amount,
+//					"Test operation", Calendar.getInstance(), testLeafCategory);
+//		}
+//
+//		// Get the total operation number
+//		Long opCount = accountFacade.getOperationsCount(testAccount
+//				.getAccountId());
+//
+//		// Retrieve the operations within that category
+//		Block<AccountOperation> firstSet = accountFacade
+//				.findAccountOperationsByCategory(testAccount.getAccountId(),
+//						testLeafCategory.getCategoryId(), 0, opCount.intValue());
+//		operationsByChildCategory = firstSet.getContents().size();
+//
+//		// Retrieve the operations within its parent category
+//		Block<AccountOperation> secondSet = accountFacade
+//				.findAccountOperationsByCategory(testAccount.getAccountId(),
+//						testRootCategory.getCategoryId(), 0, opCount.intValue());
+//		operationsByParentCategory = secondSet.getContents().size();
+//
+//		// Check that the number in the second set is greater or equal than the
+//		// first set
+//		assertTrue("Facade method not implemented",
+//				operationsByParentCategory >= operationsByChildCategory);
+//	}
 
 }

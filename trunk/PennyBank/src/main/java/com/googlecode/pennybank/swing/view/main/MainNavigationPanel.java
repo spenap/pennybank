@@ -4,15 +4,11 @@
  */
 package com.googlecode.pennybank.swing.view.main;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JComponent;
 import javax.swing.JTree;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
 
@@ -41,35 +37,35 @@ import com.googlecode.pennybank.swing.view.util.PlatformUtils;
 public class MainNavigationPanel {
 
 	private List<User> userList;
-	private final SourceListModel model;
 	private JTree navigationTree;
+	private final SourceListModel model;
 	private SourceListControlBar controlBar;
-	private static SourceList sourceList;
+	private SourceList sourceList;
 	private Account selectedAccount;
 	private User selectedUser;
+	private NavigationPanelListener navigationPanelListener;
 
 	/**
 	 * Creates a new main navigation panel
 	 */
 	public MainNavigationPanel() {
-		getUserList();
-		model = updateModel();
+		userList = getUserList();
+		model = new SourceListModel();
+		updateModel();
+		navigationPanelListener = new NavigationPanelListener(this);
+		model.addSourceListModelListener(navigationPanelListener);
 		sourceList = new SourceList(model);
+		sourceList.addSourceListSelectionListener(navigationPanelListener);
 		controlBar = createControlBar();
 		sourceList.installSourceListControlBar(controlBar);
-
 	}
 
-	private void getUserList() {
-		if (App.isDatabaseReady()) {
-			try {
-				userList = UserFacadeDelegateFactory.getDelegate().findUsers();
-			} catch (InternalErrorException e) {
+	public void collapseNavigationTree() {
+		// TODO Check mac widgets API to see if this is possible
+	}
 
-			}
-		}
-		if (userList == null)
-			userList = new ArrayList<User>();
+	public void expandNavigationTree() {
+		// TODO Check mac widgets API to see if this is possible
 	}
 
 	public JComponent getComponent() {
@@ -92,22 +88,7 @@ public class MainNavigationPanel {
 		navigationTree = new JTree(root);
 		navigationTree.getSelectionModel().setSelectionMode(
 				TreeSelectionModel.SINGLE_TREE_SELECTION);
-		navigationTree.addTreeSelectionListener(new TreeSelectionListener() {
-
-			public void valueChanged(TreeSelectionEvent e) {
-				DefaultMutableTreeNode node = (DefaultMutableTreeNode) navigationTree
-						.getLastSelectedPathComponent();
-
-				if ((node != null) && (node.isLeaf())
-						&& (node.getUserObject() instanceof Account))
-					selectedAccount = (Account) node.getUserObject();
-				else if ((node != null)
-						&& (node.getUserObject() instanceof User)) {
-					selectedUser = (User) node.getUserObject();
-				}
-			}
-
-		});
+		navigationTree.addTreeSelectionListener(navigationPanelListener);
 		navigationTree.setRootVisible(false);
 		return navigationTree;
 	}
@@ -118,16 +99,7 @@ public class MainNavigationPanel {
 	 * @return the selected account
 	 */
 	public Account getSelectedAccount() {
-
-		Account theAccount = null;
-		if (PlatformUtils.isMacOS()) {
-			SourceListItem item = sourceList.getSelectedItem();
-			if (item != null)
-				theAccount = findAccountByName(item.getText());
-		} else {
-			theAccount = selectedAccount;
-		}
-		return theAccount;
+		return selectedAccount;
 	}
 
 	/**
@@ -136,33 +108,7 @@ public class MainNavigationPanel {
 	 * @return the selected user
 	 */
 	public User getSelectedUser() {
-		User theUser = null;
-		if (PlatformUtils.isMacOS()) {
-			SourceListItem item = sourceList.getSelectedItem();
-			if (item != null)
-				theUser = findUserByName(item.getText());
-		} else {
-			theUser = selectedUser;
-		}
-		return theUser;
-	}
-
-	private Account findAccountByName(String accountName) {
-		for (User user : userList) {
-			for (Account account : user.getAccounts()) {
-				if (account.getName().equals(accountName))
-					return account;
-			}
-		}
-		return null;
-	}
-
-	private User findUserByName(String userName) {
-		for (User user : userList) {
-			if (user.getName().equals(userName))
-				return user;
-		}
-		return null;
+		return selectedUser;
 	}
 
 	/**
@@ -174,14 +120,96 @@ public class MainNavigationPanel {
 		return sourceList;
 	}
 
-	private SourceListModel updateModel() {
-		SourceListModel model = new SourceListModel();
+	/**
+	 * @param selectedAccount
+	 *            the selectedAccount to set
+	 */
+	public void setSelectedAccount(Account selectedAccount) {
+		this.selectedAccount = selectedAccount;
+		if (selectedAccount != null) {
+			MainWindow.getInstance().getContentPanel().showAccountOperations(
+					selectedAccount);
+		}
+	}
+
+	/**
+	 * @param selectedUser
+	 *            the selectedUser to set
+	 */
+	public void setSelectedUser(User selectedUser) {
+		this.selectedUser = selectedUser;
+	}
+
+	public void update() {
+		if (PlatformUtils.isMacOS()) {
+			populateModel();
+		} else {
+
+		}
+	}
+
+	private SourceListControlBar createControlBar() {
+		SourceListControlBar controlBar = new SourceListControlBar();
+
+		// Add Button (User, Account)
+		controlBar
+				.createAndAddPopdownButton(
+						MacIcons.PLUS,
+						new PopupMenuCustomizerUsingStrings(
+								navigationPanelListener,
+								MessageManager
+										.getMessage("NavigationPanel.AddUser"),
+								MessageManager
+										.getMessage("NavigationPanel.AddAccount")));
+
+		// Remove Button (User, Account)
+		controlBar
+				.createAndAddPopdownButton(
+						MacIcons.MINUS,
+						new PopupMenuCustomizerUsingStrings(
+								navigationPanelListener,
+								MessageManager
+										.getMessage("NavigationPanel.RemoveUser"),
+								MessageManager
+										.getMessage("NavigationPanel.RemoveAccount")));
+
+		// Gear Button (View options)
+		controlBar.createAndAddPopdownButton(MacIcons.GEAR,
+				new PopupMenuCustomizerUsingStrings(navigationPanelListener,
+						MessageManager.getMessage("NavigationPanel.Expand"),
+						MessageManager.getMessage("NavigationPanel.Collapse")));
+
+		return controlBar;
+	}
+
+	private List<User> getUserList() {
+		List<User> userList = null;
+		if (App.isDatabaseReady()) {
+			try {
+				userList = UserFacadeDelegateFactory.getDelegate().findUsers();
+			} catch (InternalErrorException e) {
+
+			}
+		}
+		if (userList == null)
+			userList = new ArrayList<User>();
+		this.userList = userList;
+		return userList;
+	}
+
+	private void populateModel() {
+		List<SourceListCategory> categories = model.getCategories();
+
+		for (int i = 0; i < categories.size(); i++) {
+			SourceListCategory category = categories.get(i);
+			model.removeCategory(category);
+		}
 
 		SourceListCategory usersCategory = new SourceListCategory(
 				MessageManager.getMessage("NavigationPanel.Users"));
 		model.addCategory(usersCategory);
 
-		for (User user : userList) {
+		for (User user : getUserList()) {
 			SourceListItem userItem = new SourceListItem(user.getName(),
 					IconManager.getIcon("navigation_user"));
 			model.addItemToCategory(userItem, usersCategory);
@@ -198,59 +226,11 @@ public class MainNavigationPanel {
 								accountItem);
 			}
 		}
+	}
+
+	private SourceListModel updateModel() {
+		SourceListModel model = new SourceListModel();
+		populateModel();
 		return model;
-	}
-
-	private static SourceListControlBar createControlBar() {
-		SourceListControlBar controlBar = new SourceListControlBar();
-		controlBar
-				.createAndAddPopdownButton(
-						MacIcons.PLUS,
-						new PopupMenuCustomizerUsingStrings(
-								new NavigationPanelListener(),
-								MessageManager
-										.getMessage("NavigationPanel.AddUser"),
-								MessageManager
-										.getMessage("NavigationPanel.AddAccount")));
-		controlBar.createAndAddPopdownButton(MacIcons.MINUS,
-				new PopupMenuCustomizerUsingStrings(
-						new NavigationPanelListener(), MessageManager
-								.getMessage("NavigationPanel.RemoveUser"),
-						MessageManager
-								.getMessage("NavigationPanel.RemoveAccount")));
-		controlBar.createAndAddPopdownButton(MacIcons.GEAR,
-				new PopupMenuCustomizerUsingStrings(
-						new ActionListener() {
-
-							public void actionPerformed(ActionEvent e) {
-								if (e
-										.getActionCommand()
-										.equals(
-												MessageManager
-														.getMessage("NavigationPanel.Expand"))) {
-									expandSourceList();
-
-								} else if (e
-										.getActionCommand()
-										.equals(
-												MessageManager
-														.getMessage("NavigationPanel.Collapse"))) {
-									collapseSourceList();
-								}
-
-							}
-
-						}, MessageManager.getMessage("NavigationPanel.Expand"),
-						MessageManager.getMessage("NavigationPanel.Collapse")));
-		return controlBar;
-	}
-
-	protected static void collapseSourceList() {
-		// TODO Check mac widgets API to see if this is possible
-	}
-
-	protected static void expandSourceList() {
-		// TODO Check mac widgets API to see if this is possible
-
 	}
 }

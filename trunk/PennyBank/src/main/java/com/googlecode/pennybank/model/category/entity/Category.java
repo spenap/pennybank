@@ -43,7 +43,7 @@ public class Category implements Serializable {
 	 */
 	public Category(String name) {
 		this.name = name;
-		parentCategory = null;
+		this.parentCategory = null;
 		this.childCategories = new ArrayList<Category>();
 	}
 
@@ -57,8 +57,10 @@ public class Category implements Serializable {
 	public Category(String name, Category parentCategory) {
 		this.name = name;
 		this.parentCategory = parentCategory;
-		this.parentCategory.childCategories.add(this);
 		this.childCategories = new ArrayList<Category>();
+		if (parentCategory != null) {
+			this.parentCategory.childCategories.add(this);
+		}
 	}
 
 	/**
@@ -169,6 +171,11 @@ public class Category implements Serializable {
 	 */
 	public void setChildCategories(List<Category> childCategories) {
 		this.childCategories = childCategories;
+	}
+
+	@Override
+	public String toString() {
+		return this.name;
 	}
 
 }

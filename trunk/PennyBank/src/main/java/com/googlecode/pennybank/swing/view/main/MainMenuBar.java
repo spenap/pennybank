@@ -4,16 +4,19 @@
  */
 package com.googlecode.pennybank.swing.view.main;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.KeyStroke;
 
 import com.googlecode.pennybank.swing.controller.account.AddAccountListener;
 import com.googlecode.pennybank.swing.controller.account.RemoveAccountListener;
 import com.googlecode.pennybank.swing.controller.accountoperation.AddAccountOperationListener;
 import com.googlecode.pennybank.swing.controller.accountoperation.AddAccountOperationListener.OperationType;
 import com.googlecode.pennybank.swing.controller.importation.ImportFileListener;
-import com.googlecode.pennybank.swing.controller.importation.ImportFileListener.FileType;
 import com.googlecode.pennybank.swing.controller.profile.AddUserListener;
 import com.googlecode.pennybank.swing.view.util.MessageManager;
 
@@ -33,21 +36,6 @@ public class MainMenuBar extends JMenuBar {
 	}
 
 	private void initComponents() {
-
-		// File Menu
-		JMenu fileMenu = new JMenu(MessageManager
-				.getMessage("MainMenu.FileMenu"));
-		JMenu importMenu = new JMenu(MessageManager
-				.getMessage("MainMenu.FileMenu.ImportMenu"));
-		fileMenu.add(importMenu);
-
-		JMenuItem importPListMenuItem = new JMenuItem(MessageManager
-				.getMessage("MainMenu.FileMenu.ImportMenu.PList"));
-		importPListMenuItem.addActionListener(new ImportFileListener(
-				FileType.PLIST));
-		importMenu.add(importPListMenuItem);
-
-		add(fileMenu);
 
 		// Profile Menu
 		JMenu profileMenu = new JMenu(MessageManager
@@ -123,6 +111,18 @@ public class MainMenuBar extends JMenuBar {
 		statisticsMenu.add(expensesItem);
 
 		add(statisticsMenu);
+
+		// Tools Menu
+		JMenu toolsMenu = new JMenu(MessageManager
+				.getMessage("MainMenu.ToolsMenu"));
+		JMenuItem importMenuItem = new JMenuItem(MessageManager
+				.getMessage("MainMenu.ToolsMenu.Import"));
+		importMenuItem.addActionListener(new ImportFileListener());
+		importMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I,
+				ActionEvent.SHIFT_MASK | ActionEvent.META_MASK));
+		toolsMenu.add(importMenuItem);
+
+		add(toolsMenu);
 
 		// Help Menu
 		JMenu helpMenu = new JMenu(MessageManager
