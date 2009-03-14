@@ -77,7 +77,7 @@ public class MessageBox extends JDialog {
 	 * @return void
 	 */
 	private void initialize(Frame owner) {
-		this.setSize(373, 170);
+		this.setSize(375, 185);
 		this.setResizable(false);
 		this.setModal(true);
 		this.setContentPane(getMainContentsPane());

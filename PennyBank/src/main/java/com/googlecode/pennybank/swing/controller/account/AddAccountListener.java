@@ -10,9 +10,7 @@ import java.awt.event.ActionListener;
 import com.googlecode.pennybank.model.user.entity.User;
 import com.googlecode.pennybank.swing.view.account.AddAccountWindow;
 import com.googlecode.pennybank.swing.view.main.MainWindow;
-import com.googlecode.pennybank.swing.view.util.MessageBox;
-import com.googlecode.pennybank.swing.view.util.MessageManager;
-import com.googlecode.pennybank.swing.view.util.MessageBox.MessageType;
+import com.googlecode.pennybank.swing.view.util.GuiUtils;
 
 /**
  * Listener which creates a new window to add an account
@@ -38,14 +36,7 @@ public class AddAccountListener implements ActionListener {
 					.getInstance(), theUser);
 			dialog.setVisible(true);
 		} else {
-			MessageBox messageBox = new MessageBox(
-					MainWindow.getInstance(),
-					MessageManager
-							.getMessage("AccountWindow.UserNotSelected.Title"),
-					MessageManager
-							.getMessage("AccountWindow.UserNotSelected.Description"),
-					MessageType.INFORMATION);
-			messageBox.setVisible(true);
+			GuiUtils.warn("AccountWindow.UserNotSelected");
 		}
 
 	}

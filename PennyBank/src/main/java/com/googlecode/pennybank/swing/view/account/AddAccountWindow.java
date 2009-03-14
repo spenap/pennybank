@@ -19,9 +19,16 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
+import com.googlecode.pennybank.model.account.entity.Account;
+import com.googlecode.pennybank.model.accountfacade.delegate.AccountFacadeDelegateFactory;
 import com.googlecode.pennybank.model.user.entity.User;
+import com.googlecode.pennybank.model.util.exceptions.InstanceNotFoundException;
+import com.googlecode.pennybank.model.util.exceptions.InternalErrorException;
+import com.googlecode.pennybank.swing.view.main.MainWindow;
+import com.googlecode.pennybank.swing.view.util.GuiUtils;
 import com.googlecode.pennybank.swing.view.util.IconManager;
 import com.googlecode.pennybank.swing.view.util.MessageManager;
+import com.googlecode.pennybank.swing.view.util.exceptions.BadNameException;
 
 /**
  * @author spenap
@@ -59,7 +66,7 @@ public class AddAccountWindow extends JDialog {
 	 */
 	private void initialize(Frame owner) {
 		this.setResizable(false);
-		this.setSize(350, 170);
+		this.setSize(333, 170);
 		this.setLocationRelativeTo(owner);
 		this.setTitle(MessageManager
 				.getMessage("AccountWindow.AddAccount.Title"));
@@ -132,7 +139,27 @@ public class AddAccountWindow extends JDialog {
 	}
 
 	protected void okButtonActionPerformed(ActionEvent e) {
-		System.out.println(theUser);
+		try {
+			double accountBalance = Double
+					.parseDouble(getAccountBalanceTextField().getText());
+			String accountName = getAccountNameTextField().getText();
+			if (accountName == null || accountName.trim().equals(""))
+				throw new BadNameException();
+			Account account = new Account(theUser, accountBalance, accountName);
+
+			AccountFacadeDelegateFactory.getDelegate().createAccount(account);
+			MainWindow.getInstance().getNavigationPanel().update();
+			this.dispose();
+			GuiUtils.info("AccountWindow.CreateAccount.Success");
+		} catch (NumberFormatException ex) {
+			GuiUtils.warn("AccountWindow.CreateAccount.Failure.BadNumber");
+		} catch (InstanceNotFoundException ex) {
+			GuiUtils.error("AccountWindow.CreateAccount.Failure.NotFound");
+		} catch (InternalErrorException ex) {
+			GuiUtils.error("AccountWindow.CreateAccount.Failure.Generic");
+		} catch (BadNameException ex) {
+			GuiUtils.warn("AccountWindow.CreateAccount.Failure.BadName");
+		}
 	}
 
 	/**
@@ -165,16 +192,16 @@ public class AddAccountWindow extends JDialog {
 	private JPanel getComponentsPane() {
 		if (componentsPane == null) {
 			accountBalanceLabel = new JLabel();
-			accountBalanceLabel.setHorizontalAlignment(SwingConstants.CENTER);
+			accountBalanceLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 			accountBalanceLabel.setText(MessageManager
 					.getMessage("AccountWindow.Balance"));
-			accountBalanceLabel.setBounds(new Rectangle(0, 60, 102, 28));
+			accountBalanceLabel.setBounds(new Rectangle(0, 60, 89, 28));
 
 			accountNameLabel = new JLabel();
-			accountNameLabel.setHorizontalAlignment(SwingConstants.CENTER);
+			accountNameLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 			accountNameLabel.setText(MessageManager
 					.getMessage("AccountWindow.AccountName"));
-			accountNameLabel.setBounds(new Rectangle(0, 20, 102, 28));
+			accountNameLabel.setBounds(new Rectangle(0, 20, 89, 28));
 
 			componentsPane = new JPanel();
 			componentsPane.setBorder(BorderFactory.createEmptyBorder(20, 0, 20,
@@ -203,7 +230,7 @@ public class AddAccountWindow extends JDialog {
 	private JTextField getAccountNameTextField() {
 		if (accountNameTextField == null) {
 			accountNameTextField = new JTextField();
-			accountNameTextField.setBounds(new Rectangle(104, 20, 172, 28));
+			accountNameTextField.setBounds(new Rectangle(98, 20, 172, 28));
 		}
 		return accountNameTextField;
 	}
@@ -216,7 +243,7 @@ public class AddAccountWindow extends JDialog {
 	private JTextField getAccountBalanceTextField() {
 		if (accountBalanceTextField == null) {
 			accountBalanceTextField = new JTextField();
-			accountBalanceTextField.setBounds(new Rectangle(104, 60, 172, 28));
+			accountBalanceTextField.setBounds(new Rectangle(98, 60, 172, 28));
 		}
 		return accountBalanceTextField;
 	}

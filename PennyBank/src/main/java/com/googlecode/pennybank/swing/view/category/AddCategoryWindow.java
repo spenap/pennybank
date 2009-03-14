@@ -3,7 +3,7 @@
  * 
  * 04/03/2009
  */
-package com.googlecode.pennybank.swing.view.profile;
+package com.googlecode.pennybank.swing.view.category;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -12,6 +12,7 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -19,10 +20,12 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
-import com.googlecode.pennybank.model.user.entity.User;
-import com.googlecode.pennybank.model.userfacade.delegate.UserFacadeDelegateFactory;
+import com.googlecode.pennybank.App;
+import com.googlecode.pennybank.model.accountfacade.delegate.AccountFacadeDelegateFactory;
+import com.googlecode.pennybank.model.category.entity.Category;
+import com.googlecode.pennybank.model.util.exceptions.InstanceNotFoundException;
 import com.googlecode.pennybank.model.util.exceptions.InternalErrorException;
-import com.googlecode.pennybank.swing.view.main.MainWindow;
+import com.googlecode.pennybank.swing.controller.category.AddCategoryListener;
 import com.googlecode.pennybank.swing.view.util.GuiUtils;
 import com.googlecode.pennybank.swing.view.util.IconManager;
 import com.googlecode.pennybank.swing.view.util.MessageManager;
@@ -32,23 +35,26 @@ import com.googlecode.pennybank.swing.view.util.exceptions.BadNameException;
  * @author spenap
  * 
  */
-public class AddProfileWindow extends JDialog {
+public class AddCategoryWindow extends JDialog {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel mainContentPane = null;
 	private JPanel fieldsPane = null;
 	private JLabel iconLabel = null;
 	private JPanel componentsPane = null;
-	private JLabel userNameLabel = null;
-	private JTextField userNameTextField = null;
+	private JLabel categoryNameLabel = null;
+	private JTextField categoryNameTextField = null;
 	private JPanel buttonsPane = null;
 	private JButton cancelButton = null;
 	private JButton okButton = null;
+	private JLabel parentCategoryLabel = null;
+	private JComboBox parentCategoryComboBox = null;
+	private Category createdCategory = null; // @jve:decl-index=0:
 
 	/**
 	 * @param owner
 	 */
-	public AddProfileWindow(Frame owner) {
+	public AddCategoryWindow(Frame owner) {
 		super(owner);
 		initialize(owner);
 	}
@@ -59,8 +65,9 @@ public class AddProfileWindow extends JDialog {
 	 * @return void
 	 */
 	private void initialize(Frame owner) {
-		this.setSize(379, 145);
-		this.setTitle(MessageManager.getMessage("AddProfileWindow.Title"));
+		this.setModal(true);
+		this.setSize(405, 145);
+		this.setTitle(MessageManager.getMessage("AddCategoryWindow.Title"));
 		this.setResizable(false);
 		this.setLocationRelativeTo(owner);
 		this.setContentPane(getMainContentPane());
@@ -90,7 +97,7 @@ public class AddProfileWindow extends JDialog {
 		if (fieldsPane == null) {
 			iconLabel = new JLabel();
 			iconLabel.setBorder(new EmptyBorder(0, 10, 0, 10));
-			iconLabel.setIcon(IconManager.getIcon("toolbar_add_user"));
+			iconLabel.setIcon(IconManager.getIcon("toolbar_add_category"));
 			fieldsPane = new JPanel();
 			fieldsPane.setLayout(new BorderLayout());
 			fieldsPane.add(iconLabel, java.awt.BorderLayout.WEST);
@@ -106,15 +113,25 @@ public class AddProfileWindow extends JDialog {
 	 */
 	private JPanel getComponentsPane() {
 		if (componentsPane == null) {
-			userNameLabel = new JLabel();
-			userNameLabel.setBounds(new Rectangle(16, 30, 98, 30));
-			userNameLabel.setText(MessageManager
-					.getMessage("ProfileWindow.ProfileName"));
-			userNameLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+			// Parent category label
+			parentCategoryLabel = new JLabel();
+			parentCategoryLabel.setBounds(new Rectangle(17, 45, 133, 28));
+			parentCategoryLabel.setText(MessageManager
+					.getMessage("CategoryWindow.ParentCategory"));
+			parentCategoryLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+			// Category name label
+			categoryNameLabel = new JLabel();
+			categoryNameLabel.setBounds(new Rectangle(17, 8, 133, 30));
+			categoryNameLabel.setText(MessageManager
+					.getMessage("CategoryWindow.CategoryName"));
+			categoryNameLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+			// Pane
 			componentsPane = new JPanel();
 			componentsPane.setLayout(null);
-			componentsPane.add(userNameLabel, null);
-			componentsPane.add(getUserNameTextField(), null);
+			componentsPane.add(categoryNameLabel, null);
+			componentsPane.add(getCategoryNameTextField(), null);
+			componentsPane.add(parentCategoryLabel, null);
+			componentsPane.add(getParentCategoryComboBox(), null);
 		}
 		return componentsPane;
 	}
@@ -124,12 +141,12 @@ public class AddProfileWindow extends JDialog {
 	 * 
 	 * @return javax.swing.JTextField
 	 */
-	private JTextField getUserNameTextField() {
-		if (userNameTextField == null) {
-			userNameTextField = new JTextField();
-			userNameTextField.setBounds(new Rectangle(130, 30, 180, 30));
+	private JTextField getCategoryNameTextField() {
+		if (categoryNameTextField == null) {
+			categoryNameTextField = new JTextField();
+			categoryNameTextField.setBounds(new Rectangle(163, 8, 180, 30));
 		}
-		return userNameTextField;
+		return categoryNameTextField;
 	}
 
 	/**
@@ -190,21 +207,65 @@ public class AddProfileWindow extends JDialog {
 	}
 
 	protected void okButtonActionPerformed(ActionEvent e) {
-		// Create new user
 		try {
-			String userName = getUserNameTextField().getText();
-			if (userName == null || userName.trim().equals(""))
+			String categoryName = getCategoryNameTextField().getText();
+			if (categoryName == null
+					|| categoryName.trim().toString().equals("")) {
 				throw new BadNameException();
-			UserFacadeDelegateFactory.getDelegate().createUser(
-					new User(userName));
-			MainWindow.getInstance().getNavigationPanel().update();
+			}
+			Category parentCategory = getParentCategory();
+			Category theCategory = new Category(categoryName, parentCategory);
+			createdCategory = AccountFacadeDelegateFactory.getDelegate()
+					.createCategory(theCategory);
 			this.dispose();
-			GuiUtils.info("UserWindow.CreateUser.Success");
+			GuiUtils.info("CategoryWindow.Create.Success");
+		} catch (InstanceNotFoundException ex) {
+			GuiUtils.error("CategoryWindow.Create.Failure.NotFound");
 		} catch (InternalErrorException ex) {
-			GuiUtils.error("UserWindow.CreateUser.Failure.Generic");
+			GuiUtils.error("CategoryWindow.Create.Failure.Generic");
 		} catch (BadNameException ex) {
-			GuiUtils.warn("UserWindow.CreateUser.Failure.BadName");
+			GuiUtils.error("CategoryWindow.Create.Failure.BadName");
+		}
+	}
+
+	private Category getParentCategory() {
+		Category selectedCategory = null;
+		String selectedCategoryName = getParentCategoryComboBox()
+				.getSelectedItem().toString();
+		for (Category category : App.getCategories()) {
+			if (category.getName().equals(selectedCategoryName)) {
+				selectedCategory = category;
+				break;
+			}
 		}
 
+		return selectedCategory;
 	}
+
+	/**
+	 * This method initializes parentCategoryComboBox
+	 * 
+	 * @return javax.swing.JComboBox
+	 */
+	private JComboBox getParentCategoryComboBox() {
+		if (parentCategoryComboBox == null) {
+			parentCategoryComboBox = new JComboBox();
+			parentCategoryComboBox.setBounds(new Rectangle(163, 45, 180, 28));
+			parentCategoryComboBox.addItem(MessageManager
+					.getMessage("Category.Uncategorized"));
+			for (Category category : App.getCategories()) {
+				parentCategoryComboBox.addItem(category.getName());
+			}
+			parentCategoryComboBox.addItem(MessageManager
+					.getMessage("Category.New"));
+			parentCategoryComboBox.addItemListener(new AddCategoryListener(
+					parentCategoryComboBox));
+		}
+		return parentCategoryComboBox;
+	}
+
+	public Category getCreatedCategory() {
+		return createdCategory;
+	}
+
 } // @jve:decl-index=0:visual-constraint="10,10"

@@ -12,10 +12,9 @@ import com.googlecode.pennybank.model.accountfacade.delegate.AccountFacadeDelega
 import com.googlecode.pennybank.model.category.entity.Category;
 import com.googlecode.pennybank.model.util.exceptions.InternalErrorException;
 import com.googlecode.pennybank.swing.view.main.MainWindow;
-import com.googlecode.pennybank.swing.view.util.MessageBox;
+import com.googlecode.pennybank.swing.view.util.GuiUtils;
 import com.googlecode.pennybank.swing.view.util.MessageManager;
 import com.googlecode.pennybank.swing.view.util.PlatformUtils;
-import com.googlecode.pennybank.swing.view.util.MessageBox.MessageType;
 import com.googlecode.pennybank.util.PingQuery;
 
 /**
@@ -71,12 +70,7 @@ public class App {
 	private static void initializeApp() {
 
 		if (!PingQuery.Ping()) {
-			MessageBox messageBox = new MessageBox(
-					MessageManager.getMessage("App.NoDatabaseConnection.Title"),
-					MessageManager
-							.getMessage("App.NoDatabaseConnection.Description"),
-					MessageType.ERROR);
-			messageBox.setVisible(true);
+			GuiUtils.error("App.NoDatabaseConnection");
 			databaseReady = false;
 		}
 		databaseReady = true;

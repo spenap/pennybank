@@ -9,10 +9,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import com.googlecode.pennybank.model.user.entity.User;
+import com.googlecode.pennybank.model.userfacade.delegate.UserFacadeDelegateFactory;
+import com.googlecode.pennybank.model.util.exceptions.InstanceNotFoundException;
+import com.googlecode.pennybank.model.util.exceptions.InternalErrorException;
 import com.googlecode.pennybank.swing.view.main.MainWindow;
-import com.googlecode.pennybank.swing.view.util.MessageBox;
-import com.googlecode.pennybank.swing.view.util.MessageManager;
-import com.googlecode.pennybank.swing.view.util.MessageBox.MessageType;
+import com.googlecode.pennybank.swing.view.util.GuiUtils;
 import com.googlecode.pennybank.swing.view.util.MessageBox.ResultType;
 
 /**
@@ -33,27 +34,20 @@ public class RemoveUserListener implements ActionListener {
 		toDelete = MainWindow.getInstance().getNavigationPanel()
 				.getSelectedUser();
 		if (toDelete == null) {
-			MessageBox messageBox = new MessageBox(
-					MainWindow.getInstance(),
-					MessageManager
-							.getMessage("UserWindow.UserNotSelected.Title"),
-					MessageManager
-							.getMessage("UserWindow.UserNotSelected.Description"),
-					MessageType.INFORMATION);
-			messageBox.setVisible(true);
+			GuiUtils.info("UserWindow.UserNotSelected");
 		} else {
-			MessageBox messageBox = new MessageBox(
-					MainWindow.getInstance(),
-					MessageManager
-							.getMessage("UserWindow.DeleteUser.Title"),
-					MessageManager
-							.getMessage("UserWindow.DeleteUser.Description"),
-					MessageType.YESNO);
-			messageBox.setVisible(true);
-			if (messageBox.getWindowResult() == ResultType.OK) {
-
+			if (GuiUtils.confirm("UserWindow.DeleteUser") == ResultType.OK) {
+				try {
+					UserFacadeDelegateFactory.getDelegate().deleteUser(
+							toDelete.getUserId());
+					MainWindow.getInstance().getNavigationPanel().update();
+					GuiUtils.info("UserWindow.DeleteUser.Success");
+				} catch (InstanceNotFoundException ex) {
+					GuiUtils.error("UserWindow.DeleteUser.Failure.NotFound");
+				} catch (InternalErrorException ex) {
+					GuiUtils.error("UserWindow.DeleteUser.Failure.Generic");
+				}
 			}
 		}
 	}
-
 }

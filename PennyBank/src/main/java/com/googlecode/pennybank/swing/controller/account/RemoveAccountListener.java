@@ -8,10 +8,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import com.googlecode.pennybank.model.account.entity.Account;
+import com.googlecode.pennybank.model.accountfacade.delegate.AccountFacadeDelegateFactory;
+import com.googlecode.pennybank.model.util.exceptions.InstanceNotFoundException;
+import com.googlecode.pennybank.model.util.exceptions.InternalErrorException;
 import com.googlecode.pennybank.swing.view.main.MainWindow;
-import com.googlecode.pennybank.swing.view.util.MessageBox;
-import com.googlecode.pennybank.swing.view.util.MessageManager;
-import com.googlecode.pennybank.swing.view.util.MessageBox.MessageType;
+import com.googlecode.pennybank.swing.view.util.GuiUtils;
 import com.googlecode.pennybank.swing.view.util.MessageBox.ResultType;
 
 /**
@@ -29,25 +30,21 @@ public class RemoveAccountListener implements ActionListener {
 		theAccount = MainWindow.getInstance().getNavigationPanel()
 				.getSelectedAccount();
 		if (theAccount == null) {
-			MessageBox messageBox = new MessageBox(
-					MainWindow.getInstance(),
-					MessageManager
-							.getMessage("AccountWindow.AccountNotSelected.Title"),
-					MessageManager
-							.getMessage("AccountWindow.AccountNotSelected.Description"),
-					MessageType.INFORMATION);
-			messageBox.setVisible(true);
+			GuiUtils.info("AccountWindow.AccountNotSelected");
 		} else {
-			MessageBox messageBox = new MessageBox(
-					MainWindow.getInstance(),
-					MessageManager
-							.getMessage("AccountWindow.DeleteAccount.Title"),
-					MessageManager
-							.getMessage("AccountWindow.DeleteAccount.Description"),
-					MessageType.YESNO);
-			messageBox.setVisible(true);
-			if (messageBox.getWindowResult() == ResultType.OK) {
-
+			if (GuiUtils.confirm("AccountWindow.DeleteAccount") == ResultType.OK) {
+				try {
+					AccountFacadeDelegateFactory.getDelegate().deleteAccount(
+							theAccount.getAccountId());
+					MainWindow.getInstance().getNavigationPanel().update();
+					GuiUtils.info("AccountWindow.DeleteAccount.Success");
+				} catch (InstanceNotFoundException e1) {
+					GuiUtils
+							.error("AccountWindow.DeleteAccount.Failure.NotFound");
+				} catch (InternalErrorException e1) {
+					GuiUtils
+							.error("AccountWindow.DeleteAccount.Failure.Generic");
+				}
 			}
 		}
 	}
