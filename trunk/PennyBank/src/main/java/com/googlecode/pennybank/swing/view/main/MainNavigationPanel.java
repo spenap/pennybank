@@ -10,6 +10,9 @@ import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreeSelectionModel;
 
 import com.explodingpixels.macwidgets.MacIcons;
@@ -19,7 +22,6 @@ import com.explodingpixels.macwidgets.SourceListControlBar;
 import com.explodingpixels.macwidgets.SourceListItem;
 import com.explodingpixels.macwidgets.SourceListModel;
 import com.explodingpixels.widgets.PopupMenuCustomizerUsingStrings;
-import com.googlecode.pennybank.App;
 import com.googlecode.pennybank.model.account.entity.Account;
 import com.googlecode.pennybank.model.user.entity.User;
 import com.googlecode.pennybank.model.userfacade.delegate.UserFacadeDelegateFactory;
@@ -36,7 +38,6 @@ import com.googlecode.pennybank.swing.view.util.PlatformUtils;
  */
 public class MainNavigationPanel {
 
-	private List<User> userList;
 	private JTree navigationTree;
 	private final SourceListModel model;
 	private SourceListControlBar controlBar;
@@ -49,9 +50,8 @@ public class MainNavigationPanel {
 	 * Creates a new main navigation panel
 	 */
 	public MainNavigationPanel() {
-		userList = getUserList();
 		model = new SourceListModel();
-		updateModel();
+		updateSourceListModel();
 		navigationPanelListener = new NavigationPanelListener(this);
 		model.addSourceListModelListener(navigationPanelListener);
 		sourceList = new SourceList(model);
@@ -69,28 +69,7 @@ public class MainNavigationPanel {
 	}
 
 	public JComponent getComponent() {
-		DefaultMutableTreeNode root = new DefaultMutableTreeNode();
-
-		for (User user : userList) {
-			DefaultMutableTreeNode userItem = new DefaultMutableTreeNode(user);
-			root.add(userItem);
-
-			DefaultMutableTreeNode accountItem = new DefaultMutableTreeNode(
-					MessageManager.getMessage("NavigationPanel.Accounts")
-							.toUpperCase());
-			userItem.add(accountItem);
-
-			for (Account account : user.getAccounts()) {
-				accountItem.add(new DefaultMutableTreeNode(account));
-			}
-		}
-
-		navigationTree = new JTree(root);
-		navigationTree.getSelectionModel().setSelectionMode(
-				TreeSelectionModel.SINGLE_TREE_SELECTION);
-		navigationTree.addTreeSelectionListener(navigationPanelListener);
-		navigationTree.setRootVisible(false);
-		return navigationTree;
+		return getNavigationTree();
 	}
 
 	/**
@@ -142,9 +121,9 @@ public class MainNavigationPanel {
 
 	public void update() {
 		if (PlatformUtils.isMacOS()) {
-			populateModel();
+			populateSourceListModel();
 		} else {
-
+			updateTreeModel();
 		}
 	}
 
@@ -182,22 +161,50 @@ public class MainNavigationPanel {
 		return controlBar;
 	}
 
+	private TreeModel createTreeModel() {
+		DefaultMutableTreeNode root = new DefaultMutableTreeNode();
+
+		for (User user : getUserList()) {
+			DefaultMutableTreeNode userItem = new DefaultMutableTreeNode(user);
+			root.add(userItem);
+
+			DefaultMutableTreeNode accountItem = new DefaultMutableTreeNode(
+					MessageManager.getMessage("NavigationPanel.Accounts")
+							.toUpperCase());
+			userItem.add(accountItem);
+
+			for (Account account : user.getAccounts()) {
+				accountItem.add(new DefaultMutableTreeNode(account));
+			}
+		}
+		return new DefaultTreeModel(root);
+	}
+
+	private JTree getNavigationTree() {
+		if (navigationTree == null) {
+			TreeModel treeModel = createTreeModel();
+			navigationTree = new JTree(treeModel);
+			navigationTree.getSelectionModel().setSelectionMode(
+					TreeSelectionModel.SINGLE_TREE_SELECTION);
+			navigationTree.addTreeSelectionListener(navigationPanelListener);
+			navigationTree.setRootVisible(false);
+		}
+		return navigationTree;
+	}
+
 	private List<User> getUserList() {
 		List<User> userList = null;
-		if (App.isDatabaseReady()) {
-			try {
-				userList = UserFacadeDelegateFactory.getDelegate().findUsers();
-			} catch (InternalErrorException e) {
+		try {
+			userList = UserFacadeDelegateFactory.getDelegate().findUsers();
+		} catch (InternalErrorException e) {
 
-			}
 		}
 		if (userList == null)
 			userList = new ArrayList<User>();
-		this.userList = userList;
 		return userList;
 	}
 
-	private void populateModel() {
+	private void populateSourceListModel() {
 		List<SourceListCategory> categories = model.getCategories();
 
 		for (int i = 0; i < categories.size(); i++) {
@@ -228,9 +235,16 @@ public class MainNavigationPanel {
 		}
 	}
 
-	private SourceListModel updateModel() {
+	private SourceListModel updateSourceListModel() {
 		SourceListModel model = new SourceListModel();
-		populateModel();
+		populateSourceListModel();
 		return model;
+	}
+
+	private void updateTreeModel() {
+		DefaultTreeModel treeModel = (DefaultTreeModel) navigationTree
+				.getModel();
+		TreeNode rootNode = (TreeNode) createTreeModel().getRoot();
+		treeModel.setRoot(rootNode);
 	}
 }

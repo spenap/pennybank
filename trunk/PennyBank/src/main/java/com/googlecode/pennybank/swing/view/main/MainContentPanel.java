@@ -3,14 +3,12 @@
  */
 package com.googlecode.pennybank.swing.view.main;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.awt.BorderLayout;
+import java.util.Date;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
 
 import com.googlecode.pennybank.model.account.entity.Account;
 import com.googlecode.pennybank.model.accountfacade.delegate.AccountFacadeDelegateFactory;
@@ -18,7 +16,9 @@ import com.googlecode.pennybank.model.accountoperation.entity.AccountOperation;
 import com.googlecode.pennybank.model.util.exceptions.InstanceNotFoundException;
 import com.googlecode.pennybank.model.util.exceptions.InternalErrorException;
 import com.googlecode.pennybank.model.util.vo.Block;
-import com.googlecode.pennybank.swing.view.util.MessageManager;
+import com.googlecode.pennybank.swing.view.accountoperation.AccountOperationTableModel;
+import com.googlecode.pennybank.swing.view.util.CustomDateRenderer;
+import com.googlecode.pennybank.swing.view.util.TableSorter;
 
 /**
  * JPanel showing the Main Content for the application
@@ -30,45 +30,17 @@ public class MainContentPanel extends JPanel {
 
 	private JScrollPane accountOperationsScrollPane;
 	private JTable accountOperationsTable;
-	private DateFormat dateFormat;
+	private AccountOperationTableModel tableModel;
 
 	/**
 	 * Creates a new Main Content Panel
 	 */
 	public MainContentPanel() {
 		initComponents();
-		dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 	}
 
 	public void setAccountOperations(Block<AccountOperation> block) {
-
-		DefaultTableModel tableModel = (DefaultTableModel) accountOperationsTable
-				.getModel();
-
-		tableModel.setRowCount(block.getContents().size());
-
-		for (int i = 0; i < block.getContents().size(); i++) {
-			AccountOperation operationsBlock = block.getContents().get(i);
-			// Type
-			accountOperationsTable.setValueAt(MessageManager
-					.getMessage(operationsBlock.getType().toString()), i, 0);
-
-			// Amount
-			accountOperationsTable
-					.setValueAt(operationsBlock.getAmount(), i, 1);
-
-			// Date
-			accountOperationsTable.setValueAt(dateFormat.format(operationsBlock
-					.getDate().getTime()), i, 2);
-
-			// Comment
-			accountOperationsTable.setValueAt(operationsBlock.getComment(), i,
-					3);
-
-			// Categories
-			accountOperationsTable.setValueAt(operationsBlock.getCategory(), i,
-					4);
-		}
+		tableModel.setContent(block.getContents());
 	}
 
 	public void showAccountOperations(Account selectedAccount) {
@@ -88,31 +60,17 @@ public class MainContentPanel extends JPanel {
 		}
 	}
 
-	private TableModel getAccountOperationsTableModel() {
-
-		DefaultTableModel accountOperationsTableModel = new DefaultTableModel();
-		accountOperationsTableModel.addColumn(MessageManager
-				.getMessage("AccountOperationTable.Type"));
-		accountOperationsTableModel.addColumn(MessageManager
-				.getMessage("AccountOperationTable.Amount"));
-		accountOperationsTableModel.addColumn(MessageManager
-				.getMessage("AccountOperationTable.Date"));
-		accountOperationsTableModel.addColumn(MessageManager
-				.getMessage("AccountOperationTable.Comment"));
-		accountOperationsTableModel.addColumn(MessageManager
-				.getMessage("AccountOperationTable.Category"));
-
-		return accountOperationsTableModel;
-	}
-
 	private void initComponents() {
 
 		accountOperationsScrollPane = new JScrollPane();
-		accountOperationsTable = new JTable();
+		tableModel = new AccountOperationTableModel();
+		TableSorter tableSorter = new TableSorter(tableModel);
+		accountOperationsTable = new JTable(tableSorter);
+		accountOperationsTable.setDefaultRenderer(Date.class,
+				new CustomDateRenderer());
+		tableSorter.setTableHeader(accountOperationsTable.getTableHeader());
 
-		setLayout(new java.awt.BorderLayout());
-
-		accountOperationsTable.setModel(getAccountOperationsTableModel());
+		setLayout(new BorderLayout());
 		accountOperationsScrollPane.setViewportView(accountOperationsTable);
 
 		add(accountOperationsScrollPane, java.awt.BorderLayout.CENTER);

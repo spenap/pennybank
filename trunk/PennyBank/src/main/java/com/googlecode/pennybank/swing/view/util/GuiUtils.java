@@ -4,7 +4,8 @@
 package com.googlecode.pennybank.swing.view.util;
 
 import com.googlecode.pennybank.swing.view.main.MainWindow;
-import com.googlecode.pennybank.swing.view.util.MessageBox.MessageType;
+import com.googlecode.pennybank.swing.view.messagebox.MessageBox;
+import com.googlecode.pennybank.swing.view.messagebox.MessageBox.MessageType;
 
 /**
  * @author spenap

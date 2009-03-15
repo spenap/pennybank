@@ -51,7 +51,7 @@ public class TransferWindow extends JDialog {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel mainContentPane = null;
-	private Account account;
+	private Account sourceAccount;
 	private JPanel buttonsPane = null;
 	private JPanel fieldsPane = null;
 	private JButton okButton = null;
@@ -79,7 +79,7 @@ public class TransferWindow extends JDialog {
 	 */
 	public TransferWindow(Frame owner, Account operatedAccount) {
 		super(owner);
-		this.account = operatedAccount;
+		this.sourceAccount = operatedAccount;
 		initialize();
 	}
 
@@ -248,9 +248,7 @@ public class TransferWindow extends JDialog {
 			destinationAccountComboBox = new JComboBox();
 			User selectedUser = (User) getDestinationUserCombobox()
 					.getSelectedItem();
-			for (Account account : selectedUser.getAccounts()) {
-				destinationAccountComboBox.addItem(account);
-			}
+			populateDestinationAccounts(selectedUser);
 			destinationAccountComboBox
 					.setBounds(new Rectangle(155, 60, 160, 30));
 		}
@@ -268,23 +266,13 @@ public class TransferWindow extends JDialog {
 			destinationUserComboBox.addActionListener(new ActionListener() {
 
 				public void actionPerformed(ActionEvent e) {
-					getDestinationAccountComboBox().removeAllItems();
-					User selectedUser = (User) destinationUserComboBox
-							.getSelectedItem();
-					// The ok button is disabled if there are no accounts for
-					// the user
-					okButton.setEnabled(selectedUser.getAccounts().size() != 0);
-
-					for (Account account : selectedUser.getAccounts()) {
-						getDestinationAccountComboBox().addItem(account);
-					}
+					userComboBoxActionPerformed();
 				}
 
 			});
 			for (User user : userList) {
 				destinationUserComboBox.addItem(user);
 			}
-			destinationUserComboBox.setSelectedIndex(0);
 			destinationUserComboBox.setBounds(new Rectangle(155, 15, 160, 30));
 		}
 		return destinationUserComboBox;
@@ -346,11 +334,24 @@ public class TransferWindow extends JDialog {
 		return okButton;
 	}
 
+	private Category getSelectedCategory() {
+		Category selectedCategory = null;
+		String selectedCategoryName = getCategoryComboBox().getSelectedItem()
+				.toString();
+		for (Category category : App.getCategories()) {
+			if (category.getName().equals(selectedCategoryName)) {
+				selectedCategory = category;
+				break;
+			}
+		}
+
+		return selectedCategory;
+	}
+
 	private List<User> getUserList() {
 		List<User> userList = null;
 		try {
 			userList = UserFacadeDelegateFactory.getDelegate().findUsers();
-			userList.remove(account.getUser());
 		} catch (InternalErrorException e) {
 			userList = new ArrayList<User>();
 		}
@@ -367,8 +368,9 @@ public class TransferWindow extends JDialog {
 		this.setResizable(false);
 		this.setTitle(MessageManager
 				.getMessage("TransferBetweenAccountsWindow.Title"));
-		this.dateFormat = DateFormat.getDateInstance();
+		this.dateFormat = DateFormat.getDateInstance(DateFormat.SHORT);
 		this.userList = getUserList();
+		this.setModal(true);
 		this.setContentPane(getMainContentPane());
 	}
 
@@ -387,10 +389,11 @@ public class TransferWindow extends JDialog {
 			Category operationCategory = getSelectedCategory();
 			String comment = getDescriptionTextArea().getText();
 			AccountFacadeDelegateFactory.getDelegate().transfer(
-					account.getAccountId(), destinationAccount.getAccountId(),
-					amount, comment, operationDate, operationCategory);
+					sourceAccount.getAccountId(),
+					destinationAccount.getAccountId(), amount, comment,
+					operationDate, operationCategory);
 			MainWindow.getInstance().getContentPanel().showAccountOperations(
-					account);
+					sourceAccount);
 			this.dispose();
 			GuiUtils.info("AccountOperationWindow.Operate.Success");
 		} catch (ParseException ex) {
@@ -406,17 +409,23 @@ public class TransferWindow extends JDialog {
 		}
 	}
 
-	private Category getSelectedCategory() {
-		Category selectedCategory = null;
-		String selectedCategoryName = getCategoryComboBox().getSelectedItem()
-				.toString();
-		for (Category category : App.getCategories()) {
-			if (category.getName().equals(selectedCategoryName)) {
-				selectedCategory = category;
-				break;
-			}
-		}
+	protected void userComboBoxActionPerformed() {
 
-		return selectedCategory;
+		User selectedUser = (User) destinationUserComboBox.getSelectedItem();
+
+		populateDestinationAccounts(selectedUser);
+	}
+
+	private void populateDestinationAccounts(User selectedUser) {
+		if (destinationAccountComboBox == null)
+			return;
+		destinationAccountComboBox.removeAllItems();
+		for (Account account : selectedUser.getAccounts()) {
+			if (!sourceAccount.equals(account))
+				destinationAccountComboBox.addItem(account);
+		}
+		// The ok button is disabled if there are no valid accounts
+		// for the user
+		okButton.setEnabled(destinationAccountComboBox.getItemCount() != 0);
 	}
 } // @jve:decl-index=0:visual-constraint="10,10"

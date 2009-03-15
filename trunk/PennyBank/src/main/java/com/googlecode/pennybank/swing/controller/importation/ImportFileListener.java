@@ -7,11 +7,18 @@ package com.googlecode.pennybank.swing.controller.importation;
 import java.awt.FileDialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.googlecode.pennybank.model.user.entity.User;
+import com.googlecode.pennybank.model.userfacade.delegate.UserFacadeDelegateFactory;
+import com.googlecode.pennybank.model.util.exceptions.InternalErrorException;
+import com.googlecode.pennybank.swing.controller.profile.AddUserListener;
 import com.googlecode.pennybank.swing.view.importation.ShowImportationResultsWindow;
 import com.googlecode.pennybank.swing.view.main.MainWindow;
+import com.googlecode.pennybank.swing.view.messagebox.MessageBox.ResultType;
 import com.googlecode.pennybank.swing.view.util.GuiUtils;
 import com.googlecode.pennybank.util.importation.PListImportationHelper;
 import com.googlecode.pennybank.util.importation.exceptions.ImportationException;
@@ -26,6 +33,16 @@ import com.googlecode.pennybank.util.importation.exceptions.ParseException;
 public class ImportFileListener implements ActionListener {
 
 	public void actionPerformed(ActionEvent e) {
+
+		// Check if there are users available
+		if (getUserList().size() == 0) {
+			// Asks the user if he wants to create an user in the database
+			if (GuiUtils.confirm("Importation.Warning.NoUsers") == ResultType.OK) {
+				new AddUserListener().actionPerformed(e);
+			} else { // If the user denies the creation, abort the operation
+				return;
+			}
+		}
 
 		FileDialog fileChooser = new FileDialog(MainWindow.getInstance());
 		fileChooser.setMode(FileDialog.LOAD);
@@ -45,6 +62,16 @@ public class ImportFileListener implements ActionListener {
 		} else {
 			GuiUtils.error("Importation.Failure.NotSupported");
 		}
+	}
+
+	private List<User> getUserList() {
+		List<User> userList = null;
+		try {
+			userList = UserFacadeDelegateFactory.getDelegate().findUsers();
+		} catch (InternalErrorException e) {
+			userList = new ArrayList<User>();
+		}
+		return userList;
 	}
 
 	private void importPlist(String pathToFile) throws ImportationException {

@@ -76,7 +76,7 @@ public class DepositWithdrawWindow extends JDialog {
 		super(owner);
 		this.type = type;
 		this.account = operatedAccount;
-		dateFormat = DateFormat.getDateInstance();
+		dateFormat = DateFormat.getDateInstance(DateFormat.SHORT);
 		initialize(owner);
 	}
 
@@ -314,6 +314,7 @@ public class DepositWithdrawWindow extends JDialog {
 		this.setLocationRelativeTo(owner);
 		this.setResizable(false);
 		this.setTitle(title);
+		this.setModal(true);
 		this.setContentPane(getMainContentPane());
 	}
 

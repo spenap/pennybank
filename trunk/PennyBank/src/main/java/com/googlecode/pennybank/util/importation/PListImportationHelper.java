@@ -253,11 +253,16 @@ public class PListImportationHelper {
 	}
 
 	private Category getCategory(String categoryName) {
+		Category theCategory = null;
 		for (Category category : categoriesRead) {
 			if (category.getName().equals(categoryName))
-				return category;
+				theCategory = category;
 		}
-		return new Category(categoryName);
+		if (theCategory == null) {
+			theCategory = new Category(categoryName);
+			categoriesRead.add(theCategory);
+		}
+		return theCategory;
 	}
 
 	private void readAccountOperations(Node key) throws ParseException {
@@ -281,6 +286,9 @@ public class PListImportationHelper {
 			helper.parseAccountFile(pList);
 			for (AccountOperation operation : helper.getAccountOperations()) {
 				System.out.println(operation);
+			}
+			for (Category category : helper.getCategories()) {
+				System.out.println(category);
 			}
 		} catch (NotYetParsedException e) {
 			e.printStackTrace();
