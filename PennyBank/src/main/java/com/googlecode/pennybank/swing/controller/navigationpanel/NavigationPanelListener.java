@@ -118,11 +118,13 @@ public class NavigationPanelListener implements ActionListener,
 				.getComponent()).getLastSelectedPathComponent();
 
 		if ((node != null) && (node.isLeaf())
-				&& (node.getUserObject() instanceof Account))
+				&& (node.getUserObject() instanceof Account)) {
 			mainNavigationPanel.setSelectedAccount((Account) node
 					.getUserObject());
-		else if ((node != null) && (node.getUserObject() instanceof User)) {
+			mainNavigationPanel.setSelectedUser(null);
+		} else if ((node != null) && (node.getUserObject() instanceof User)) {
 			mainNavigationPanel.setSelectedUser((User) node.getUserObject());
+			mainNavigationPanel.setSelectedAccount(null);
 		}
 	}
 

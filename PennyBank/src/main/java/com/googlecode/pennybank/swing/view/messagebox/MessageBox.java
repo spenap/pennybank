@@ -3,7 +3,7 @@
  * 
  * 04/03/2009
  */
-package com.googlecode.pennybank.swing.view.util;
+package com.googlecode.pennybank.swing.view.messagebox;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -19,6 +19,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
 import javax.swing.border.EmptyBorder;
+
+import com.googlecode.pennybank.swing.view.util.IconManager;
+import com.googlecode.pennybank.swing.view.util.MessageManager;
 
 /**
  * @author spenap

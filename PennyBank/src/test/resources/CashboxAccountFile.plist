@@ -23,6 +23,8 @@
 			<real>1052.27</real>
 			<key>Description Column</key>
 			<string>A Comment</string>
+			<key>Label</key>
+			<string>A Category</string>
 			<key>Reconciled Column</key>
 			<false/>
 			<key>Withdrawal Column</key>

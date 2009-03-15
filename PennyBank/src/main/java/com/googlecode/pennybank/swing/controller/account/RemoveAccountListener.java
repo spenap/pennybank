@@ -12,8 +12,8 @@ import com.googlecode.pennybank.model.accountfacade.delegate.AccountFacadeDelega
 import com.googlecode.pennybank.model.util.exceptions.InstanceNotFoundException;
 import com.googlecode.pennybank.model.util.exceptions.InternalErrorException;
 import com.googlecode.pennybank.swing.view.main.MainWindow;
+import com.googlecode.pennybank.swing.view.messagebox.MessageBox.ResultType;
 import com.googlecode.pennybank.swing.view.util.GuiUtils;
-import com.googlecode.pennybank.swing.view.util.MessageBox.ResultType;
 
 /**
  * 

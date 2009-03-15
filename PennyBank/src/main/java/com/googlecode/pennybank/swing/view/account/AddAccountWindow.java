@@ -70,6 +70,7 @@ public class AddAccountWindow extends JDialog {
 		this.setLocationRelativeTo(owner);
 		this.setTitle(MessageManager
 				.getMessage("AccountWindow.AddAccount.Title"));
+		this.setModal(true);
 		this.setContentPane(getMainContentPane());
 	}
 

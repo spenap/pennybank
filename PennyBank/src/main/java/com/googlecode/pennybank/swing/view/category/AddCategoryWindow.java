@@ -69,6 +69,7 @@ public class AddCategoryWindow extends JDialog {
 		this.setSize(405, 145);
 		this.setTitle(MessageManager.getMessage("AddCategoryWindow.Title"));
 		this.setResizable(false);
+		this.setModal(true);
 		this.setLocationRelativeTo(owner);
 		this.setContentPane(getMainContentPane());
 	}

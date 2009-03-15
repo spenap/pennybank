@@ -62,6 +62,7 @@ public class AddProfileWindow extends JDialog {
 		this.setSize(379, 145);
 		this.setTitle(MessageManager.getMessage("AddProfileWindow.Title"));
 		this.setResizable(false);
+		this.setModal(true);
 		this.setLocationRelativeTo(owner);
 		this.setContentPane(getMainContentPane());
 	}
