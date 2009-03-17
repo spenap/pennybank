@@ -5,6 +5,7 @@ package com.googlecode.pennybank.swing.view.util;
 
 import java.awt.Component;
 import java.text.DateFormat;
+import java.text.NumberFormat;
 import java.util.Date;
 
 import javax.swing.JLabel;
@@ -16,20 +17,27 @@ import javax.swing.table.DefaultTableCellRenderer;
  * 
  */
 @SuppressWarnings("serial")
-public class CustomDateRenderer extends DefaultTableCellRenderer {
+public class AccountOperationTableRenderer extends DefaultTableCellRenderer {
 
 	private DateFormat dateFormat;
+	private NumberFormat numberFormat;
 
-	public CustomDateRenderer() {
+	public AccountOperationTableRenderer() {
 		dateFormat = DateFormat.getDateInstance(DateFormat.LONG);
+		numberFormat = NumberFormat.getCurrencyInstance();
 	}
 
 	@Override
 	public Component getTableCellRendererComponent(JTable table, Object value,
 			boolean isSelected, boolean hasFocus, int row, int column) {
-
-		Date date = (Date) value;
-		String formattedValue = dateFormat.format(date);
+		String formattedValue = null;
+		if (value instanceof Date) {
+			Date date = (Date) value;
+			formattedValue = dateFormat.format(date);
+		} else {
+			Double amount = (Double) value;
+			formattedValue = numberFormat.format(amount);
+		}
 		JLabel label = new JLabel(formattedValue);
 
 		if (isSelected) {

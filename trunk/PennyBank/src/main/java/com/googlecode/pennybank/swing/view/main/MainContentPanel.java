@@ -4,21 +4,33 @@
 package com.googlecode.pennybank.swing.view.main;
 
 import java.awt.BorderLayout;
+import java.text.NumberFormat;
 import java.util.Date;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
+import ca.odell.glazedlists.BasicEventList;
+import ca.odell.glazedlists.FilterList;
+import ca.odell.glazedlists.SortedList;
+import ca.odell.glazedlists.matchers.MatcherEditor;
+import ca.odell.glazedlists.swing.EventTableModel;
+import ca.odell.glazedlists.swing.TableComparatorChooser;
+import ca.odell.glazedlists.swing.TextComponentMatcherEditor;
+
+import com.explodingpixels.macwidgets.MacWidgetFactory;
 import com.googlecode.pennybank.model.account.entity.Account;
 import com.googlecode.pennybank.model.accountfacade.delegate.AccountFacadeDelegateFactory;
 import com.googlecode.pennybank.model.accountoperation.entity.AccountOperation;
 import com.googlecode.pennybank.model.util.exceptions.InstanceNotFoundException;
 import com.googlecode.pennybank.model.util.exceptions.InternalErrorException;
 import com.googlecode.pennybank.model.util.vo.Block;
-import com.googlecode.pennybank.swing.view.accountoperation.AccountOperationTableModel;
-import com.googlecode.pennybank.swing.view.util.CustomDateRenderer;
-import com.googlecode.pennybank.swing.view.util.TableSorter;
+import com.googlecode.pennybank.swing.view.accountoperation.AccountOperationComparator;
+import com.googlecode.pennybank.swing.view.accountoperation.AccountOperationTableFormat;
+import com.googlecode.pennybank.swing.view.accountoperation.AccountOperationTextFilterator;
+import com.googlecode.pennybank.swing.view.util.AccountOperationTableRenderer;
+import com.googlecode.pennybank.swing.view.util.MessageManager;
 
 /**
  * JPanel showing the Main Content for the application
@@ -30,7 +42,7 @@ public class MainContentPanel extends JPanel {
 
 	private JScrollPane accountOperationsScrollPane;
 	private JTable accountOperationsTable;
-	private AccountOperationTableModel tableModel;
+	private SortedList<AccountOperation> accountOperationList;
 
 	/**
 	 * Creates a new Main Content Panel
@@ -40,7 +52,8 @@ public class MainContentPanel extends JPanel {
 	}
 
 	public void setAccountOperations(Block<AccountOperation> block) {
-		tableModel.setContent(block.getContents());
+		accountOperationList.clear();
+		accountOperationList.addAll(block.getContents());
 	}
 
 	public void showAccountOperations(Account selectedAccount) {
@@ -53,6 +66,19 @@ public class MainContentPanel extends JPanel {
 							selectedAccount.getAccountId(), startIndex,
 							count.intValue());
 			setAccountOperations(operations);
+
+			MainWindow.getInstance().getStatusBar().setText(
+					selectedAccount.getName()
+							+ ": "
+							+ count.intValue()
+							+ " "
+							+ MessageManager.getMessage("StatusBar.Movements")
+							+ " - "
+							+ MessageManager.getMessage("StatusBar.Balance")
+							+ ": "
+							+ NumberFormat.getCurrencyInstance().format(
+									selectedAccount.getBalance()));
+
 		} catch (InternalErrorException e) {
 			e.printStackTrace();
 		} catch (InstanceNotFoundException e) {
@@ -63,16 +89,52 @@ public class MainContentPanel extends JPanel {
 	private void initComponents() {
 
 		accountOperationsScrollPane = new JScrollPane();
-		tableModel = new AccountOperationTableModel();
-		TableSorter tableSorter = new TableSorter(tableModel);
-		accountOperationsTable = new JTable(tableSorter);
-		accountOperationsTable.setDefaultRenderer(Date.class,
-				new CustomDateRenderer());
-		tableSorter.setTableHeader(accountOperationsTable.getTableHeader());
+		accountOperationList = new SortedList<AccountOperation>(
+				new BasicEventList<AccountOperation>(),
+				new AccountOperationComparator());
+
+		MatcherEditor<AccountOperation> textMatcherEditor = new TextComponentMatcherEditor<AccountOperation>(
+				MainToolBar.getSearchField(),
+				new AccountOperationTextFilterator());
+		FilterList<AccountOperation> textFilteredIssues = new FilterList<AccountOperation>(
+				accountOperationList, textMatcherEditor);
+		EventTableModel<AccountOperation> accountOperationTableModel = new EventTableModel<AccountOperation>(
+				textFilteredIssues, new AccountOperationTableFormat());
 
 		setLayout(new BorderLayout());
-		accountOperationsScrollPane.setViewportView(accountOperationsTable);
+		accountOperationsScrollPane
+				.setViewportView(getTable(accountOperationTableModel));
 
 		add(accountOperationsScrollPane, java.awt.BorderLayout.CENTER);
+	}
+
+	private JTable getTable(
+			EventTableModel<AccountOperation> accountOperationTableModel) {
+		if (accountOperationsTable == null) {
+			accountOperationsTable = MacWidgetFactory
+					.createITunesTable(accountOperationTableModel);
+			// accountOperationsTable = new JTable(accountOperationTableModel);
+
+			TableComparatorChooser<AccountOperation> tableSorter = TableComparatorChooser
+					.install(accountOperationsTable, accountOperationList,
+							TableComparatorChooser.MULTIPLE_COLUMN_MOUSE);
+			// tableSorter.addSortActionListener(new ActionListener() {
+			//
+			// public void actionPerformed(ActionEvent e) {
+			// System.out.println(e.getSource());
+			// // accountOperationsTable.getTableHeader().putClientProperty(
+			// // "JTableHeader.selectedColumn", 1);
+			// accountOperationsTable.getTableHeader().putClientProperty(
+			// "JTableHeader.sortDirection", "ascending");
+			// }
+			//
+			// });
+
+			accountOperationsTable.setDefaultRenderer(Date.class,
+					new AccountOperationTableRenderer());
+			accountOperationsTable.setDefaultRenderer(Double.class,
+					new AccountOperationTableRenderer());
+		}
+		return accountOperationsTable;
 	}
 }

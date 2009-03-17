@@ -17,7 +17,7 @@
 			</property>
 			<property name="hibernate.connection.password">${dataSource.password}
 			</property>
-			<property name="hibernate.connection.url">${dataSource.url}</property>
+			<property name="hibernate.connection.url">${dataSource.testUrl}</property>
 			<property name="hibernate.connection.autocommit">true</property>
 		</properties>
 
@@ -30,5 +30,6 @@
 		<class>
 			com.googlecode.pennybank.model.accountoperation.entity.AccountOperation
 		</class>
+
 	</persistence-unit>
 </persistence>

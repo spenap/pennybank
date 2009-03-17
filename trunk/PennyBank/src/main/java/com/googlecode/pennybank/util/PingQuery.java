@@ -16,8 +16,6 @@ import com.googlecode.pennybank.model.util.exceptions.InternalErrorException;
  * 
  */
 public class PingQuery {
-
-    private double miDouble;
     
 	/**
 	 * Simple query to initialize the DB It should be called when loading the
