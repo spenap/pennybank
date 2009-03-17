@@ -27,6 +27,7 @@ public class AccountOperationTableModel extends AbstractTableModel {
 			MessageManager.getMessage("AccountOperationTable.Category") };
 	private List<AccountOperation> accountOperations = new ArrayList<AccountOperation>();
 
+	@Deprecated
 	public AccountOperationTableModel() {
 	}
 

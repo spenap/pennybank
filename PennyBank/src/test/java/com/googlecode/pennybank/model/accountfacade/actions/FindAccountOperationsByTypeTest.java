@@ -62,8 +62,8 @@ public class FindAccountOperationsByTypeTest {
 
 		Random random = new Random();
 		double amount = 123.4;
-		additionsMade = random.nextInt(30);
-		withdrawalsMade = random.nextInt(30);
+		additionsMade = 1 + random.nextInt(30);
+		withdrawalsMade = 1 + random.nextInt(30);
 
 		for (int i = 0; i < additionsMade; i++) {
 			accountFacade.addToAccount(testAccount.getAccountId(), amount,

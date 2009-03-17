@@ -28,6 +28,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 
+import com.googlecode.pennybank.App;
 import com.googlecode.pennybank.model.account.entity.Account;
 import com.googlecode.pennybank.model.accountfacade.delegate.AccountFacadeDelegate;
 import com.googlecode.pennybank.model.accountfacade.delegate.AccountFacadeDelegateFactory;
@@ -614,7 +615,7 @@ public class ShowImportationResultsWindow extends JDialog {
 			}
 
 			for (Category category : categoryList) {
-				accountFacade.createCategory(category);
+				App.getCategories().add(accountFacade.createCategory(category));
 			}
 
 			for (AccountOperation operation : operationList) {
@@ -623,7 +624,7 @@ public class ShowImportationResultsWindow extends JDialog {
 							operation.getAmount(), operation.getComment(),
 							operation.getDate(), operation.getCategory());
 				} else {
-					accountFacade.addToAccount(account.getAccountId(),
+					accountFacade.withdrawFromAccount(account.getAccountId(),
 							operation.getAmount(), operation.getComment(),
 							operation.getDate(), operation.getCategory());
 				}

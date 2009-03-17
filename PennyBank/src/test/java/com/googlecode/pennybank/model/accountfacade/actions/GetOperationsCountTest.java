@@ -73,7 +73,7 @@ public class GetOperationsCountTest {
 			throws InstanceNotFoundException, NegativeAmountException,
 			InternalErrorException {
 		for (int i = 0; i < OPERATIONS_COUNT; i++) {
-			accountFacade.addToAccount(testAccount.getAccountId(), i * i,
+			accountFacade.addToAccount(testAccount.getAccountId(), i * i + 1,
 					"Test operation " + i, Calendar.getInstance(), null);
 		}
 		long operationsCount = accountFacade.getOperationsCount(testAccount

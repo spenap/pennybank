@@ -1,7 +1,6 @@
 package com.googlecode.pennybank.swing.view.main;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Container;
 
 import javax.swing.JComponent;
@@ -24,9 +23,9 @@ import com.googlecode.pennybank.swing.view.util.PlatformUtils;
 public class MainWindow extends JFrame {
 
 	private Container mainWindow;
-	private Component toolBar;
+	private MainToolBar toolBar;
 	private JSplitPane mainContent;
-	private Component bottomBar;
+	private MainStatusBar statusBar;
 	private MainNavigationPanel navigationPanel;
 	private JComponent contentPanel;
 	private JMenuBar menuBar;
@@ -86,23 +85,23 @@ public class MainWindow extends JFrame {
 		// Navigation Panel
 		navigationPanel = new MainNavigationPanel();
 
+		// ToolBar
+		toolBar = new MainToolBar();
+
 		// Content Panel
 		contentPanel = new MainContentPanel();
 
-		// ToolBar
-		toolBar = MainToolBar.getMainToolBar(this);
-
 		// BottomBar
-		bottomBar = MainBottomBar.getBottomBar();
+		statusBar = new MainStatusBar();
 
 		// Main Content
 		mainContent = MainContent.getJSPlitPane(navigationPanel, contentPanel);
 
 		// Window
 		mainWindow = new JPanel(new BorderLayout());
-		mainWindow.add(toolBar, BorderLayout.NORTH);
+		mainWindow.add(toolBar.getComponent(this), BorderLayout.NORTH);
 		mainWindow.add(mainContent, BorderLayout.CENTER);
-		mainWindow.add(bottomBar, BorderLayout.SOUTH);
+		mainWindow.add(statusBar.getStatusBar(), BorderLayout.SOUTH);
 
 		setContentPane(mainWindow);
 	}
@@ -110,5 +109,13 @@ public class MainWindow extends JFrame {
 	private void setUp() {
 		pack();
 		setLocation(100, 50);
+	}
+
+	public MainStatusBar getStatusBar() {
+		return statusBar;
+	}
+
+	public MainToolBar getToolBar() {
+		return toolBar;
 	}
 }

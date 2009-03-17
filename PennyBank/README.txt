@@ -51,9 +51,11 @@ Create a database
 
 - Start the MySQL server.
 
-- Create a database with name "pennybank".
+- Create a database with name "pennybank" and other with name "pennybank_test"
 
   mysqladmin -u root create pennybank
+
+  mysqladmin -u root create pennybank_test
 
 - Create a user with name "pennybank" and password "pennybank", and allow her/him to
   access from local host.
@@ -61,6 +63,7 @@ Create a database
   mysql -u root
 
   GRANT ALL PRIVILEGES ON pennybank.* to pennybank@localhost IDENTIFIED BY 'pennybank';
+  GRANT ALL PRIVILEGES ON pennybank_test.* to pennybank@localhost IDENTIFIED BY 'pennybank';
   
 - Try to access to "pennybank" database as "pennybank" user with password "pennybank".
    

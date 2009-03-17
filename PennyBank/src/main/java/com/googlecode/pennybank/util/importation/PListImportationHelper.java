@@ -17,6 +17,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.googlecode.pennybank.App;
 import com.googlecode.pennybank.model.account.entity.Account;
 import com.googlecode.pennybank.model.accountoperation.entity.AccountOperation;
 import com.googlecode.pennybank.model.accountoperation.entity.AccountOperation.Type;
@@ -254,13 +255,19 @@ public class PListImportationHelper {
 
 	private Category getCategory(String categoryName) {
 		Category theCategory = null;
-		for (Category category : categoriesRead) {
+		for (Category category : App.getCategories()) {
 			if (category.getName().equals(categoryName))
 				theCategory = category;
 		}
 		if (theCategory == null) {
-			theCategory = new Category(categoryName);
-			categoriesRead.add(theCategory);
+			for (Category category : categoriesRead) {
+				if (category.getName().equals(categoryName))
+					theCategory = category;
+			}
+			if (theCategory == null) {
+				theCategory = new Category(categoryName);
+				categoriesRead.add(theCategory);
+			}
 		}
 		return theCategory;
 	}

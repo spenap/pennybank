@@ -10,9 +10,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
+import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
+import javax.swing.border.EmptyBorder;
+import javax.swing.text.JTextComponent;
 
 import com.explodingpixels.macwidgets.MacButtonFactory;
 import com.explodingpixels.macwidgets.MacWidgetFactory;
@@ -21,6 +25,7 @@ import com.googlecode.pennybank.swing.controller.account.AddAccountListener;
 import com.googlecode.pennybank.swing.controller.account.RemoveAccountListener;
 import com.googlecode.pennybank.swing.controller.accountoperation.AddAccountOperationListener;
 import com.googlecode.pennybank.swing.controller.accountoperation.AddAccountOperationListener.OperationType;
+import com.googlecode.pennybank.swing.controller.main.TableSearchActionListener;
 import com.googlecode.pennybank.swing.controller.profile.AddUserListener;
 import com.googlecode.pennybank.swing.controller.profile.RemoveUserListener;
 import com.googlecode.pennybank.swing.view.util.IconManager;
@@ -35,6 +40,12 @@ import com.googlecode.pennybank.swing.view.util.PlatformUtils;
 @SuppressWarnings("serial")
 public class MainToolBar extends Component {
 
+	private static JTextField searchField;
+
+	public MainToolBar() {
+
+	}
+
 	/**
 	 * Gets the ToolBar
 	 * 
@@ -42,7 +53,7 @@ public class MainToolBar extends Component {
 	 *            the frame to insert the toolBar into
 	 * @return the toolBar
 	 */
-	public static Component getMainToolBar(JFrame mainFrame) {
+	public Component getComponent(JFrame mainFrame) {
 
 		List<JButton> leftButtons = new ArrayList<JButton>();
 		List<JButton> rightButtons = new ArrayList<JButton>();
@@ -105,7 +116,7 @@ public class MainToolBar extends Component {
 		}
 	}
 
-	private static JToolBar populateJToolBar(JFrame mainFrame,
+	private JToolBar populateJToolBar(JFrame mainFrame,
 			List<JButton> leftButtons, List<JButton> rightButtons) {
 
 		JToolBar jToolBar = new JToolBar();
@@ -121,14 +132,10 @@ public class MainToolBar extends Component {
 			jToolBar.add(button);
 		}
 
-		// jToolBar.add(removeAccountButton);
-		// jToolBar.add(addToAccountButton);
-		// jToolBar.add(withdrawFromAccountButton);
-
 		return jToolBar;
 	}
 
-	private static TriAreaComponent populateOSXToolBar(JFrame mainFrame,
+	private TriAreaComponent populateOSXToolBar(JFrame mainFrame,
 			List<JButton> leftButtons, List<JButton> rightButtons) {
 
 		TriAreaComponent osxToolBar = MacWidgetFactory.createUnifiedToolBar();
@@ -138,12 +145,6 @@ public class MainToolBar extends Component {
 		for (JButton button : leftButtons) {
 			osxToolBar.addComponentToLeft(MacButtonFactory
 					.makeUnifiedToolBarButton(button));
-			// osxToolBar.addComponentToLeft(MacButtonFactory
-			// .makeUnifiedToolBarButton(removeAccountButton));
-			// osxToolBar.addComponentToLeft(MacButtonFactory
-			// .makeUnifiedToolBarButton(addToAccountButton));
-			// osxToolBar.addComponentToLeft(MacButtonFactory
-			// .makeUnifiedToolBarButton(withdrawFromAccountButton));
 		}
 
 		for (JButton button : rightButtons) {
@@ -151,10 +152,51 @@ public class MainToolBar extends Component {
 		}
 
 		// Right side buttons
-		JTextField searchField = new JTextField();
-		searchField.setPreferredSize(new Dimension(150, 20));
-		searchField.putClientProperty("JTextField.variant", "search");
-		osxToolBar.addComponentToRight(searchField);
+		osxToolBar.addComponentToRight(getSearchField());
 		return osxToolBar;
+	}
+
+	private static JPopupMenu getSearchPopup() {
+		TableSearchActionListener tableSearchActionListener = new TableSearchActionListener();
+
+		// Search popup menu
+		JPopupMenu searchPopupMenu = new JPopupMenu(MessageManager
+				.getMessage("Search.Title"));
+		searchPopupMenu.setBorder(new EmptyBorder(8, 6, 8, 6));
+		// Search in comments
+		JCheckBoxMenuItem searchCommentsMenuItem = new JCheckBoxMenuItem(
+				MessageManager.getMessage("Search.Comments"));
+		searchCommentsMenuItem.addActionListener(tableSearchActionListener);
+		tableSearchActionListener.add(searchCommentsMenuItem);
+		searchPopupMenu.add(searchCommentsMenuItem);
+
+		// Search in categories
+		JCheckBoxMenuItem searchCategoriesMenuItem = new JCheckBoxMenuItem(
+				MessageManager.getMessage("Search.Categories"));
+		tableSearchActionListener.add(searchCategoriesMenuItem);
+		searchCategoriesMenuItem.addActionListener(tableSearchActionListener);
+		searchPopupMenu.add(searchCategoriesMenuItem);
+
+		// Search in everything
+		JCheckBoxMenuItem searchAllMenuItem = new JCheckBoxMenuItem(
+				MessageManager.getMessage("Search.All"));
+		searchAllMenuItem.addActionListener(tableSearchActionListener);
+		tableSearchActionListener.add(searchAllMenuItem);
+		searchPopupMenu.add(searchAllMenuItem);
+		return searchPopupMenu;
+	}
+
+	public static JTextComponent getSearchField() {
+		if (searchField == null) {
+			searchField = new JTextField();
+			searchField.setPreferredSize(new Dimension(150, 20));
+			searchField.putClientProperty("JTextField.variant", "search");
+
+			JPopupMenu searchPopupMenu = getSearchPopup();
+
+			searchField.putClientProperty("JTextField.Search.FindPopup",
+					searchPopupMenu);
+		}
+		return searchField;
 	}
 }
