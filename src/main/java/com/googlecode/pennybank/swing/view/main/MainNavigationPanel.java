@@ -58,14 +58,15 @@ public class MainNavigationPanel {
 		sourceList.addSourceListSelectionListener(navigationPanelListener);
 		controlBar = createControlBar();
 		sourceList.installSourceListControlBar(controlBar);
+		sourceList
+				.setSourceListContextMenuProvider(new MainNavigationPanelContextMenu());
 	}
 
-	public void collapseNavigationTree() {
-		// TODO Check mac widgets API to see if this is possible
-	}
+	public void setExpanded(boolean expanded) {
+		for (SourceListCategory category : model.getCategories()) {
+			sourceList.setExpanded(category, expanded);
+		}
 
-	public void expandNavigationTree() {
-		// TODO Check mac widgets API to see if this is possible
 	}
 
 	public JComponent getComponent() {
@@ -105,10 +106,12 @@ public class MainNavigationPanel {
 	 */
 	public void setSelectedAccount(Account selectedAccount) {
 		this.selectedAccount = selectedAccount;
+		MainWindow mainWindow = MainWindow.getInstance();
 		if (selectedAccount != null) {
-			MainWindow.getInstance().getContentPanel().showAccountOperations(
-					selectedAccount);
+			mainWindow.getContentPanel().showAccountOperations(selectedAccount);
 		}
+		mainWindow.setUserEnabled(getSelectedUser() != null);
+		mainWindow.setAccountEnabled(selectedAccount != null);
 	}
 
 	/**
@@ -117,6 +120,9 @@ public class MainNavigationPanel {
 	 */
 	public void setSelectedUser(User selectedUser) {
 		this.selectedUser = selectedUser;
+		MainWindow mainWindow = MainWindow.getInstance();
+		mainWindow.setUserEnabled(selectedUser != null);
+		mainWindow.setAccountEnabled(getSelectedAccount() != null);
 	}
 
 	public void update() {

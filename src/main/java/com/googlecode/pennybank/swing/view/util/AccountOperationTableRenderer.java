@@ -8,7 +8,6 @@ import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.Date;
 
-import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
@@ -38,15 +37,7 @@ public class AccountOperationTableRenderer extends DefaultTableCellRenderer {
 			Double amount = (Double) value;
 			formattedValue = numberFormat.format(amount);
 		}
-		JLabel label = new JLabel(formattedValue);
-
-		if (isSelected) {
-			label.setBackground(table.getSelectionBackground());
-			label.setOpaque(true);
-			label.setForeground(table.getSelectionForeground());
-		}
-
-		return label;
+		return super.getTableCellRendererComponent(table, formattedValue,
+				isSelected, hasFocus, row, column);
 	}
-
 }

@@ -133,7 +133,6 @@ public class Account implements Serializable {
 	 *            the user to set
 	 */
 	public void setUser(User user) {
-
 		this.user = user;
 	}
 

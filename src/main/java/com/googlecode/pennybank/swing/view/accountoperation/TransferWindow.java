@@ -37,7 +37,7 @@ import com.googlecode.pennybank.model.userfacade.delegate.UserFacadeDelegateFact
 import com.googlecode.pennybank.model.util.exceptions.InstanceNotFoundException;
 import com.googlecode.pennybank.model.util.exceptions.InternalErrorException;
 import com.googlecode.pennybank.model.util.exceptions.NegativeAmountException;
-import com.googlecode.pennybank.swing.controller.category.AddCategoryListener;
+import com.googlecode.pennybank.swing.view.category.CategoriesComboBox;
 import com.googlecode.pennybank.swing.view.main.MainWindow;
 import com.googlecode.pennybank.swing.view.util.GuiUtils;
 import com.googlecode.pennybank.swing.view.util.IconManager;
@@ -139,16 +139,8 @@ public class TransferWindow extends JDialog {
 	 */
 	private JComboBox getCategoryComboBox() {
 		if (categoryComboBox == null) {
-			categoryComboBox = new JComboBox();
+			categoryComboBox = new CategoriesComboBox();
 			categoryComboBox.setBounds(new Rectangle(155, 201, 160, 30));
-			categoryComboBox.addItem(MessageManager
-					.getMessage("Category.Uncategorized"));
-			for (Category category : App.getCategories()) {
-				categoryComboBox.addItem(category.getName());
-			}
-			categoryComboBox.addItem(MessageManager.getMessage("Category.New"));
-			categoryComboBox.addItemListener(new AddCategoryListener(
-					categoryComboBox));
 		}
 		return categoryComboBox;
 	}

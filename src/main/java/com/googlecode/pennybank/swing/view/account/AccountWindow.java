@@ -10,6 +10,8 @@ import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
+import java.text.NumberFormat;
+import java.text.ParseException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -34,7 +36,7 @@ import com.googlecode.pennybank.swing.view.util.exceptions.BadNameException;
  * @author spenap
  * 
  */
-public class AddAccountWindow extends JDialog {
+public class AccountWindow extends JDialog {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel mainContentPane = null;
@@ -49,13 +51,29 @@ public class AddAccountWindow extends JDialog {
 	private JTextField accountNameTextField = null;
 	private JTextField accountBalanceTextField = null;
 	private User theUser;
+	private PersistMode persistMode = null;
+	private Account theAccount = null;
+
+	private enum PersistMode {
+		CreateAccount, UpdateAccount
+	};
 
 	/**
 	 * @param owner
 	 */
-	public AddAccountWindow(Frame owner, User user) {
+	public AccountWindow(Frame owner, User user) {
 		super(owner);
 		this.theUser = user;
+		this.persistMode = PersistMode.CreateAccount;
+		this.theAccount = new Account(theUser, 0, "");
+		initialize(owner);
+	}
+
+	public AccountWindow(Frame owner, User user, Account toUpdate) {
+		super(owner);
+		this.theUser = user;
+		this.persistMode = PersistMode.UpdateAccount;
+		this.theAccount = toUpdate;
 		initialize(owner);
 	}
 
@@ -68,8 +86,8 @@ public class AddAccountWindow extends JDialog {
 		this.setResizable(false);
 		this.setSize(333, 170);
 		this.setLocationRelativeTo(owner);
-		this.setTitle(MessageManager
-				.getMessage("AccountWindow.AddAccount.Title"));
+		this.setTitle(MessageManager.getMessage("AccountWindow."
+				+ persistMode.toString() + ".Title"));
 		this.setModal(true);
 		this.setContentPane(getMainContentPane());
 	}
@@ -141,26 +159,48 @@ public class AddAccountWindow extends JDialog {
 
 	protected void okButtonActionPerformed(ActionEvent e) {
 		try {
-			double accountBalance = Double
-					.parseDouble(getAccountBalanceTextField().getText());
 			String accountName = getAccountNameTextField().getText();
 			if (accountName == null || accountName.trim().equals(""))
 				throw new BadNameException();
-			Account account = new Account(theUser, accountBalance, accountName);
+			double accountBalance = NumberFormat.getInstance().parse(
+					getAccountBalanceTextField().getText()).doubleValue();
+			theAccount.setName(accountName);
+			theAccount.setBalance(accountBalance);
 
-			AccountFacadeDelegateFactory.getDelegate().createAccount(account);
-			MainWindow.getInstance().getNavigationPanel().update();
-			this.dispose();
-			GuiUtils.info("AccountWindow.CreateAccount.Success");
-		} catch (NumberFormatException ex) {
-			GuiUtils.warn("AccountWindow.CreateAccount.Failure.BadNumber");
-		} catch (InstanceNotFoundException ex) {
-			GuiUtils.error("AccountWindow.CreateAccount.Failure.NotFound");
-		} catch (InternalErrorException ex) {
-			GuiUtils.error("AccountWindow.CreateAccount.Failure.Generic");
+			if (persistAccount(theAccount)) {
+				MainWindow.getInstance().getNavigationPanel().update();
+				this.dispose();
+				GuiUtils.info("AccountWindow." + persistMode.toString()
+						+ ".Success");
+			}
 		} catch (BadNameException ex) {
-			GuiUtils.warn("AccountWindow.CreateAccount.Failure.BadName");
+			GuiUtils.warn("AccountWindow." + persistMode.toString()
+					+ ".Failure.BadName");
+		} catch (ParseException ex) {
+			GuiUtils.warn("AccountWindow." + persistMode.toString()
+					+ ".Failure.BadNumber");
 		}
+	}
+
+	private boolean persistAccount(Account theAccount) {
+		boolean success = false;
+		try {
+			if (persistMode == PersistMode.CreateAccount) {
+				AccountFacadeDelegateFactory.getDelegate().createAccount(
+						theAccount);
+			} else {
+				AccountFacadeDelegateFactory.getDelegate().updateAccount(
+						theAccount);
+			}
+			success = true;
+		} catch (InstanceNotFoundException ex) {
+			GuiUtils.error("AccountWindow." + persistMode.toString()
+					+ ".Failure.NotFound");
+		} catch (InternalErrorException ex) {
+			GuiUtils.error("AccountWindow." + persistMode.toString()
+					+ ".Failure.Generic");
+		}
+		return success;
 	}
 
 	/**
@@ -231,6 +271,7 @@ public class AddAccountWindow extends JDialog {
 	private JTextField getAccountNameTextField() {
 		if (accountNameTextField == null) {
 			accountNameTextField = new JTextField();
+			accountNameTextField.setText(theAccount.getName());
 			accountNameTextField.setBounds(new Rectangle(98, 20, 172, 28));
 		}
 		return accountNameTextField;
@@ -244,6 +285,8 @@ public class AddAccountWindow extends JDialog {
 	private JTextField getAccountBalanceTextField() {
 		if (accountBalanceTextField == null) {
 			accountBalanceTextField = new JTextField();
+			accountBalanceTextField.setText(NumberFormat.getInstance().format(
+					theAccount.getBalance()));
 			accountBalanceTextField.setBounds(new Rectangle(98, 60, 172, 28));
 		}
 		return accountBalanceTextField;

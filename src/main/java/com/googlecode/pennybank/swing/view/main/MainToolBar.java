@@ -40,7 +40,46 @@ import com.googlecode.pennybank.swing.view.util.PlatformUtils;
 @SuppressWarnings("serial")
 public class MainToolBar extends Component {
 
+	private static JPopupMenu getSearchPopup() {
+		TableSearchActionListener tableSearchActionListener = new TableSearchActionListener();
+
+		// Search popup menu
+		JPopupMenu searchPopupMenu = new JPopupMenu(MessageManager
+				.getMessage("Search.Title"));
+		searchPopupMenu.setBorder(new EmptyBorder(8, 6, 8, 6));
+		// Search in comments
+		JCheckBoxMenuItem searchCommentsMenuItem = new JCheckBoxMenuItem(
+				MessageManager.getMessage("Search.Comments"));
+		searchCommentsMenuItem.addActionListener(tableSearchActionListener);
+		tableSearchActionListener.add(searchCommentsMenuItem);
+		searchPopupMenu.add(searchCommentsMenuItem);
+
+		// Search in categories
+		JCheckBoxMenuItem searchCategoriesMenuItem = new JCheckBoxMenuItem(
+				MessageManager.getMessage("Search.Categories"));
+		tableSearchActionListener.add(searchCategoriesMenuItem);
+		searchCategoriesMenuItem.addActionListener(tableSearchActionListener);
+		searchPopupMenu.add(searchCategoriesMenuItem);
+
+		// Search in everything
+		JCheckBoxMenuItem searchAllMenuItem = new JCheckBoxMenuItem(
+				MessageManager.getMessage("Search.All"));
+		searchAllMenuItem.addActionListener(tableSearchActionListener);
+		tableSearchActionListener.add(searchAllMenuItem);
+		searchPopupMenu.add(searchAllMenuItem);
+		return searchPopupMenu;
+	}
+
+	private JButton addUserButton;
+	private JButton delUserButton;
+	private JButton addAccountButton;
+	private JButton removeAccountButton;
+
+	private JButton addToAccountButton;
 	private static JTextField searchField;
+	private JButton withdrawFromAccountButton;
+
+	private JButton transferBetweenAccountsButton;
 
 	public MainToolBar() {
 
@@ -59,54 +98,20 @@ public class MainToolBar extends Component {
 		List<JButton> rightButtons = new ArrayList<JButton>();
 
 		// User buttons
-		JButton addUserButton = new JButton(MessageManager
-				.getMessage("MainToolbar.Users.AddUser"), IconManager
-				.getIcon("toolbar_add_user"));
-		addUserButton.addActionListener(new AddUserListener());
-		leftButtons.add(addUserButton);
-
-		JButton delUserButton = new JButton(MessageManager
-				.getMessage("MainToolbar.Users.RemoveUser"), IconManager
-				.getIcon("toolbar_del_user"));
-		delUserButton.addActionListener(new RemoveUserListener());
-		leftButtons.add(delUserButton);
+		leftButtons.add(getAddUserButton());
+		leftButtons.add(getDelUserButton());
 
 		// Account buttons
-		JButton addAccountButton = new JButton(MessageManager
-				.getMessage("MainToolbar.Accounts.AddAccount"), IconManager
-				.getIcon("toolbar_add_account"));
-		addAccountButton.addActionListener(new AddAccountListener());
-		leftButtons.add(addAccountButton);
-
-		JButton removeAccountButton = new JButton(MessageManager
-				.getMessage("MainToolbar.Accounts.RemoveAccount"), IconManager
-				.getIcon("toolbar_del_account"));
-		removeAccountButton.addActionListener(new RemoveAccountListener());
-		leftButtons.add(removeAccountButton);
+		leftButtons.add(getAddAccountButton());
+		leftButtons.add(getRemoveAccountButton());
 
 		// Account operation buttons
-		JButton addToAccountButton = new JButton(MessageManager
-				.getMessage("MainToolbar.Accounts.AddToAccount"), IconManager
-				.getIcon("toolbar_deposit"));
-		addToAccountButton.addActionListener(new AddAccountOperationListener(
-				OperationType.DEPOSIT));
-		leftButtons.add(addToAccountButton);
+		leftButtons.add(getAddToAccountButton());
+		leftButtons.add(getWithdrawFromAccountButton());
+		leftButtons.add(getTransferBetweenAccountsButton());
 
-		JButton withdrawFromAccountButton = new JButton(MessageManager
-				.getMessage("MainToolbar.Accounts.WithdrawFromAccount"),
-				IconManager.getIcon("toolbar_withdraw"));
-		withdrawFromAccountButton
-				.addActionListener(new AddAccountOperationListener(
-						OperationType.WITHDRAW));
-		leftButtons.add(withdrawFromAccountButton);
-
-		JButton transferBetweenAccountsButton = new JButton(MessageManager
-				.getMessage("MainToolbar.Accounts.TransferBetweenAccounts"),
-				IconManager.getIcon("toolbar_transfer"));
-		transferBetweenAccountsButton
-				.addActionListener(new AddAccountOperationListener(
-						OperationType.TRANSFER));
-		leftButtons.add(transferBetweenAccountsButton);
+		setAccountEnabled(false);
+		setUserEnabled(false);
 
 		if (PlatformUtils.isMacOS()) {
 			return populateOSXToolBar(mainFrame, leftButtons, rightButtons)
@@ -114,6 +119,109 @@ public class MainToolBar extends Component {
 		} else {
 			return populateJToolBar(mainFrame, leftButtons, rightButtons);
 		}
+	}
+
+	public static JTextComponent getSearchField() {
+		if (searchField == null) {
+			searchField = new JTextField();
+			searchField.setPreferredSize(new Dimension(150, 20));
+			searchField.putClientProperty("JTextField.variant", "search");
+
+			JPopupMenu searchPopupMenu = getSearchPopup();
+
+			searchField.putClientProperty("JTextField.Search.FindPopup",
+					searchPopupMenu);
+		}
+		return searchField;
+	}
+
+	public void setUserEnabled(boolean value) {
+		getDelUserButton().setEnabled(value);
+		getAddAccountButton().setEnabled(value);
+	}
+
+	public void setAccountEnabled(boolean value) {
+		getRemoveAccountButton().setEnabled(value);
+		getAddToAccountButton().setEnabled(value);
+		getWithdrawFromAccountButton().setEnabled(value);
+		getTransferBetweenAccountsButton().setEnabled(value);
+	}
+
+	private JButton getAddAccountButton() {
+		if (addAccountButton == null) {
+			addAccountButton = new JButton(MessageManager
+					.getMessage("MainToolbar.Accounts.AddAccount"), IconManager
+					.getIcon("toolbar_add_account"));
+			addAccountButton.addActionListener(new AddAccountListener());
+		}
+		return addAccountButton;
+	}
+
+	private JButton getAddToAccountButton() {
+		if (addToAccountButton == null) {
+			addToAccountButton = new JButton(MessageManager
+					.getMessage("MainToolbar.Accounts.AddToAccount"),
+					IconManager.getIcon("toolbar_deposit"));
+			addToAccountButton
+					.addActionListener(new AddAccountOperationListener(
+							OperationType.DEPOSIT));
+		}
+		return addToAccountButton;
+	}
+
+	private JButton getAddUserButton() {
+		if (addUserButton == null) {
+			addUserButton = new JButton(MessageManager
+					.getMessage("MainToolbar.Users.AddUser"), IconManager
+					.getIcon("toolbar_add_user"));
+			addUserButton.addActionListener(new AddUserListener());
+		}
+		return addUserButton;
+	}
+
+	private JButton getDelUserButton() {
+		if (delUserButton == null) {
+			delUserButton = new JButton(MessageManager
+					.getMessage("MainToolbar.Users.RemoveUser"), IconManager
+					.getIcon("toolbar_del_user"));
+			delUserButton.addActionListener(new RemoveUserListener());
+		}
+		return delUserButton;
+	}
+
+	private JButton getRemoveAccountButton() {
+		if (removeAccountButton == null) {
+			removeAccountButton = new JButton(MessageManager
+					.getMessage("MainToolbar.Accounts.RemoveAccount"),
+					IconManager.getIcon("toolbar_del_account"));
+			removeAccountButton.addActionListener(new RemoveAccountListener());
+		}
+		return removeAccountButton;
+	}
+
+	private JButton getTransferBetweenAccountsButton() {
+		if (transferBetweenAccountsButton == null) {
+			transferBetweenAccountsButton = new JButton(
+					MessageManager
+							.getMessage("MainToolbar.Accounts.TransferBetweenAccounts"),
+					IconManager.getIcon("toolbar_transfer"));
+			transferBetweenAccountsButton
+					.addActionListener(new AddAccountOperationListener(
+							OperationType.TRANSFER));
+		}
+		return transferBetweenAccountsButton;
+	}
+
+	private JButton getWithdrawFromAccountButton() {
+		if (withdrawFromAccountButton == null) {
+			withdrawFromAccountButton = new JButton(MessageManager
+					.getMessage("MainToolbar.Accounts.WithdrawFromAccount"),
+					IconManager.getIcon("toolbar_withdraw"));
+			withdrawFromAccountButton
+					.addActionListener(new AddAccountOperationListener(
+							OperationType.WITHDRAW));
+		}
+		return withdrawFromAccountButton;
 	}
 
 	private JToolBar populateJToolBar(JFrame mainFrame,
@@ -154,49 +262,5 @@ public class MainToolBar extends Component {
 		// Right side buttons
 		osxToolBar.addComponentToRight(getSearchField());
 		return osxToolBar;
-	}
-
-	private static JPopupMenu getSearchPopup() {
-		TableSearchActionListener tableSearchActionListener = new TableSearchActionListener();
-
-		// Search popup menu
-		JPopupMenu searchPopupMenu = new JPopupMenu(MessageManager
-				.getMessage("Search.Title"));
-		searchPopupMenu.setBorder(new EmptyBorder(8, 6, 8, 6));
-		// Search in comments
-		JCheckBoxMenuItem searchCommentsMenuItem = new JCheckBoxMenuItem(
-				MessageManager.getMessage("Search.Comments"));
-		searchCommentsMenuItem.addActionListener(tableSearchActionListener);
-		tableSearchActionListener.add(searchCommentsMenuItem);
-		searchPopupMenu.add(searchCommentsMenuItem);
-
-		// Search in categories
-		JCheckBoxMenuItem searchCategoriesMenuItem = new JCheckBoxMenuItem(
-				MessageManager.getMessage("Search.Categories"));
-		tableSearchActionListener.add(searchCategoriesMenuItem);
-		searchCategoriesMenuItem.addActionListener(tableSearchActionListener);
-		searchPopupMenu.add(searchCategoriesMenuItem);
-
-		// Search in everything
-		JCheckBoxMenuItem searchAllMenuItem = new JCheckBoxMenuItem(
-				MessageManager.getMessage("Search.All"));
-		searchAllMenuItem.addActionListener(tableSearchActionListener);
-		tableSearchActionListener.add(searchAllMenuItem);
-		searchPopupMenu.add(searchAllMenuItem);
-		return searchPopupMenu;
-	}
-
-	public static JTextComponent getSearchField() {
-		if (searchField == null) {
-			searchField = new JTextField();
-			searchField.setPreferredSize(new Dimension(150, 20));
-			searchField.putClientProperty("JTextField.variant", "search");
-
-			JPopupMenu searchPopupMenu = getSearchPopup();
-
-			searchField.putClientProperty("JTextField.Search.FindPopup",
-					searchPopupMenu);
-		}
-		return searchField;
 	}
 }
