@@ -88,7 +88,7 @@ public class MainContentPanel extends JPanel {
 
 	private void initComponents() {
 
-		accountOperationsScrollPane = new JScrollPane();
+		accountOperationsScrollPane = null;
 		accountOperationList = new SortedList<AccountOperation>(
 				new BasicEventList<AccountOperation>(),
 				new AccountOperationComparator());
@@ -102,8 +102,8 @@ public class MainContentPanel extends JPanel {
 				textFilteredIssues, new AccountOperationTableFormat());
 
 		setLayout(new BorderLayout());
-		accountOperationsScrollPane
-				.setViewportView(getTable(accountOperationTableModel));
+		accountOperationsScrollPane = MacWidgetFactory
+				.wrapITunesTableInJScrollPane(getTable(accountOperationTableModel));
 
 		add(accountOperationsScrollPane, java.awt.BorderLayout.CENTER);
 	}
@@ -113,22 +113,10 @@ public class MainContentPanel extends JPanel {
 		if (accountOperationsTable == null) {
 			accountOperationsTable = MacWidgetFactory
 					.createITunesTable(accountOperationTableModel);
-			// accountOperationsTable = new JTable(accountOperationTableModel);
 
-			TableComparatorChooser<AccountOperation> tableSorter = TableComparatorChooser
-					.install(accountOperationsTable, accountOperationList,
-							TableComparatorChooser.MULTIPLE_COLUMN_MOUSE);
-			// tableSorter.addSortActionListener(new ActionListener() {
-			//
-			// public void actionPerformed(ActionEvent e) {
-			// System.out.println(e.getSource());
-			// // accountOperationsTable.getTableHeader().putClientProperty(
-			// // "JTableHeader.selectedColumn", 1);
-			// accountOperationsTable.getTableHeader().putClientProperty(
-			// "JTableHeader.sortDirection", "ascending");
-			// }
-			//
-			// });
+			TableComparatorChooser.install(accountOperationsTable,
+					accountOperationList,
+					TableComparatorChooser.MULTIPLE_COLUMN_MOUSE);
 
 			accountOperationsTable.setDefaultRenderer(Date.class,
 					new AccountOperationTableRenderer());

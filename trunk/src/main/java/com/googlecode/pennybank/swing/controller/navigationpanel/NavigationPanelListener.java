@@ -54,7 +54,6 @@ public class NavigationPanelListener implements ActionListener,
 	 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
 	public void actionPerformed(ActionEvent e) {
-		System.out.println(e.getActionCommand());
 
 		if (e.getActionCommand().equals(
 				MessageManager.getMessage("NavigationPanel.AddUser"))) {
@@ -70,10 +69,10 @@ public class NavigationPanelListener implements ActionListener,
 			new RemoveAccountListener().actionPerformed(e);
 		} else if (e.getActionCommand().equals(
 				MessageManager.getMessage("NavigationPanel.Expand"))) {
-			mainNavigationPanel.expandNavigationTree();
+			mainNavigationPanel.setExpanded(true);
 		} else if (e.getActionCommand().equals(
 				MessageManager.getMessage("NavigationPanel.Collapse"))) {
-			mainNavigationPanel.collapseNavigationTree();
+			mainNavigationPanel.setExpanded(false);
 		}
 	}
 

@@ -28,6 +28,12 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 
+import ca.odell.glazedlists.BasicEventList;
+import ca.odell.glazedlists.SortedList;
+import ca.odell.glazedlists.swing.EventTableModel;
+import ca.odell.glazedlists.swing.TableComparatorChooser;
+
+import com.explodingpixels.macwidgets.MacWidgetFactory;
 import com.googlecode.pennybank.App;
 import com.googlecode.pennybank.model.account.entity.Account;
 import com.googlecode.pennybank.model.accountfacade.delegate.AccountFacadeDelegate;
@@ -40,11 +46,11 @@ import com.googlecode.pennybank.model.userfacade.delegate.UserFacadeDelegateFact
 import com.googlecode.pennybank.model.util.exceptions.InstanceNotFoundException;
 import com.googlecode.pennybank.model.util.exceptions.InternalErrorException;
 import com.googlecode.pennybank.model.util.exceptions.NegativeAmountException;
-import com.googlecode.pennybank.swing.view.accountoperation.AccountOperationTableModel;
+import com.googlecode.pennybank.swing.view.accountoperation.AccountOperationComparator;
+import com.googlecode.pennybank.swing.view.accountoperation.AccountOperationTableFormat;
 import com.googlecode.pennybank.swing.view.main.MainWindow;
 import com.googlecode.pennybank.swing.view.util.GuiUtils;
 import com.googlecode.pennybank.swing.view.util.MessageManager;
-import com.googlecode.pennybank.swing.view.util.TableSorter;
 
 public class ShowImportationResultsWindow extends JDialog {
 
@@ -53,7 +59,7 @@ public class ShowImportationResultsWindow extends JDialog {
 	private JTextPane descriptionTextPane = null;
 	private Account account;
 	private List<Category> categoryList;
-	private List<AccountOperation> operationList;
+	private SortedList<AccountOperation> operationList;
 	private JTabbedPane importationResultsPane = null;
 	private JPanel categoriesPanel = null;
 	private JPanel operationsPanel = null;
@@ -89,7 +95,10 @@ public class ShowImportationResultsWindow extends JDialog {
 		super(owner);
 		this.account = account;
 		this.categoryList = categoryList;
-		this.operationList = operationList;
+		this.operationList = new SortedList<AccountOperation>(
+				new BasicEventList<AccountOperation>(),
+				new AccountOperationComparator());
+		this.operationList.addAll(operationList);
 		initialize(owner);
 	}
 
@@ -442,11 +451,12 @@ public class ShowImportationResultsWindow extends JDialog {
 	 */
 	private JTable getOperationsTable() {
 		if (operationsTable == null) {
-			AccountOperationTableModel tableModel = new AccountOperationTableModel();
-			tableModel.setContent(operationList);
-			TableSorter tableSorter = new TableSorter(tableModel);
-			operationsTable = new JTable(tableSorter);
-			tableSorter.setTableHeader(operationsTable.getTableHeader());
+			EventTableModel<AccountOperation> accountTableModel = new EventTableModel<AccountOperation>(
+					operationList, new AccountOperationTableFormat());
+			operationsTable = MacWidgetFactory
+					.createITunesTable(accountTableModel);
+			TableComparatorChooser.install(operationsTable, operationList,
+					TableComparatorChooser.MULTIPLE_COLUMN_MOUSE);
 		}
 		return operationsTable;
 	}

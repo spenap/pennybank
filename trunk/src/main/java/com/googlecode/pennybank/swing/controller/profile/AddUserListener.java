@@ -8,7 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import com.googlecode.pennybank.swing.view.main.MainWindow;
-import com.googlecode.pennybank.swing.view.profile.AddProfileWindow;
+import com.googlecode.pennybank.swing.view.profile.ProfileWindow;
 
 /**
  * Listener which allows an user to get a window to create a new profile
@@ -24,8 +24,8 @@ public class AddUserListener implements ActionListener {
      */
     public void actionPerformed(ActionEvent e) {
 
-        AddProfileWindow window =
-                new AddProfileWindow(MainWindow.getInstance());
+        ProfileWindow window =
+                new ProfileWindow(MainWindow.getInstance());
         window.setVisible(true);
 
     }

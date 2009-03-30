@@ -118,4 +118,18 @@ public class MainWindow extends JFrame {
 	public MainToolBar getToolBar() {
 		return toolBar;
 	}
+
+	public JMenuBar getMainMenuBar() {
+		return menuBar;
+	}
+
+	public void setUserEnabled(boolean value) {
+		((MainMenuBar) menuBar).setUserEnabled(value);
+		toolBar.setUserEnabled(value);
+	}
+
+	public void setAccountEnabled(boolean value) {
+		((MainMenuBar) menuBar).setAccountEnabled(value);
+		toolBar.setAccountEnabled(value);
+	}
 }

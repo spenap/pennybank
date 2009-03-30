@@ -8,7 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import com.googlecode.pennybank.model.user.entity.User;
-import com.googlecode.pennybank.swing.view.account.AddAccountWindow;
+import com.googlecode.pennybank.swing.view.account.AccountWindow;
 import com.googlecode.pennybank.swing.view.main.MainWindow;
 import com.googlecode.pennybank.swing.view.util.GuiUtils;
 
@@ -32,7 +32,7 @@ public class AddAccountListener implements ActionListener {
 				.getSelectedUser();
 
 		if (theUser != null) {
-			AddAccountWindow dialog = new AddAccountWindow(MainWindow
+			AccountWindow dialog = new AccountWindow(MainWindow
 					.getInstance(), theUser);
 			dialog.setVisible(true);
 		} else {

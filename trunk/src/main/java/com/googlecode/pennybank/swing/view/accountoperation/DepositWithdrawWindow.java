@@ -35,7 +35,7 @@ import com.googlecode.pennybank.model.category.entity.Category;
 import com.googlecode.pennybank.model.util.exceptions.InstanceNotFoundException;
 import com.googlecode.pennybank.model.util.exceptions.InternalErrorException;
 import com.googlecode.pennybank.model.util.exceptions.NegativeAmountException;
-import com.googlecode.pennybank.swing.controller.category.AddCategoryListener;
+import com.googlecode.pennybank.swing.view.category.CategoriesComboBox;
 import com.googlecode.pennybank.swing.view.main.MainWindow;
 import com.googlecode.pennybank.swing.view.util.GuiUtils;
 import com.googlecode.pennybank.swing.view.util.IconManager;
@@ -53,7 +53,7 @@ public class DepositWithdrawWindow extends JDialog {
 	private JPanel buttonsPane = null;
 	private JButton okButton = null;
 	private JButton cancelButton = null;
-	private Type type;
+	private Type operationType;
 	private JLabel iconLabel = null;
 	private JPanel componentsPane = null;
 	private String title;
@@ -74,7 +74,7 @@ public class DepositWithdrawWindow extends JDialog {
 	 */
 	public DepositWithdrawWindow(Frame owner, Type type, Account operatedAccount) {
 		super(owner);
-		this.type = type;
+		this.operationType = type;
 		this.account = operatedAccount;
 		dateFormat = DateFormat.getDateInstance(DateFormat.SHORT);
 		initialize(owner);
@@ -137,16 +137,8 @@ public class DepositWithdrawWindow extends JDialog {
 	 */
 	private JComboBox getCategoryComboBox() {
 		if (categoryComboBox == null) {
-			categoryComboBox = new JComboBox();
-			categoryComboBox.addItem(MessageManager
-					.getMessage("Category.Uncategorized"));
-			for (Category category : App.getCategories()) {
-				categoryComboBox.addItem(category.getName());
-			}
-			categoryComboBox.addItem(MessageManager.getMessage("Category.New"));
+			categoryComboBox = new CategoriesComboBox();
 			categoryComboBox.setBounds(new Rectangle(17, 71, 327, 47));
-			categoryComboBox.addItemListener(new AddCategoryListener(
-					categoryComboBox));
 		}
 		return categoryComboBox;
 	}
@@ -233,7 +225,7 @@ public class DepositWithdrawWindow extends JDialog {
 	private JLabel getIconLabel() {
 		iconLabel = new JLabel();
 		imageIcon = IconManager.getIcon("toolbar_deposit");
-		switch (type) {
+		switch (operationType) {
 		case WITHDRAW:
 			imageIcon = IconManager.getIcon("toolbar_withdraw");
 			break;
@@ -301,7 +293,7 @@ public class DepositWithdrawWindow extends JDialog {
 	 */
 	private void initialize(Frame owner) {
 		this.setSize(420, 264);
-		switch (type) {
+		switch (operationType) {
 		case WITHDRAW:
 			title = MessageManager
 					.getMessage("WithdrawFromAccountWindow.Title");
@@ -339,7 +331,7 @@ public class DepositWithdrawWindow extends JDialog {
 			// Create the account
 			AccountFacadeDelegate accountFacade = AccountFacadeDelegateFactory
 					.getDelegate();
-			switch (type) {
+			switch (operationType) {
 			case DEPOSIT:
 				accountFacade.addToAccount(account.getAccountId(), amount,
 						comment, operationDate, category);

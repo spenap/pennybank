@@ -120,7 +120,6 @@
 					<username>${dataSource.user}</username>
 					<password>${dataSource.password}</password>
 				</configuration>
-
 				<executions>
 					<execution>
 						<id>create-schema</id>
@@ -246,7 +245,7 @@
 			<version>1.8.0</version>
 		</dependency>
 		<dependency>
-			<groupId>jfreechart</groupId>
+			<groupId>jfree</groupId>
 			<artifactId>jfreechart</artifactId>
 			<version>1.0.0</version>
 		</dependency>

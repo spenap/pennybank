@@ -83,8 +83,12 @@ public class Category implements Serializable {
 				|| (!childCategories.isEmpty() && !childCategories
 						.equals(theOther.childCategories)))
 			return false;
-		return categoryId.equals(theOther.categoryId)
-				&& name.equals(theOther.name) && version == theOther.version;
+		if ((categoryId == null && theOther.categoryId != null)
+				|| (categoryId != null && !categoryId.equals(theOther
+						.getCategoryId()))) {
+			return false;
+		}
+		return name.equals(theOther.name) && version == theOther.version;
 	}
 
 	/**
