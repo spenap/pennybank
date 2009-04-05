@@ -10,7 +10,9 @@ import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.text.DateFormat;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Calendar;
 
@@ -30,6 +32,7 @@ import com.googlecode.pennybank.App;
 import com.googlecode.pennybank.model.account.entity.Account;
 import com.googlecode.pennybank.model.accountfacade.delegate.AccountFacadeDelegate;
 import com.googlecode.pennybank.model.accountfacade.delegate.AccountFacadeDelegateFactory;
+import com.googlecode.pennybank.model.accountoperation.entity.AccountOperation;
 import com.googlecode.pennybank.model.accountoperation.entity.AccountOperation.Type;
 import com.googlecode.pennybank.model.category.entity.Category;
 import com.googlecode.pennybank.model.util.exceptions.InstanceNotFoundException;
@@ -56,17 +59,23 @@ public class DepositWithdrawWindow extends JDialog {
 	private Type operationType;
 	private JLabel iconLabel = null;
 	private JPanel componentsPane = null;
-	private String title;
-	private ImageIcon imageIcon;
+	private String title = null;
+	private ImageIcon imageIcon = null;
 	private JLabel amountLabel = null;
 	private JTextField amountTextField = null;
 	private JLabel dateLabel = null;
 	private JTextField dateTextField = null;
 	private JComboBox categoryComboBox = null;
 	private JTextArea descriptionTextArea = null;
-	private Account account;
+	private Account account = null;
 	private JLabel descriptionLabel = null;
-	private DateFormat dateFormat;
+	private DateFormat dateFormat = null;
+	private AccountOperation theOperation = null;
+	private PersistMode persistMode = null;
+
+	private enum PersistMode {
+		CREATE_NEW, UPDATE_EXISTENT
+	};
 
 	/**
 	 * @param owner
@@ -76,7 +85,20 @@ public class DepositWithdrawWindow extends JDialog {
 		super(owner);
 		this.operationType = type;
 		this.account = operatedAccount;
-		dateFormat = DateFormat.getDateInstance(DateFormat.SHORT);
+		this.theOperation = new AccountOperation(operatedAccount, type, 0,
+				Calendar.getInstance(), "");
+		this.dateFormat = DateFormat.getDateInstance(DateFormat.SHORT);
+		this.persistMode = PersistMode.CREATE_NEW;
+		initialize(owner);
+	}
+
+	public DepositWithdrawWindow(Frame owner, AccountOperation operation) {
+		super(owner);
+		this.operationType = operation.getType();
+		this.account = operation.getAccount();
+		this.theOperation = operation;
+		this.dateFormat = DateFormat.getDateInstance(DateFormat.SHORT);
+		this.persistMode = PersistMode.UPDATE_EXISTENT;
 		initialize(owner);
 	}
 
@@ -88,6 +110,8 @@ public class DepositWithdrawWindow extends JDialog {
 	private JTextField getAmountTextField() {
 		if (amountTextField == null) {
 			amountTextField = new JTextField();
+			amountTextField.setText(NumberFormat.getInstance().format(
+					theOperation.getAmount()));
 			amountTextField.setBounds(new Rectangle(164, 1, 180, 30));
 		}
 		return amountTextField;
@@ -101,9 +125,9 @@ public class DepositWithdrawWindow extends JDialog {
 	private JPanel getButtonsPane() {
 		if (buttonsPane == null) {
 			FlowLayout flowLayout = new FlowLayout();
-			flowLayout.setAlignment(java.awt.FlowLayout.RIGHT);
-			flowLayout.setAlignment(java.awt.FlowLayout.RIGHT);
-			flowLayout.setAlignment(java.awt.FlowLayout.RIGHT);
+			flowLayout.setAlignment(FlowLayout.RIGHT);
+			flowLayout.setAlignment(FlowLayout.RIGHT);
+			flowLayout.setAlignment(FlowLayout.RIGHT);
 			buttonsPane = new JPanel();
 			buttonsPane.setLayout(flowLayout);
 			buttonsPane.add(getCancelButton(), null);
@@ -121,8 +145,8 @@ public class DepositWithdrawWindow extends JDialog {
 		if (cancelButton == null) {
 			cancelButton = new JButton();
 			cancelButton.setText(MessageManager.getMessage("cancelButton"));
-			cancelButton.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
+			cancelButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
 					cancelButtonActionPerformed(e);
 				}
 			});
@@ -138,6 +162,15 @@ public class DepositWithdrawWindow extends JDialog {
 	private JComboBox getCategoryComboBox() {
 		if (categoryComboBox == null) {
 			categoryComboBox = new CategoriesComboBox();
+			Category theCategory = theOperation.getCategory();
+			String categoryName = null;
+			if (theCategory != null) {
+				categoryName = theCategory.getName();
+			} else {
+				categoryName = MessageManager
+						.getMessage("Category.Uncategorized");
+			}
+			categoryComboBox.setSelectedItem(categoryName);
 			categoryComboBox.setBounds(new Rectangle(17, 71, 327, 47));
 		}
 		return categoryComboBox;
@@ -185,7 +218,7 @@ public class DepositWithdrawWindow extends JDialog {
 	private JTextField getDateTextField() {
 		if (dateTextField == null) {
 			dateTextField = new JTextField();
-			dateTextField.setText(dateFormat.format(Calendar.getInstance()
+			dateTextField.setText(dateFormat.format(theOperation.getDate()
 					.getTime()));
 			dateTextField.setBounds(new Rectangle(164, 41, 180, 30));
 		}
@@ -200,6 +233,7 @@ public class DepositWithdrawWindow extends JDialog {
 	private JTextArea getDescriptionTextArea() {
 		if (descriptionTextArea == null) {
 			descriptionTextArea = new JTextArea();
+			descriptionTextArea.setText(theOperation.getComment());
 			descriptionTextArea.setBorder(new BevelBorder(BevelBorder.LOWERED));
 			descriptionTextArea.setLineWrap(true);
 			descriptionTextArea.setBounds(new Rectangle(20, 142, 327, 55));
@@ -328,20 +362,31 @@ public class DepositWithdrawWindow extends JDialog {
 			// Get category
 			Category category = getSelectedCategory();
 
-			// Create the account
 			AccountFacadeDelegate accountFacade = AccountFacadeDelegateFactory
 					.getDelegate();
-			switch (operationType) {
-			case DEPOSIT:
-				accountFacade.addToAccount(account.getAccountId(), amount,
-						comment, operationDate, category);
-				break;
-			case WITHDRAW:
-				accountFacade.withdrawFromAccount(account.getAccountId(),
-						amount, comment, operationDate, category);
-				break;
-			default:
-				break;
+			if (persistMode == PersistMode.CREATE_NEW) {
+				// Create the operation
+
+				switch (operationType) {
+				case DEPOSIT:
+					accountFacade.addToAccount(account.getAccountId(), amount,
+							comment, operationDate, category);
+					break;
+				case WITHDRAW:
+					accountFacade.withdrawFromAccount(account.getAccountId(),
+							amount, comment, operationDate, category);
+					break;
+				default:
+					break;
+				}
+			} else {
+				// Update the operation
+				theOperation.setAmount(amount);
+				theOperation.setDate(operationDate);
+				theOperation.setCategory(category);
+				theOperation.setComment(comment);
+
+				accountFacade.updateAccountOperation(theOperation);
 			}
 			MainWindow.getInstance().getContentPanel().showAccountOperations(
 					account);

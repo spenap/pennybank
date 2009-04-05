@@ -5,19 +5,9 @@ package com.googlecode.pennybank.swing.view.main;
 
 import java.awt.BorderLayout;
 import java.text.NumberFormat;
-import java.util.Date;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
-
-import ca.odell.glazedlists.BasicEventList;
-import ca.odell.glazedlists.FilterList;
-import ca.odell.glazedlists.SortedList;
-import ca.odell.glazedlists.matchers.MatcherEditor;
-import ca.odell.glazedlists.swing.EventTableModel;
-import ca.odell.glazedlists.swing.TableComparatorChooser;
-import ca.odell.glazedlists.swing.TextComponentMatcherEditor;
 
 import com.explodingpixels.macwidgets.MacWidgetFactory;
 import com.googlecode.pennybank.model.account.entity.Account;
@@ -26,10 +16,7 @@ import com.googlecode.pennybank.model.accountoperation.entity.AccountOperation;
 import com.googlecode.pennybank.model.util.exceptions.InstanceNotFoundException;
 import com.googlecode.pennybank.model.util.exceptions.InternalErrorException;
 import com.googlecode.pennybank.model.util.vo.Block;
-import com.googlecode.pennybank.swing.view.accountoperation.AccountOperationComparator;
-import com.googlecode.pennybank.swing.view.accountoperation.AccountOperationTableFormat;
-import com.googlecode.pennybank.swing.view.accountoperation.AccountOperationTextFilterator;
-import com.googlecode.pennybank.swing.view.util.AccountOperationTableRenderer;
+import com.googlecode.pennybank.swing.view.accountoperationtable.AccountOperationTable;
 import com.googlecode.pennybank.swing.view.util.MessageManager;
 
 /**
@@ -40,20 +27,14 @@ import com.googlecode.pennybank.swing.view.util.MessageManager;
 @SuppressWarnings("serial")
 public class MainContentPanel extends JPanel {
 
-	private JScrollPane accountOperationsScrollPane;
-	private JTable accountOperationsTable;
-	private SortedList<AccountOperation> accountOperationList;
+	private JScrollPane accountOperationsScrollPane = null;
+	private AccountOperationTable operationsTable = null;
 
 	/**
 	 * Creates a new Main Content Panel
 	 */
 	public MainContentPanel() {
 		initComponents();
-	}
-
-	public void setAccountOperations(Block<AccountOperation> block) {
-		accountOperationList.clear();
-		accountOperationList.addAll(block.getContents());
 	}
 
 	public void showAccountOperations(Account selectedAccount) {
@@ -65,7 +46,7 @@ public class MainContentPanel extends JPanel {
 					.getDelegate().findAccountOperations(
 							selectedAccount.getAccountId(), startIndex,
 							count.intValue());
-			setAccountOperations(operations);
+			operationsTable.setAccountOperations(operations.getContents());
 
 			MainWindow.getInstance().getStatusBar().setText(
 					selectedAccount.getName()
@@ -86,43 +67,17 @@ public class MainContentPanel extends JPanel {
 		}
 	}
 
-	private void initComponents() {
-
-		accountOperationsScrollPane = null;
-		accountOperationList = new SortedList<AccountOperation>(
-				new BasicEventList<AccountOperation>(),
-				new AccountOperationComparator());
-
-		MatcherEditor<AccountOperation> textMatcherEditor = new TextComponentMatcherEditor<AccountOperation>(
-				MainToolBar.getSearchField(),
-				new AccountOperationTextFilterator());
-		FilterList<AccountOperation> textFilteredIssues = new FilterList<AccountOperation>(
-				accountOperationList, textMatcherEditor);
-		EventTableModel<AccountOperation> accountOperationTableModel = new EventTableModel<AccountOperation>(
-				textFilteredIssues, new AccountOperationTableFormat());
-
-		setLayout(new BorderLayout());
-		accountOperationsScrollPane = MacWidgetFactory
-				.wrapITunesTableInJScrollPane(getTable(accountOperationTableModel));
-
-		add(accountOperationsScrollPane, java.awt.BorderLayout.CENTER);
+	public AccountOperationTable getOperationsTable() {
+		return operationsTable;
 	}
 
-	private JTable getTable(
-			EventTableModel<AccountOperation> accountOperationTableModel) {
-		if (accountOperationsTable == null) {
-			accountOperationsTable = MacWidgetFactory
-					.createITunesTable(accountOperationTableModel);
+	private void initComponents() {
 
-			TableComparatorChooser.install(accountOperationsTable,
-					accountOperationList,
-					TableComparatorChooser.MULTIPLE_COLUMN_MOUSE);
+		setLayout(new BorderLayout());
+		operationsTable = new AccountOperationTable();
+		accountOperationsScrollPane = MacWidgetFactory
+				.wrapITunesTableInJScrollPane(operationsTable.getJTable());
 
-			accountOperationsTable.setDefaultRenderer(Date.class,
-					new AccountOperationTableRenderer());
-			accountOperationsTable.setDefaultRenderer(Double.class,
-					new AccountOperationTableRenderer());
-		}
-		return accountOperationsTable;
+		add(accountOperationsScrollPane, BorderLayout.CENTER);
 	}
 }
