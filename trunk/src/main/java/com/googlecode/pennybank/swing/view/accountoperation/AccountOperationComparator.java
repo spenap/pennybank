@@ -15,7 +15,8 @@ public class AccountOperationComparator implements Comparator<AccountOperation> 
 
 	public int compare(AccountOperation anOperation,
 			AccountOperation anotherOperation) {
-		// TODO Auto-generated method stub
+		// TODO Fix the AccountOperationComparator implementation, or let
+		// AccountOperation implement Comparable
 		return 0;
 	}
 

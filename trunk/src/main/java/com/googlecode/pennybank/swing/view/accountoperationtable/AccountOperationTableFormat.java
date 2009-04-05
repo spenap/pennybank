@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.googlecode.pennybank.swing.view.accountoperation;
+package com.googlecode.pennybank.swing.view.accountoperationtable;
 
 import java.util.Comparator;
 import java.util.Date;

@@ -5,10 +5,12 @@ package com.googlecode.pennybank.swing.controller.main;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.MenuElement;
+
+import com.googlecode.pennybank.swing.view.accountoperationtable.AccountOperationTableFilter;
 
 /**
  * @author spenap
@@ -16,7 +18,7 @@ import javax.swing.JCheckBoxMenuItem;
  */
 public class TableSearchActionListener implements ActionListener {
 
-	List<JCheckBoxMenuItem> menuItems = new ArrayList<JCheckBoxMenuItem>();
+	private JPopupMenu tableSearchPopupMenu = null;
 
 	/*
 	 * (non-Javadoc)
@@ -26,18 +28,32 @@ public class TableSearchActionListener implements ActionListener {
 	 */
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() instanceof JCheckBoxMenuItem) {
-			updateItemsState((JCheckBoxMenuItem) e.getSource());
+			JCheckBoxMenuItem item = (JCheckBoxMenuItem) e.getSource();
+			updateItemsState(item);
+			if (item.equals(AccountOperationTableFilter
+					.getSearchCommentsMenuItem())) {
+				AccountOperationTableFilter
+						.setSearchMode(AccountOperationTableFilter.SearchMode.Comments);
+			} else if (item.equals(AccountOperationTableFilter
+					.getSearchCategoriesMenuItem())) {
+				AccountOperationTableFilter
+						.setSearchMode(AccountOperationTableFilter.SearchMode.Category);
+			} else if (item.equals(AccountOperationTableFilter
+					.getSearchAllMenuItem())) {
+				AccountOperationTableFilter
+						.setSearchMode(AccountOperationTableFilter.SearchMode.All);
+			}
 		}
 	}
 
 	private void updateItemsState(JCheckBoxMenuItem selectedItem) {
-		for (JCheckBoxMenuItem menuItem : menuItems) {
-			menuItem.setSelected(menuItem.equals(selectedItem));
+		for (MenuElement menuItem : tableSearchPopupMenu.getSubElements()) {
+			JCheckBoxMenuItem checkBoxMenuItem = (JCheckBoxMenuItem) menuItem;
+			checkBoxMenuItem.setSelected(menuItem.equals(selectedItem));
 		}
 	}
 
-	public void add(JCheckBoxMenuItem menuItem) {
-		menuItems.add(menuItem);
+	public void setPopupMenu(JPopupMenu searchPopupMenu) {
+		this.tableSearchPopupMenu = searchPopupMenu;
 	}
-
 }

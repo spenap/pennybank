@@ -22,12 +22,12 @@ public class PlatformUtils {
 	}
 
 	public static boolean isWindows() {
-		// TODO Auto-generated method stub
+		// TODO Check if we are running under Windows
 		return false;
 	}
 
 	public static boolean isLinux() {
-		// TODO Auto-generated method stub
+		// TODO Check if we are running under Windows
 		return true;
 	}
 
