@@ -15,10 +15,15 @@ import javax.swing.KeyStroke;
 import com.googlecode.pennybank.swing.controller.account.AddAccountListener;
 import com.googlecode.pennybank.swing.controller.account.RemoveAccountListener;
 import com.googlecode.pennybank.swing.controller.accountoperation.AddAccountOperationListener;
+import com.googlecode.pennybank.swing.controller.accountoperation.DeleteAccountOperationListener;
+import com.googlecode.pennybank.swing.controller.accountoperation.EditAccountOperationListener;
 import com.googlecode.pennybank.swing.controller.accountoperation.AddAccountOperationListener.OperationType;
 import com.googlecode.pennybank.swing.controller.category.ManageCategoriesListener;
 import com.googlecode.pennybank.swing.controller.importation.ImportFileListener;
+import com.googlecode.pennybank.swing.controller.main.RedoActionListener;
+import com.googlecode.pennybank.swing.controller.main.UndoActionListener;
 import com.googlecode.pennybank.swing.controller.profile.AddUserListener;
+import com.googlecode.pennybank.swing.controller.profile.RemoveUserListener;
 import com.googlecode.pennybank.swing.view.util.MessageManager;
 
 /**
@@ -55,6 +60,8 @@ public class MainMenuBar extends JMenuBar {
 	private JMenuItem addToAccountItem;
 	private JMenuItem withdrawFromAccountItem;
 	private JMenuItem transferItem;
+	private JMenuItem editAccountOperationItem;
+	private JMenuItem removeAccountOperationItem;
 	private JMenu statisticsMenu;
 	private JMenuItem incomesItem;
 	private JMenuItem expensesItem;
@@ -75,10 +82,25 @@ public class MainMenuBar extends JMenuBar {
 	 */
 	public void setAccountEnabled(boolean accountSelected) {
 		getEditAccountItem().setEnabled(accountSelected);
+		getRemoveAccountItem().setVisible(accountSelected);
 		getRemoveAccountItem().setEnabled(accountSelected);
 		getAddToAccountItem().setEnabled(accountSelected);
 		getWithdrawFromAccountItem().setEnabled(accountSelected);
 		getTransferItem().setEnabled(accountSelected);
+		if (accountSelected) {
+			getDeleteMenuItem().setVisible(!accountSelected);
+		}
+	}
+
+	public void setOperationEnabled(boolean operationSelected) {
+		getEditAccountOperationItem().setEnabled(operationSelected);
+		getRemoveAccountOperationItem().setVisible(operationSelected);
+		getRemoveAccountOperationItem().setEnabled(operationSelected);
+
+		if (operationSelected) {
+			getDeleteMenuItem().setVisible(!operationSelected);
+			setAccountEnabled(!operationSelected);
+		}
 	}
 
 	/**
@@ -89,8 +111,32 @@ public class MainMenuBar extends JMenuBar {
 	 */
 	public void setUserEnabled(boolean userSelected) {
 		getEditUserItem().setEnabled(userSelected);
+		getRemoveUserItem().setVisible(userSelected);
 		getRemoveUserItem().setEnabled(userSelected);
 		getAddAccountItem().setEnabled(userSelected);
+		if (userSelected) {
+			getDeleteMenuItem().setVisible(!userSelected);
+		}
+	}
+
+	public void setRedoText(String redoAction) {
+		StringBuilder text = new StringBuilder(MessageManager
+				.getMessage("MainMenu.EditMenu.Redo"));
+		if (redoAction != null) {
+			text.append(" " + redoAction);
+		}
+		getRedoMenuItem().setEnabled(redoAction != null);
+		getRedoMenuItem().setText(text.toString());
+	}
+
+	public void setUndoText(String undoAction) {
+		StringBuilder text = new StringBuilder(MessageManager
+				.getMessage("MainMenu.EditMenu.Undo"));
+		if (undoAction != null) {
+			text.append(" " + undoAction);
+		}
+		getUndoMenuItem().setEnabled(undoAction != null);
+		getUndoMenuItem().setText(text.toString());
 	}
 
 	private JMenu getAccountsMenu() {
@@ -99,7 +145,6 @@ public class MainMenuBar extends JMenuBar {
 					.getMessage("MainMenu.AccountsMenu"));
 			accountsMenu.add(getAddAccountItem());
 			accountsMenu.add(getEditAccountItem());
-			accountsMenu.add(getRemoveAccountItem());
 
 			accountsMenu.addSeparator();
 
@@ -110,6 +155,8 @@ public class MainMenuBar extends JMenuBar {
 			accountsMenu.add(getAddToAccountItem());
 			accountsMenu.add(getWithdrawFromAccountItem());
 			accountsMenu.add(getTransferItem());
+			accountsMenu.add(getEditAccountOperationItem());
+
 		}
 		return accountsMenu;
 	}
@@ -183,6 +230,9 @@ public class MainMenuBar extends JMenuBar {
 		if (deleteMenuItem == null) {
 			deleteMenuItem = new JMenuItem(MessageManager
 					.getMessage("MainMenu.EditMenu.Delete"));
+			deleteMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+					KeyEvent.VK_DELETE, 0));
+			deleteMenuItem.setEnabled(false);
 		}
 		return deleteMenuItem;
 	}
@@ -195,6 +245,16 @@ public class MainMenuBar extends JMenuBar {
 		return editAccountItem;
 	}
 
+	private JMenuItem getEditAccountOperationItem() {
+		if (editAccountOperationItem == null) {
+			editAccountOperationItem = new JMenuItem(MessageManager
+					.getMessage("MainMenu.AccountsMenu.EditAccountOperation"));
+			editAccountOperationItem
+					.addActionListener(new EditAccountOperationListener());
+		}
+		return editAccountOperationItem;
+	}
+
 	private JMenu getEditMenu() {
 		if (editMenu == null) {
 			editMenu = new JMenu(MessageManager.getMessage("MainMenu.EditMenu"));
@@ -205,6 +265,9 @@ public class MainMenuBar extends JMenuBar {
 			editMenu.add(getCopyMenuItem());
 			editMenu.add(getPasteMenuItem());
 			editMenu.add(getDeleteMenuItem());
+			editMenu.add(getRemoveAccountItem());
+			editMenu.add(getRemoveAccountOperationItem());
+			editMenu.add(getRemoveUserItem());
 			editMenu.add(getSelectAllMenuItem());
 		}
 		return editMenu;
@@ -300,8 +363,10 @@ public class MainMenuBar extends JMenuBar {
 		if (redoMenuItem == null) {
 			redoMenuItem = new JMenuItem(MessageManager
 					.getMessage("MainMenu.EditMenu.Redo"));
+			redoMenuItem.addActionListener(new RedoActionListener());
 			redoMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z,
 					ActionEvent.META_MASK | ActionEvent.SHIFT_MASK));
+			redoMenuItem.setEnabled(false);
 		}
 		return redoMenuItem;
 	}
@@ -311,14 +376,31 @@ public class MainMenuBar extends JMenuBar {
 			removeAccountItem = new JMenuItem(MessageManager
 					.getMessage("MainMenu.AccountsMenu.RemoveAccount"));
 			removeAccountItem.addActionListener(new RemoveAccountListener());
+			removeAccountItem.setAccelerator(KeyStroke.getKeyStroke(
+					KeyEvent.VK_DELETE, 0));
 		}
 		return removeAccountItem;
+	}
+
+	private JMenuItem getRemoveAccountOperationItem() {
+		if (removeAccountOperationItem == null) {
+			removeAccountOperationItem = new JMenuItem(MessageManager
+					.getMessage("MainMenu.AccountsMenu.RemoveAccountOperation"));
+			removeAccountOperationItem
+					.addActionListener(new DeleteAccountOperationListener());
+			removeAccountOperationItem.setAccelerator(KeyStroke.getKeyStroke(
+					KeyEvent.VK_DELETE, 0));
+		}
+		return removeAccountOperationItem;
 	}
 
 	private JMenuItem getRemoveUserItem() {
 		if (removeUserItem == null) {
 			removeUserItem = new JMenuItem(MessageManager
 					.getMessage("MainMenu.UserMenu.RemoveUser"));
+			removeUserItem.addActionListener(new RemoveUserListener());
+			removeUserItem.setAccelerator(KeyStroke.getKeyStroke(
+					KeyEvent.VK_DELETE, 0));
 		}
 		return removeUserItem;
 	}
@@ -366,8 +448,10 @@ public class MainMenuBar extends JMenuBar {
 		if (undoMenuItem == null) {
 			undoMenuItem = new JMenuItem(MessageManager
 					.getMessage("MainMenu.EditMenu.Undo"));
+			undoMenuItem.addActionListener(new UndoActionListener());
 			undoMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z,
 					ActionEvent.META_MASK));
+			undoMenuItem.setEnabled(false);
 		}
 		return undoMenuItem;
 	}
@@ -377,7 +461,6 @@ public class MainMenuBar extends JMenuBar {
 			userMenu = new JMenu(MessageManager.getMessage("MainMenu.UserMenu"));
 			userMenu.add(getAddUserItem());
 			userMenu.add(getEditUserItem());
-			userMenu.add(getRemoveUserItem());
 		}
 		return userMenu;
 	}
@@ -402,5 +485,6 @@ public class MainMenuBar extends JMenuBar {
 		add(getCustomHelpMenu());
 		setUserEnabled(false);
 		setAccountEnabled(false);
+		setOperationEnabled(false);
 	}
 }

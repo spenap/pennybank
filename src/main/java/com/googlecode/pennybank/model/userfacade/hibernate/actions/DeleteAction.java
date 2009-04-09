@@ -10,7 +10,7 @@ import com.googlecode.pennybank.model.util.transactions.TransactionalPlainAction
 
 /**
  * An action encapsulating the deletion of an user
- *
+ * 
  * @author spenap
  */
 public class DeleteAction implements TransactionalPlainAction {
@@ -18,19 +18,20 @@ public class DeleteAction implements TransactionalPlainAction {
 	private Long userId;
 	private UserDAO userDAO;
 
-    /**
-     * Creates a new action with the specified parameters
-     *
-     * @param userId The user to be deleted
-     */
-    public DeleteAction(Long userId) {
+	/**
+	 * Creates a new action with the specified parameters
+	 * 
+	 * @param userId
+	 *            The user to be deleted
+	 */
+	public DeleteAction(Long userId) {
 		this.userId = userId;
-		
+
 	}
 
 	public Object execute(EntityManager entityManager) throws ModelException,
 			InternalErrorException {
-		
+
 		initializeDAOs(entityManager);
 		userDAO.remove(userId);
 		return null;

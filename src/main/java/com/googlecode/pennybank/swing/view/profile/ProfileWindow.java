@@ -20,20 +20,17 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import com.googlecode.pennybank.model.user.entity.User;
-import com.googlecode.pennybank.model.userfacade.delegate.UserFacadeDelegateFactory;
-import com.googlecode.pennybank.model.util.exceptions.InstanceNotFoundException;
-import com.googlecode.pennybank.model.util.exceptions.InternalErrorException;
-import com.googlecode.pennybank.swing.view.main.MainWindow;
 import com.googlecode.pennybank.swing.view.util.GuiUtils;
 import com.googlecode.pennybank.swing.view.util.IconManager;
 import com.googlecode.pennybank.swing.view.util.MessageManager;
+import com.googlecode.pennybank.swing.view.util.ResultWindow;
 import com.googlecode.pennybank.swing.view.util.exceptions.BadNameException;
 
 /**
  * @author spenap
  * 
  */
-public class ProfileWindow extends JDialog {
+public class ProfileWindow extends JDialog implements ResultWindow {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel mainContentPane = null;
@@ -47,6 +44,11 @@ public class ProfileWindow extends JDialog {
 	private JButton okButton = null;
 	private PersistMode persistMode = null;
 	private User theUser = null;
+	private ResultType windowResult;
+
+	public User getUser() {
+		return theUser;
+	}
 
 	private enum PersistMode {
 		CreateUser, UpdateUser
@@ -187,6 +189,7 @@ public class ProfileWindow extends JDialog {
 	}
 
 	protected void cancelButtonActionPerformed(ActionEvent e) {
+		this.windowResult = ResultType.CANCEL;
 		this.dispose();
 	}
 
@@ -215,30 +218,16 @@ public class ProfileWindow extends JDialog {
 			if (userName == null || userName.trim().equals(""))
 				throw new BadNameException();
 			theUser.setName(userName);
-			persistUser(theUser);
-			MainWindow.getInstance().getNavigationPanel().update();
+			this.windowResult = ResultType.OK;
 			this.dispose();
-			GuiUtils.info("UserWindow." + persistMode.toString() + ".Success");
-		} catch (InternalErrorException ex) {
-			GuiUtils.error("UserWindow." + persistMode.toString()
-					+ ".Failure.Generic");
 		} catch (BadNameException ex) {
 			GuiUtils.warn("UserWindow." + persistMode.toString()
 					+ ".Failure.BadName");
-		} catch (InstanceNotFoundException ex) {
-			GuiUtils.warn("UserWindow." + persistMode.toString()
-					+ ".Failure.NotFound");
 		}
 
 	}
 
-	private void persistUser(User user) throws InternalErrorException,
-			InstanceNotFoundException {
-		if (persistMode == PersistMode.CreateUser) {
-			UserFacadeDelegateFactory.getDelegate().createUser(user);
-		} else {
-			UserFacadeDelegateFactory.getDelegate().updateUser(user);
-		}
-
+	public ResultType getResult() {
+		return windowResult;
 	}
 } // @jve:decl-index=0:visual-constraint="10,10"

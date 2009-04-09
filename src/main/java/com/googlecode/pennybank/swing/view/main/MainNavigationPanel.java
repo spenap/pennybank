@@ -56,6 +56,7 @@ public class MainNavigationPanel {
 		model.addSourceListModelListener(navigationPanelListener);
 		sourceList = new SourceList(model);
 		sourceList.addSourceListSelectionListener(navigationPanelListener);
+		sourceList.addSourceListClickListener(navigationPanelListener);
 		controlBar = createControlBar();
 		sourceList.installSourceListControlBar(controlBar);
 		sourceList

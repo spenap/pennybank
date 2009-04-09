@@ -22,12 +22,13 @@ import javax.swing.border.EmptyBorder;
 
 import com.googlecode.pennybank.swing.view.util.IconManager;
 import com.googlecode.pennybank.swing.view.util.MessageManager;
+import com.googlecode.pennybank.swing.view.util.ResultWindow;
 
 /**
  * @author spenap
  * 
  */
-public class MessageBox extends JDialog {
+public class MessageBox extends JDialog implements ResultWindow {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel mainContentsPane = null;
@@ -46,10 +47,6 @@ public class MessageBox extends JDialog {
 
 	public enum MessageType {
 		INFORMATION, WARNING, ERROR, YESNO
-	}
-
-	public enum ResultType {
-		OK, CANCEL
 	}
 
 	public MessageBox(String messageHeader, String messageDescription,
@@ -241,7 +238,7 @@ public class MessageBox extends JDialog {
 		return descriptionPane;
 	}
 
-	public ResultType getWindowResult() {
+	public ResultType getResult() {
 		return windowResult;
 	}
 

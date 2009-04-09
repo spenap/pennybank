@@ -22,21 +22,18 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import com.googlecode.pennybank.model.account.entity.Account;
-import com.googlecode.pennybank.model.accountfacade.delegate.AccountFacadeDelegateFactory;
 import com.googlecode.pennybank.model.user.entity.User;
-import com.googlecode.pennybank.model.util.exceptions.InstanceNotFoundException;
-import com.googlecode.pennybank.model.util.exceptions.InternalErrorException;
-import com.googlecode.pennybank.swing.view.main.MainWindow;
 import com.googlecode.pennybank.swing.view.util.GuiUtils;
 import com.googlecode.pennybank.swing.view.util.IconManager;
 import com.googlecode.pennybank.swing.view.util.MessageManager;
+import com.googlecode.pennybank.swing.view.util.ResultWindow;
 import com.googlecode.pennybank.swing.view.util.exceptions.BadNameException;
 
 /**
  * @author spenap
  * 
  */
-public class AccountWindow extends JDialog {
+public class AccountWindow extends JDialog implements ResultWindow {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel mainContentPane = null;
@@ -53,10 +50,15 @@ public class AccountWindow extends JDialog {
 	private User theUser;
 	private PersistMode persistMode = null;
 	private Account theAccount = null;
+	private ResultType windowResult;
 
 	private enum PersistMode {
-		CreateAccount, UpdateAccount
+		CREATE_ACCOUNT, UPDATE_ACCOUNT
 	};
+
+	public Account getAccount() {
+		return theAccount;
+	}
 
 	/**
 	 * @param owner
@@ -64,15 +66,15 @@ public class AccountWindow extends JDialog {
 	public AccountWindow(Frame owner, User user) {
 		super(owner);
 		this.theUser = user;
-		this.persistMode = PersistMode.CreateAccount;
+		this.persistMode = PersistMode.CREATE_ACCOUNT;
 		this.theAccount = new Account(theUser, 0, "");
 		initialize(owner);
 	}
 
-	public AccountWindow(Frame owner, User user, Account toUpdate) {
+	public AccountWindow(Frame owner, Account toUpdate) {
 		super(owner);
-		this.theUser = user;
-		this.persistMode = PersistMode.UpdateAccount;
+		this.theUser = toUpdate.getUser();
+		this.persistMode = PersistMode.UPDATE_ACCOUNT;
 		this.theAccount = toUpdate;
 		initialize(owner);
 	}
@@ -158,6 +160,7 @@ public class AccountWindow extends JDialog {
 	}
 
 	protected void okButtonActionPerformed(ActionEvent e) {
+		this.windowResult = ResultType.OK;
 		try {
 			String accountName = getAccountNameTextField().getText();
 			if (accountName == null || accountName.trim().equals(""))
@@ -166,13 +169,7 @@ public class AccountWindow extends JDialog {
 					getAccountBalanceTextField().getText()).doubleValue();
 			theAccount.setName(accountName);
 			theAccount.setBalance(accountBalance);
-
-			if (persistAccount(theAccount)) {
-				MainWindow.getInstance().getNavigationPanel().update();
-				this.dispose();
-				GuiUtils.info("AccountWindow." + persistMode.toString()
-						+ ".Success");
-			}
+			this.dispose();
 		} catch (BadNameException ex) {
 			GuiUtils.warn("AccountWindow." + persistMode.toString()
 					+ ".Failure.BadName");
@@ -180,27 +177,6 @@ public class AccountWindow extends JDialog {
 			GuiUtils.warn("AccountWindow." + persistMode.toString()
 					+ ".Failure.BadNumber");
 		}
-	}
-
-	private boolean persistAccount(Account theAccount) {
-		boolean success = false;
-		try {
-			if (persistMode == PersistMode.CreateAccount) {
-				AccountFacadeDelegateFactory.getDelegate().createAccount(
-						theAccount);
-			} else {
-				AccountFacadeDelegateFactory.getDelegate().updateAccount(
-						theAccount);
-			}
-			success = true;
-		} catch (InstanceNotFoundException ex) {
-			GuiUtils.error("AccountWindow." + persistMode.toString()
-					+ ".Failure.NotFound");
-		} catch (InternalErrorException ex) {
-			GuiUtils.error("AccountWindow." + persistMode.toString()
-					+ ".Failure.Generic");
-		}
-		return success;
 	}
 
 	/**
@@ -222,6 +198,7 @@ public class AccountWindow extends JDialog {
 	}
 
 	protected void cancelButtonActionPerformed(ActionEvent e) {
+		this.windowResult = ResultType.CANCEL;
 		this.dispose();
 	}
 
@@ -290,5 +267,9 @@ public class AccountWindow extends JDialog {
 			accountBalanceTextField.setBounds(new Rectangle(98, 60, 172, 28));
 		}
 		return accountBalanceTextField;
+	}
+
+	public ResultType getResult() {
+		return this.windowResult;
 	}
 } // @jve:decl-index=0:visual-constraint="128,6"

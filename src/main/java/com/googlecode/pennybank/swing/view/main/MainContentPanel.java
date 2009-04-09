@@ -4,10 +4,14 @@
 package com.googlecode.pennybank.swing.view.main;
 
 import java.awt.BorderLayout;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.text.NumberFormat;
 
+import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 
 import com.explodingpixels.macwidgets.MacWidgetFactory;
 import com.googlecode.pennybank.model.account.entity.Account;
@@ -75,8 +79,22 @@ public class MainContentPanel extends JPanel {
 
 		setLayout(new BorderLayout());
 		operationsTable = new AccountOperationTable();
+		JTable theTable = operationsTable.getJTable();
+		theTable.addFocusListener(new FocusListener() {
+
+			public void focusGained(FocusEvent e) {
+				JMenuBar menu = MainWindow.getInstance().getMainMenuBar();
+				((MainMenuBar) menu).setOperationEnabled(true);
+			}
+
+			public void focusLost(FocusEvent e) {
+				JMenuBar menu = MainWindow.getInstance().getMainMenuBar();
+				((MainMenuBar) menu).setOperationEnabled(false);
+			}
+
+		});
 		accountOperationsScrollPane = MacWidgetFactory
-				.wrapITunesTableInJScrollPane(operationsTable.getJTable());
+				.wrapITunesTableInJScrollPane(theTable);
 
 		add(accountOperationsScrollPane, BorderLayout.CENTER);
 	}

@@ -26,7 +26,6 @@ public class EditAccountOperationListener implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 
 		List<AccountOperation> selectedOperations = getSelectedOperations();
-		// TODO Edit the account operation
 		if (selectedOperations.size() == 1) {
 			AccountOperation operation = selectedOperations.get(0);
 			DepositWithdrawWindow window = new DepositWithdrawWindow(MainWindow
