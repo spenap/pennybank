@@ -19,12 +19,13 @@ public class CreateUserAction implements TransactionalPlainAction {
 	private User user;
 	private UserDAO userDAO;
 
-    /**
-     * Creates a new action with the specified parameters
-     * 
-     * @param user The user to be created
-     */
-    public CreateUserAction(User user) {
+	/**
+	 * Creates a new action with the specified parameters
+	 * 
+	 * @param user
+	 *            The user to be created
+	 */
+	public CreateUserAction(User user) {
 
 		this.user = user;
 

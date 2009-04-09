@@ -2,6 +2,7 @@ package com.googlecode.pennybank;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -11,6 +12,8 @@ import javax.swing.UnsupportedLookAndFeelException;
 import com.googlecode.pennybank.model.accountfacade.delegate.AccountFacadeDelegateFactory;
 import com.googlecode.pennybank.model.category.entity.Category;
 import com.googlecode.pennybank.model.util.exceptions.InternalErrorException;
+import com.googlecode.pennybank.swing.controller.actions.UIAction;
+import com.googlecode.pennybank.swing.view.main.MainMenuBar;
 import com.googlecode.pennybank.swing.view.main.MainWindow;
 import com.googlecode.pennybank.swing.view.util.GuiUtils;
 import com.googlecode.pennybank.swing.view.util.MessageManager;
@@ -26,6 +29,8 @@ public class App {
 
 	private static List<Category> categories;
 	private static boolean databaseReady;
+	private static Stack<UIAction> redoableActions;
+	private static Stack<UIAction> undoableActions;
 
 	/**
 	 * Application entry point
@@ -74,6 +79,8 @@ public class App {
 			databaseReady = false;
 		}
 		databaseReady = true;
+		undoableActions = new Stack<UIAction>();
+		redoableActions = new Stack<UIAction>();
 	}
 
 	/**
@@ -101,5 +108,41 @@ public class App {
 	 */
 	public static boolean isDatabaseReady() {
 		return databaseReady;
+	}
+
+	public static boolean execute(UIAction action) {
+		undoableActions.add(action);
+		MainMenuBar menuBar = (MainMenuBar) MainWindow.getInstance()
+				.getMainMenuBar();
+		menuBar.setUndoText(action.getName());
+		return action.execute();
+	}
+
+	public static void redoAction() {
+		UIAction theAction = redoableActions.pop();
+		undoableActions.add(theAction);
+		MainMenuBar menuBar = (MainMenuBar) MainWindow.getInstance()
+				.getMainMenuBar();
+		menuBar.setUndoText(theAction.getName());
+		theAction.redo();
+		if (!redoableActions.isEmpty()) {
+			menuBar.setRedoText(redoableActions.peek().getName());
+		} else {
+			menuBar.setRedoText(null);
+		}
+	}
+
+	public static void undoAction() {
+		UIAction theAction = undoableActions.pop();
+		redoableActions.add(theAction);
+		MainMenuBar menuBar = (MainMenuBar) MainWindow.getInstance()
+				.getMainMenuBar();
+		menuBar.setRedoText(theAction.getName());
+		theAction.undo();
+		if (!undoableActions.isEmpty()) {
+			menuBar.setUndoText(undoableActions.peek().getName());
+		} else {
+			menuBar.setUndoText(null);
+		}
 	}
 }

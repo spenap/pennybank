@@ -16,6 +16,7 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import com.explodingpixels.macwidgets.SourceListCategory;
+import com.explodingpixels.macwidgets.SourceListClickListener;
 import com.explodingpixels.macwidgets.SourceListItem;
 import com.explodingpixels.macwidgets.SourceListModelListener;
 import com.explodingpixels.macwidgets.SourceListSelectionListener;
@@ -37,7 +38,7 @@ import com.googlecode.pennybank.swing.view.util.MessageManager;
  */
 public class NavigationPanelListener implements ActionListener,
 		SourceListSelectionListener, TreeSelectionListener,
-		SourceListModelListener {
+		SourceListModelListener, SourceListClickListener {
 
 	private MainNavigationPanel mainNavigationPanel;
 	private List<User> userList;
@@ -103,7 +104,23 @@ public class NavigationPanelListener implements ActionListener,
 		userList = readUserList();
 	}
 
+	public void sourceListCategoryClicked(SourceListCategory arg0, Button arg1,
+			int arg2) {
+		SourceListItem selectedItem = mainNavigationPanel.getSourceList()
+				.getSelectedItem();
+		updateFromSelection(selectedItem);
+	}
+
+	public void sourceListItemClicked(SourceListItem sourceListItem,
+			Button arg1, int arg2) {
+		updateFromSelection(sourceListItem);
+	}
+
 	public void sourceListItemSelected(SourceListItem sourceListItem) {
+		updateFromSelection(sourceListItem);
+	}
+
+	private void updateFromSelection(SourceListItem sourceListItem) {
 		if (sourceListItem != null) {
 			Account theAccount = findAccountByName(sourceListItem.getText());
 			User theUser = findUserByName(sourceListItem.getText());

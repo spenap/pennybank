@@ -7,13 +7,12 @@ package com.googlecode.pennybank.swing.controller.account;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import com.googlecode.pennybank.App;
 import com.googlecode.pennybank.model.account.entity.Account;
-import com.googlecode.pennybank.model.accountfacade.delegate.AccountFacadeDelegateFactory;
-import com.googlecode.pennybank.model.util.exceptions.InstanceNotFoundException;
-import com.googlecode.pennybank.model.util.exceptions.InternalErrorException;
+import com.googlecode.pennybank.swing.controller.actions.RemoveAccountAction;
 import com.googlecode.pennybank.swing.view.main.MainWindow;
-import com.googlecode.pennybank.swing.view.messagebox.MessageBox.ResultType;
 import com.googlecode.pennybank.swing.view.util.GuiUtils;
+import com.googlecode.pennybank.swing.view.util.ResultWindow.ResultType;
 
 /**
  * 
@@ -33,18 +32,8 @@ public class RemoveAccountListener implements ActionListener {
 			GuiUtils.info("AccountWindow.AccountNotSelected");
 		} else {
 			if (GuiUtils.confirm("AccountWindow.DeleteAccount") == ResultType.OK) {
-				try {
-					AccountFacadeDelegateFactory.getDelegate().deleteAccount(
-							theAccount.getAccountId());
-					MainWindow.getInstance().getNavigationPanel().update();
+				if (App.execute(new RemoveAccountAction(theAccount)))
 					GuiUtils.info("AccountWindow.DeleteAccount.Success");
-				} catch (InstanceNotFoundException e1) {
-					GuiUtils
-							.error("AccountWindow.DeleteAccount.Failure.NotFound");
-				} catch (InternalErrorException e1) {
-					GuiUtils
-							.error("AccountWindow.DeleteAccount.Failure.Generic");
-				}
 			}
 		}
 	}
