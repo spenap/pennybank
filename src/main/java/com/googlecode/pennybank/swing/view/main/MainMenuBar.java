@@ -15,7 +15,7 @@ import javax.swing.KeyStroke;
 import com.googlecode.pennybank.swing.controller.account.AddAccountListener;
 import com.googlecode.pennybank.swing.controller.account.RemoveAccountListener;
 import com.googlecode.pennybank.swing.controller.accountoperation.AddAccountOperationListener;
-import com.googlecode.pennybank.swing.controller.accountoperation.DeleteAccountOperationListener;
+import com.googlecode.pennybank.swing.controller.accountoperation.RemoveAccountOperationListener;
 import com.googlecode.pennybank.swing.controller.accountoperation.EditAccountOperationListener;
 import com.googlecode.pennybank.swing.controller.accountoperation.AddAccountOperationListener.OperationType;
 import com.googlecode.pennybank.swing.controller.category.ManageCategoriesListener;
@@ -387,7 +387,7 @@ public class MainMenuBar extends JMenuBar {
 			removeAccountOperationItem = new JMenuItem(MessageManager
 					.getMessage("MainMenu.AccountsMenu.RemoveAccountOperation"));
 			removeAccountOperationItem
-					.addActionListener(new DeleteAccountOperationListener());
+					.addActionListener(new RemoveAccountOperationListener());
 			removeAccountOperationItem.setAccelerator(KeyStroke.getKeyStroke(
 					KeyEvent.VK_DELETE, 0));
 		}

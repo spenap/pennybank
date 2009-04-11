@@ -82,7 +82,7 @@ public class AddToAccountAction implements TransactionalPlainAction {
 				Type.DEPOSIT, amount, operationDate, comment, theCategory);
 		accountOperationDAO.create(addOperation);
 
-		return null;
+		return addOperation;
 	}
 
 	private void initializeDAOs(EntityManager entityManager)

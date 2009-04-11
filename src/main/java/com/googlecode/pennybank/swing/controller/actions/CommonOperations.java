@@ -36,26 +36,30 @@ public class CommonOperations {
 		return createdAccount;
 	}
 
-	public static void createAccountOperation(
+	public static AccountOperation createAccountOperation(
 			AccountOperation theAccountOperation) {
+		AccountOperation createdOperation = null;
 		try {
-			// Restore the account operations
 			switch (theAccountOperation.getType()) {
 			case DEPOSIT:
-				AccountFacadeDelegateFactory.getDelegate().addToAccount(
-						theAccountOperation.getAccount().getAccountId(),
-						theAccountOperation.getAmount(),
-						theAccountOperation.getComment(),
-						theAccountOperation.getDate(),
-						theAccountOperation.getCategory());
+				createdOperation = AccountFacadeDelegateFactory
+						.getDelegate()
+						.addToAccount(
+								theAccountOperation.getAccount().getAccountId(),
+								theAccountOperation.getAmount(),
+								theAccountOperation.getComment(),
+								theAccountOperation.getDate(),
+								theAccountOperation.getCategory());
 				break;
 			case WITHDRAW:
-				AccountFacadeDelegateFactory.getDelegate().withdrawFromAccount(
-						theAccountOperation.getAccount().getAccountId(),
-						theAccountOperation.getAmount(),
-						theAccountOperation.getComment(),
-						theAccountOperation.getDate(),
-						theAccountOperation.getCategory());
+				createdOperation = AccountFacadeDelegateFactory
+						.getDelegate()
+						.withdrawFromAccount(
+								theAccountOperation.getAccount().getAccountId(),
+								theAccountOperation.getAmount(),
+								theAccountOperation.getComment(),
+								theAccountOperation.getDate(),
+								theAccountOperation.getCategory());
 				break;
 			default:
 				break;
@@ -67,6 +71,7 @@ public class CommonOperations {
 		} catch (NegativeAmountException e) {
 			GuiUtils.error("UserWindow.RestoreUser.Failure.Negative");
 		}
+		return createdOperation;
 	}
 
 	public static User createUser(User theUser) {
@@ -91,6 +96,19 @@ public class CommonOperations {
 		}
 	}
 
+	public static void removeAccountOperation(
+			AccountOperation theAccountOperation) {
+		try {
+			AccountFacadeDelegateFactory.getDelegate().deleteAccountOperation(
+					theAccountOperation.getOperationIdentifier());
+		} catch (InstanceNotFoundException e) {
+			GuiUtils.error("AccountOperationWindow.Delete.Failure.NotFound");
+		} catch (InternalErrorException e) {
+			e.printStackTrace();
+			GuiUtils.error("AccountOperationWindow.Delete.Failure.Generic");
+		}
+	}
+
 	public static void removeUser(User theUser) {
 		try {
 			UserFacadeDelegateFactory.getDelegate().deleteUser(
@@ -110,6 +128,19 @@ public class CommonOperations {
 			GuiUtils.error("AccountWindow.UpdateAccount.Failure.NotFound");
 		} catch (InternalErrorException e) {
 			GuiUtils.error("AccountWindow.UpdateAccount.Failure.Generic");
+		}
+	}
+
+	public static void updateAccountOperation(
+			AccountOperation theAccountOperation) {
+		try {
+			AccountFacadeDelegateFactory.getDelegate().updateAccountOperation(
+					theAccountOperation);
+		} catch (InstanceNotFoundException e) {
+			GuiUtils.error("AccountOperationWindow.Operate.Failure.NotFound");
+		} catch (InternalErrorException e) {
+			e.printStackTrace();
+			GuiUtils.warn("AccountOperationWindow.Operate.Failure.Generic");
 		}
 	}
 

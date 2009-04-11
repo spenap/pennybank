@@ -82,7 +82,7 @@ public class WithdrawFromAccountAction implements TransactionalPlainAction {
 				Type.WITHDRAW, amount, operationDate, comment, theCategory);
 		accountOperationDAO.create(withdrawOperation);
 
-		return null;
+		return withdrawOperation;
 	}
 
 	private void initializeDAOs(EntityManager entityManager)

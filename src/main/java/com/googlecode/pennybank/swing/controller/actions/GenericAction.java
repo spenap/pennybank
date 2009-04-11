@@ -3,6 +3,9 @@
  */
 package com.googlecode.pennybank.swing.controller.actions;
 
+import com.googlecode.pennybank.model.account.entity.Account;
+import com.googlecode.pennybank.swing.view.main.MainContentPanel;
+import com.googlecode.pennybank.swing.view.main.MainNavigationPanel;
 import com.googlecode.pennybank.swing.view.main.MainWindow;
 
 /**
@@ -38,7 +41,17 @@ public abstract class GenericAction implements UIAction {
 	}
 
 	private void update() {
-		MainWindow.getInstance().getNavigationPanel().update();
+		Account selectedAccount = null;
+		MainNavigationPanel navigationPanel = null;
+		MainContentPanel contentPanel = null;
+
+		navigationPanel = MainWindow.getInstance().getNavigationPanel();
+		contentPanel = MainWindow.getInstance().getContentPanel();
+		selectedAccount = navigationPanel.getSelectedAccount();
+
+		navigationPanel.update();
+		if (selectedAccount != null)
+			contentPanel.showAccountOperations(selectedAccount);
 	}
 
 	protected abstract boolean doExecute();
