@@ -43,8 +43,8 @@ import com.googlecode.pennybank.model.util.vo.Block;
 public class AccountFacade extends HibernateFacade implements
 		AccountFacadeDelegate {
 
-	public void addToAccount(Long accountId, double amount, String comment,
-			Calendar operationDate, Category category)
+	public AccountOperation addToAccount(Long accountId, double amount,
+			String comment, Calendar operationDate, Category category)
 			throws InstanceNotFoundException, InternalErrorException,
 			NegativeAmountException {
 
@@ -55,7 +55,8 @@ public class AccountFacade extends HibernateFacade implements
 		AddToAccountAction action = new AddToAccountAction(accountId, amount,
 				comment, operationDate, category);
 		try {
-			PlainActionProcessor.process(entityManager, action);
+			return (AccountOperation) PlainActionProcessor.process(
+					entityManager, action);
 		} catch (InstanceNotFoundException e) {
 			throw e;
 		} catch (ModelException e) {
@@ -312,7 +313,7 @@ public class AccountFacade extends HibernateFacade implements
 		}
 	}
 
-	public void withdrawFromAccount(Long accountId, double amount,
+	public AccountOperation withdrawFromAccount(Long accountId, double amount,
 			String comment, Calendar operationDate, Category category)
 			throws InstanceNotFoundException, InternalErrorException,
 			NegativeAmountException {
@@ -324,7 +325,8 @@ public class AccountFacade extends HibernateFacade implements
 		WithdrawFromAccountAction action = new WithdrawFromAccountAction(
 				accountId, amount, comment, operationDate, category);
 		try {
-			PlainActionProcessor.process(entityManager, action);
+			return (AccountOperation) PlainActionProcessor.process(
+					entityManager, action);
 		} catch (InstanceNotFoundException e) {
 			throw e;
 		} catch (ModelException e) {

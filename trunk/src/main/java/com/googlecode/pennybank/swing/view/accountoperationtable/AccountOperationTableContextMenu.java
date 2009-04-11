@@ -7,7 +7,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 
-import com.googlecode.pennybank.swing.controller.accountoperation.DeleteAccountOperationListener;
+import com.googlecode.pennybank.swing.controller.accountoperation.RemoveAccountOperationListener;
 import com.googlecode.pennybank.swing.controller.accountoperation.EditAccountOperationListener;
 import com.googlecode.pennybank.swing.view.util.MessageManager;
 
@@ -36,7 +36,7 @@ public class AccountOperationTableContextMenu extends JPopupMenu {
 			deleteOperationItem = new JMenuItem(MessageManager
 					.getMessage("AccountOperationTable.ContextMenu.Delete"));
 			deleteOperationItem
-					.addActionListener(new DeleteAccountOperationListener());
+					.addActionListener(new RemoveAccountOperationListener());
 		}
 		return deleteOperationItem;
 	}

@@ -32,6 +32,9 @@ public interface AccountFacadeDelegate {
 	 *            The operation date
 	 * @param category
 	 *            Category which classifies the account operation
+	 * 
+	 * @return The account operation created
+	 * 
 	 * @throws InstanceNotFoundException
 	 *             if the account was not found
 	 * @throws InternalErrorException
@@ -39,8 +42,8 @@ public interface AccountFacadeDelegate {
 	 * @throws NegativeAmountException
 	 *             if the amount is negative
 	 */
-	public void addToAccount(Long accountId, double amount, String comment,
-			Calendar operationDate, Category category)
+	public AccountOperation addToAccount(Long accountId, double amount,
+			String comment, Calendar operationDate, Category category)
 			throws InstanceNotFoundException, InternalErrorException,
 			NegativeAmountException;
 
@@ -318,6 +321,7 @@ public interface AccountFacadeDelegate {
 	 *            The operation date
 	 * @param category
 	 *            Category which classifies the account operation
+	 * @return The account operation created
 	 * @throws InstanceNotFoundException
 	 *             if the account was not found
 	 * @throws InternalErrorException
@@ -325,7 +329,7 @@ public interface AccountFacadeDelegate {
 	 * @throws NegativeAmountException
 	 *             if the amount is negative
 	 */
-	public void withdrawFromAccount(Long accountId, double amount,
+	public AccountOperation withdrawFromAccount(Long accountId, double amount,
 			String comment, Calendar operationDate, Category category)
 			throws InstanceNotFoundException, InternalErrorException,
 			NegativeAmountException;

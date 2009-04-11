@@ -233,7 +233,7 @@ public class AccountOperation implements Serializable {
 	 */
 	public void setAmount(double amount) {
 
-		if (this.amount != 0) {
+		if (this.amount != 0 && this.account != null) {
 			double difference = this.amount - amount;
 			switch (type) {
 			case DEPOSIT:

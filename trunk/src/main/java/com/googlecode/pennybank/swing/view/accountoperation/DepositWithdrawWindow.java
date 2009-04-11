@@ -30,25 +30,20 @@ import javax.swing.border.EmptyBorder;
 
 import com.googlecode.pennybank.App;
 import com.googlecode.pennybank.model.account.entity.Account;
-import com.googlecode.pennybank.model.accountfacade.delegate.AccountFacadeDelegate;
-import com.googlecode.pennybank.model.accountfacade.delegate.AccountFacadeDelegateFactory;
 import com.googlecode.pennybank.model.accountoperation.entity.AccountOperation;
 import com.googlecode.pennybank.model.accountoperation.entity.AccountOperation.Type;
 import com.googlecode.pennybank.model.category.entity.Category;
-import com.googlecode.pennybank.model.util.exceptions.InstanceNotFoundException;
-import com.googlecode.pennybank.model.util.exceptions.InternalErrorException;
-import com.googlecode.pennybank.model.util.exceptions.NegativeAmountException;
 import com.googlecode.pennybank.swing.view.category.CategoriesComboBox;
-import com.googlecode.pennybank.swing.view.main.MainWindow;
 import com.googlecode.pennybank.swing.view.util.GuiUtils;
 import com.googlecode.pennybank.swing.view.util.IconManager;
 import com.googlecode.pennybank.swing.view.util.MessageManager;
+import com.googlecode.pennybank.swing.view.util.ResultWindow;
 
 /**
  * @author spenap
  * 
  */
-public class DepositWithdrawWindow extends JDialog {
+public class DepositWithdrawWindow extends JDialog implements ResultWindow {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel mainContentPane = null;
@@ -67,15 +62,14 @@ public class DepositWithdrawWindow extends JDialog {
 	private JTextField dateTextField = null;
 	private JComboBox categoryComboBox = null;
 	private JTextArea descriptionTextArea = null;
-	private Account account = null;
 	private JLabel descriptionLabel = null;
 	private DateFormat dateFormat = null;
 	private AccountOperation theOperation = null;
-	private PersistMode persistMode = null;
+	private ResultType windowResult;
 
-	private enum PersistMode {
-		CREATE_NEW, UPDATE_EXISTENT
-	};
+	public AccountOperation getAccountOperation() {
+		return theOperation;
+	}
 
 	/**
 	 * @param owner
@@ -84,21 +78,17 @@ public class DepositWithdrawWindow extends JDialog {
 	public DepositWithdrawWindow(Frame owner, Type type, Account operatedAccount) {
 		super(owner);
 		this.operationType = type;
-		this.account = operatedAccount;
 		this.theOperation = new AccountOperation(operatedAccount, type, 0,
 				Calendar.getInstance(), "");
 		this.dateFormat = DateFormat.getDateInstance(DateFormat.SHORT);
-		this.persistMode = PersistMode.CREATE_NEW;
 		initialize(owner);
 	}
 
 	public DepositWithdrawWindow(Frame owner, AccountOperation operation) {
 		super(owner);
 		this.operationType = operation.getType();
-		this.account = operation.getAccount();
 		this.theOperation = operation;
 		this.dateFormat = DateFormat.getDateInstance(DateFormat.SHORT);
-		this.persistMode = PersistMode.UPDATE_EXISTENT;
 		initialize(owner);
 	}
 
@@ -345,6 +335,7 @@ public class DepositWithdrawWindow extends JDialog {
 	}
 
 	protected void cancelButtonActionPerformed(ActionEvent e) {
+		this.windowResult = ResultType.CANCEL;
 		this.dispose();
 	}
 
@@ -362,48 +353,22 @@ public class DepositWithdrawWindow extends JDialog {
 			// Get category
 			Category category = getSelectedCategory();
 
-			AccountFacadeDelegate accountFacade = AccountFacadeDelegateFactory
-					.getDelegate();
-			if (persistMode == PersistMode.CREATE_NEW) {
-				// Create the operation
+			theOperation.setAmount(amount);
+			theOperation.setDate(operationDate);
+			theOperation.setCategory(category);
+			theOperation.setComment(comment);
 
-				switch (operationType) {
-				case DEPOSIT:
-					accountFacade.addToAccount(account.getAccountId(), amount,
-							comment, operationDate, category);
-					break;
-				case WITHDRAW:
-					accountFacade.withdrawFromAccount(account.getAccountId(),
-							amount, comment, operationDate, category);
-					break;
-				default:
-					break;
-				}
-			} else {
-				// Update the operation
-				theOperation.setAmount(amount);
-				theOperation.setDate(operationDate);
-				theOperation.setCategory(category);
-				theOperation.setComment(comment);
-
-				accountFacade.updateAccountOperation(theOperation);
-			}
-			MainWindow.getInstance().getContentPanel().showAccountOperations(
-					account);
+			this.windowResult = ResultType.OK;
 			this.dispose();
-			GuiUtils.info("AccountOperationWindow.Operate.Success");
-		} catch (InstanceNotFoundException ex) {
-			GuiUtils.error("AccountOperationWindow.Operate.Failure.NotFound");
 		} catch (ParseException ex) {
 			GuiUtils.warn("AccountOperationWindow.Operate.Failure.BadDate");
 		} catch (NumberFormatException ex) {
 			GuiUtils.warn("AccountOperationWindow.Operate.Failure.BadNumber");
-		} catch (InternalErrorException ex) {
-			GuiUtils.warn("AccountOperationWindow.Operate.Failure.Generic");
-		} catch (NegativeAmountException ex) {
-			GuiUtils.warn("AccountOperationWindow.Operate.Failure.Negative");
 		}
+	}
 
+	public ResultType getResult() {
+		return windowResult;
 	}
 
 } // @jve:decl-index=0:visual-constraint="10,10"
